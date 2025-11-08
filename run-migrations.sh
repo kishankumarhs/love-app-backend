@@ -35,8 +35,6 @@ run_migration "src/migrations/004-create-requests-referrals.sql"
 run_migration "src/migrations/005-create-notification-tables.sql"
 run_migration "src/migrations/006-create-user-profile-feedback.sql"
 run_migration "src/migrations/007-create-donations-payments.sql"
-run_migration "src/migrations/008-create-volunteer-voucher-system.sql"
-run_migration "src/migrations/009-create-reviews-moderation-audit.sql"
 
 echo "All migrations completed successfully!"
 echo "Database schema is now up to date."
