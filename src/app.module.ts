@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 import jwtConfig from './config/jwt.config';
+import stripeConfig from './config/stripe.config';
 
 // Core modules
 import { AuthModule } from './auth/auth.module';
@@ -26,7 +27,7 @@ import { AuditModule } from './audit/audit.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [databaseConfig, appConfig, jwtConfig],
+      load: [databaseConfig, appConfig, jwtConfig, stripeConfig],
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({

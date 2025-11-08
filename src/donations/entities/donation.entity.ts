@@ -1,7 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 import { Campaign } from '../../campaign/entities/campaign.entity';
+import { Provider } from '../../provider/entities/provider.entity';
 
 export enum DonationStatus {
   PENDING = 'pending',
@@ -21,12 +22,16 @@ export class Donation {
   amount: number;
 
   @ApiProperty({ enum: DonationStatus })
-  @Column({ type: 'enum', enum: DonationStatus, default: DonationStatus.PENDING })
+  @Column({ type: 'varchar', length: 20, default: DonationStatus.PENDING })
   status: DonationStatus;
 
   @ApiProperty()
   @Column({ nullable: true })
   stripePaymentIntentId: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  stripeChargeId: string;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn()
@@ -42,7 +47,34 @@ export class Donation {
   @Column()
   campaignId: string;
 
+  @ManyToOne(() => Provider, { nullable: true })
+  @JoinColumn()
+  provider: Provider;
+
+  @Column({ nullable: true })
+  providerId: string;
+
+  @ApiProperty()
+  @Column({ nullable: true, type: 'text' })
+  failureReason: string;
+
+  @ApiProperty()
+  @Column({ type: 'jsonb', default: '{}' })
+  metadata: Record<string, any>;
+
   @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
+
+  @ApiProperty()
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  completedAt: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  refundedAt: Date;
 }

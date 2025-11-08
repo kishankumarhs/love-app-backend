@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNumber, IsUUID, IsOptional, Min, IsString } from 'class-validator';
 
-export class CreateDonationDto {
+export class CreatePaymentIntentDto {
   @ApiProperty()
   @IsNumber()
   @Min(0.01)
