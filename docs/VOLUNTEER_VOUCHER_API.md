@@ -1,9 +1,11 @@
 # Volunteer and Wi-Fi Voucher Features API
 
 ## Overview
+
 Complete volunteer management system with application process, location preferences, and Wi-Fi voucher generation with status tracking and expiry validation.
 
 ## Features
+
 - Volunteer application and approval workflow
 - Location preferences and interests management
 - Wi-Fi voucher code generation and activation
@@ -14,6 +16,7 @@ Complete volunteer management system with application process, location preferen
 ## API Endpoints
 
 ### Volunteer Applications
+
 ```http
 POST /volunteers/applications
 Authorization: Bearer <token>
@@ -43,24 +46,28 @@ Content-Type: application/json
 ```
 
 ### Approve Application
+
 ```http
 POST /volunteers/applications/:id/approve
 Authorization: Bearer <token>
 ```
 
 ### Get Applications
+
 ```http
 GET /volunteers/applications?status=pending
 Authorization: Bearer <token>
 ```
 
 ### Get My Application
+
 ```http
 GET /volunteers/applications/my
 Authorization: Bearer <token>
 ```
 
 ### Wi-Fi Voucher Management
+
 ```http
 POST /volunteers/vouchers
 Authorization: Bearer <token>
@@ -76,6 +83,7 @@ Content-Type: application/json
 ```
 
 ### Activate Voucher
+
 ```http
 POST /volunteers/vouchers/activate
 Content-Type: application/json
@@ -91,17 +99,20 @@ Content-Type: application/json
 ```
 
 ### Get Voucher by Code
+
 ```http
 GET /volunteers/vouchers/code/:code
 ```
 
 ### Get Provider Vouchers
+
 ```http
 GET /volunteers/vouchers/provider/:providerId
 Authorization: Bearer <token>
 ```
 
 ### Volunteer Management
+
 ```http
 GET /volunteers/:id/assignments
 Authorization: Bearer <token>
@@ -110,6 +121,7 @@ Authorization: Bearer <token>
 ## Database Schema
 
 ### Volunteer Applications Table
+
 - `id` (UUID, Primary Key)
 - `user_id` (UUID, Foreign Key)
 - `interests` (Text Array)
@@ -125,6 +137,7 @@ Authorization: Bearer <token>
 - `created_at`, `updated_at`
 
 ### Wi-Fi Vouchers Table
+
 - `id` (UUID, Primary Key)
 - `code` (String, Unique)
 - `provider_id` (UUID, Foreign Key)
@@ -140,6 +153,7 @@ Authorization: Bearer <token>
 - `created_at`, `updated_at`
 
 ### Voucher Usage Logs Table
+
 - `id` (UUID, Primary Key)
 - `voucher_id` (UUID, Foreign Key)
 - `event_type` (Enum: created, activated, used, expired, revoked, bandwidth_exceeded)
@@ -151,6 +165,7 @@ Authorization: Bearer <token>
 - `created_at`
 
 ### Volunteer Assignments Table
+
 - `id` (UUID, Primary Key)
 - `volunteer_id` (UUID, Foreign Key)
 - `campaign_id` (UUID, Foreign Key, Optional)
@@ -166,18 +181,21 @@ Authorization: Bearer <token>
 - `created_at`, `updated_at`
 
 ## Voucher Code Generation
+
 - 12-character alphanumeric codes
 - Format: XXXX-XXXX-XXXX (displayed with hyphens)
 - Unique constraint enforced at database level
 - Collision detection and retry logic
 
 ## Expiry Validation
+
 - Automatic expiry check on activation
 - Hourly cron job to expire vouchers
 - Bandwidth limit enforcement
 - Device limit validation
 
 ## Location Preferences
+
 ```json
 {
   "preferredAreas": ["downtown", "suburbs", "rural"],
@@ -188,6 +206,7 @@ Authorization: Bearer <token>
 ```
 
 ## Volunteer Interests
+
 - community_support
 - emergency_response
 - technical_support
@@ -198,6 +217,7 @@ Authorization: Bearer <token>
 - youth_programs
 
 ## Volunteer Skills
+
 - first_aid
 - communication
 - technical_skills
@@ -210,13 +230,14 @@ Authorization: Bearer <token>
 ## Usage Examples
 
 ### Volunteer Application Flow
+
 ```javascript
 // Submit application
 const application = await fetch('/volunteers/applications', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     interests: ['community_support', 'emergency_response'],
@@ -225,32 +246,33 @@ const application = await fetch('/volunteers/applications', {
     locationPreferences: {
       preferredAreas: ['downtown'],
       maxDistance: 20,
-      transportationMode: 'car'
+      transportationMode: 'car',
     },
-    motivation: 'Want to help my community'
-  })
+    motivation: 'Want to help my community',
+  }),
 });
 
 // Check application status
 const myApplication = await fetch('/volunteers/applications/my', {
-  headers: { 'Authorization': `Bearer ${token}` }
+  headers: { Authorization: `Bearer ${token}` },
 });
 ```
 
 ### Voucher Management Flow
+
 ```javascript
 // Create voucher
 const voucher = await fetch('/volunteers/vouchers', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     providerId: 'provider-uuid',
     durationHours: 24,
-    bandwidthLimitMb: 1000
-  })
+    bandwidthLimitMb: 1000,
+  }),
 });
 
 // Activate voucher
@@ -261,13 +283,14 @@ const activation = await fetch('/volunteers/vouchers/activate', {
     code: 'ABCD1234EFGH',
     deviceInfo: {
       macAddress: '00:11:22:33:44:55',
-      deviceType: 'smartphone'
-    }
-  })
+      deviceType: 'smartphone',
+    },
+  }),
 });
 ```
 
 ## Security Features
+
 - Role-based access control for applications
 - Voucher code uniqueness validation
 - Device tracking and limits
@@ -275,6 +298,7 @@ const activation = await fetch('/volunteers/vouchers/activate', {
 - Automatic expiry enforcement
 
 ## Testing
+
 - Test voucher code generation uniqueness
 - Verify expiry validation logic
 - Test application approval workflow

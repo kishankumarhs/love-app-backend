@@ -1,9 +1,11 @@
 # Reviews, Moderation & Reporting API
 
 ## Overview
+
 Complete review system with moderation queue, admin reporting capabilities, and comprehensive audit logging for all CRUD actions.
 
 ## Features
+
 - User-submitted reviews with moderation workflow
 - Content reporting and moderation queue
 - Admin export reporting (CSV/XLSX/JSON)
@@ -14,6 +16,7 @@ Complete review system with moderation queue, admin reporting capabilities, and 
 ## API Endpoints
 
 ### Reviews
+
 ```http
 POST /reviews
 Authorization: Bearer <token>
@@ -27,16 +30,19 @@ Content-Type: application/json
 ```
 
 ### Get Reviews
+
 ```http
 GET /reviews?status=approved&providerId=uuid&limit=20&offset=0
 ```
 
 ### Get Provider Reviews
+
 ```http
 GET /reviews/provider/:providerId?limit=20&offset=0
 ```
 
 ### Report Review
+
 ```http
 POST /reviews/:id/report
 Authorization: Bearer <token>
@@ -49,6 +55,7 @@ Content-Type: application/json
 ```
 
 ### Moderate Review
+
 ```http
 POST /reviews/:id/moderate
 Authorization: Bearer <token>
@@ -61,12 +68,14 @@ Content-Type: application/json
 ```
 
 ### Moderation Queue
+
 ```http
 GET /reviews/moderation/queue?status=pending&contentType=review&limit=50&offset=0
 Authorization: Bearer <token>
 ```
 
 ### Resolve Moderation
+
 ```http
 POST /reviews/moderation/:id/resolve
 Authorization: Bearer <token>
@@ -79,6 +88,7 @@ Content-Type: application/json
 ```
 
 ### Admin Reports
+
 ```http
 POST /reviews/reports
 Authorization: Bearer <token>
@@ -98,12 +108,14 @@ Content-Type: application/json
 ```
 
 ### Download Report
+
 ```http
 GET /reviews/reports/:id/download
 Authorization: Bearer <token>
 ```
 
 ### Audit Logs
+
 ```http
 GET /reviews/audit?entityType=Review&action=CREATE&limit=100&offset=0
 Authorization: Bearer <token>
@@ -112,6 +124,7 @@ Authorization: Bearer <token>
 ## Database Schema
 
 ### Reviews Table (Updated)
+
 - `id` (UUID, Primary Key)
 - `rating` (Integer 1-5)
 - `comment` (Text)
@@ -126,6 +139,7 @@ Authorization: Bearer <token>
 - `created_at`, `updated_at`
 
 ### Moderation Queue Table
+
 - `id` (UUID, Primary Key)
 - `content_type` (Enum: review, comment, report, user_profile)
 - `content_id` (UUID)
@@ -139,6 +153,7 @@ Authorization: Bearer <token>
 - `created_at`, `updated_at`, `resolved_at`
 
 ### Audit Logs Table
+
 - `id` (UUID, Primary Key)
 - `entity_type` (String)
 - `entity_id` (UUID)
@@ -152,6 +167,7 @@ Authorization: Bearer <token>
 - `created_at`
 
 ### Reports Table
+
 - `id` (UUID, Primary Key)
 - `name` (String)
 - `type` (Enum: users, providers, campaigns, donations, reviews, volunteers, custom)
@@ -167,6 +183,7 @@ Authorization: Bearer <token>
 - `error_message` (Text)
 
 ### Review Helpful Table
+
 - `id` (UUID, Primary Key)
 - `review_id` (UUID, Foreign Key)
 - `user_id` (UUID, Foreign Key)
@@ -174,12 +191,14 @@ Authorization: Bearer <token>
 - `created_at`
 
 ## Review Status Flow
+
 1. **Pending** - Newly submitted review awaiting moderation
 2. **Approved** - Review approved by moderator, visible to public
 3. **Rejected** - Review rejected by moderator, not visible
 4. **Flagged** - Review flagged for additional review
 
 ## Moderation Workflow
+
 1. User reports content or automatic flagging occurs
 2. Content added to moderation queue with priority
 3. Moderator reviews and assigns status
@@ -187,6 +206,7 @@ Authorization: Bearer <token>
 5. Audit log created for all moderation actions
 
 ## Report Types
+
 - **Users**: User accounts with registration and activity data
 - **Providers**: Service provider information and statistics
 - **Campaigns**: Campaign details with funding information
@@ -196,11 +216,13 @@ Authorization: Bearer <token>
 - **Custom**: Flexible reporting with custom queries
 
 ## Export Formats
+
 - **CSV**: Comma-separated values for spreadsheet import
 - **XLSX**: Excel format with formatting and multiple sheets
 - **JSON**: Structured data format for API consumption
 
 ## Audit Actions Tracked
+
 - **CREATE**: New entity creation
 - **UPDATE**: Entity modifications with before/after values
 - **DELETE**: Entity removal with final state
@@ -208,6 +230,7 @@ Authorization: Bearer <token>
 - **LOGOUT**: User session termination
 
 ## Security Features
+
 - Role-based access control for moderation
 - IP address and user agent tracking
 - Audit trail for all administrative actions
@@ -217,56 +240,58 @@ Authorization: Bearer <token>
 ## Usage Examples
 
 ### Review Submission and Moderation
+
 ```javascript
 // Submit review
 const review = await fetch('/reviews', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     rating: 5,
     comment: 'Great service!',
-    providerId: 'provider-uuid'
-  })
+    providerId: 'provider-uuid',
+  }),
 });
 
 // Report inappropriate review
 await fetch(`/reviews/${reviewId}/report`, {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     reason: 'inappropriate',
-    description: 'Contains offensive language'
-  })
+    description: 'Contains offensive language',
+  }),
 });
 
 // Moderate review (admin only)
 await fetch(`/reviews/${reviewId}/moderate`, {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     action: 'reject',
-    rejectionReason: 'Violates community guidelines'
-  })
+    rejectionReason: 'Violates community guidelines',
+  }),
 });
 ```
 
 ### Admin Reporting
+
 ```javascript
 // Generate user report
 const report = await fetch('/reviews/reports', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
     name: 'Monthly Active Users',
@@ -275,33 +300,39 @@ const report = await fetch('/reviews/reports', {
     filters: {
       startDate: '2024-01-01',
       endDate: '2024-01-31',
-      role: 'user'
+      role: 'user',
     },
-    columns: ['id', 'email', 'firstName', 'lastName', 'createdAt']
-  })
+    columns: ['id', 'email', 'firstName', 'lastName', 'createdAt'],
+  }),
 });
 
 // Download completed report
 const reportFile = await fetch(`/reviews/reports/${reportId}/download`, {
-  headers: { 'Authorization': `Bearer ${token}` }
+  headers: { Authorization: `Bearer ${token}` },
 });
 ```
 
 ### Audit Log Querying
+
 ```javascript
 // Get audit logs for specific entity
-const auditLogs = await fetch('/reviews/audit?' + new URLSearchParams({
-  entityType: 'Review',
-  entityId: 'review-uuid',
-  action: 'UPDATE',
-  startDate: '2024-01-01',
-  limit: '50'
-}), {
-  headers: { 'Authorization': `Bearer ${token}` }
-});
+const auditLogs = await fetch(
+  '/reviews/audit?' +
+    new URLSearchParams({
+      entityType: 'Review',
+      entityId: 'review-uuid',
+      action: 'UPDATE',
+      startDate: '2024-01-01',
+      limit: '50',
+    }),
+  {
+    headers: { Authorization: `Bearer ${token}` },
+  },
+);
 ```
 
 ## Performance Considerations
+
 - Indexed queries on frequently searched fields
 - Automatic report file cleanup after expiration
 - Pagination for large result sets
@@ -309,6 +340,7 @@ const auditLogs = await fetch('/reviews/audit?' + new URLSearchParams({
 - Background processing for report generation
 
 ## Testing
+
 - Test review submission and moderation workflow
 - Verify audit logging for all CRUD operations
 - Test report generation in all formats

@@ -1,9 +1,11 @@
 # Donations and Payment Integration API
 
 ## Overview
+
 Complete donations and payment processing system using Stripe integration with support for payment methods, donation history, refunds, and webhook handling.
 
 ## Features
+
 - Stripe payment processing
 - Payment method management
 - Donation history tracking
@@ -15,6 +17,7 @@ Complete donations and payment processing system using Stripe integration with s
 ## API Endpoints
 
 ### Payment Intent
+
 ```http
 POST /donations/payment-intent
 Authorization: Bearer <token>
@@ -28,12 +31,14 @@ Content-Type: application/json
 ```
 
 ### Confirm Donation
+
 ```http
 POST /donations/confirm/:donationId
 Authorization: Bearer <token>
 ```
 
 ### Create Refund
+
 ```http
 POST /donations/refund
 Authorization: Bearer <token>
@@ -47,6 +52,7 @@ Content-Type: application/json
 ```
 
 ### Save Payment Method
+
 ```http
 POST /donations/payment-methods
 Authorization: Bearer <token>
@@ -59,24 +65,28 @@ Content-Type: application/json
 ```
 
 ### Get Payment Methods
+
 ```http
 GET /donations/payment-methods
 Authorization: Bearer <token>
 ```
 
 ### Get Donation History
+
 ```http
 GET /donations/history?campaignId=uuid
 Authorization: Bearer <token>
 ```
 
 ### Get Donation Details
+
 ```http
 GET /donations/:donationId
 Authorization: Bearer <token>
 ```
 
 ### Stripe Webhook
+
 ```http
 POST /donations/webhook
 Stripe-Signature: <signature>
@@ -86,6 +96,7 @@ Content-Type: application/json
 ## Database Schema
 
 ### Donations Table
+
 - `id` (UUID, Primary Key)
 - `amount` (Decimal)
 - `status` (Enum: pending, completed, failed, refunded)
@@ -99,6 +110,7 @@ Content-Type: application/json
 - `created_at`, `updated_at`, `completed_at`, `refunded_at`
 
 ### Payment Methods Table
+
 - `id` (UUID, Primary Key)
 - `user_id` (UUID, Foreign Key)
 - `stripe_payment_method_id` (String)
@@ -110,6 +122,7 @@ Content-Type: application/json
 - `created_at`, `updated_at`
 
 ### Donation History Table
+
 - `id` (UUID, Primary Key)
 - `donation_id` (UUID, Foreign Key)
 - `event_type` (Enum: created, processing, completed, failed, refunded, disputed)
@@ -118,6 +131,7 @@ Content-Type: application/json
 - `created_at`
 
 ### Refunds Table
+
 - `id` (UUID, Primary Key)
 - `donation_id` (UUID, Foreign Key)
 - `stripe_refund_id` (String)
@@ -127,6 +141,7 @@ Content-Type: application/json
 - `created_at`, `processed_at`
 
 ## Environment Variables
+
 ```env
 STRIPE_SECRET_KEY=sk_test_xxx
 STRIPE_PUBLISHABLE_KEY=pk_test_xxx
@@ -135,11 +150,13 @@ STRIPE_CURRENCY=usd
 ```
 
 ## Webhook Events Handled
+
 - `payment_intent.succeeded` - Mark donation as completed
 - `payment_intent.payment_failed` - Mark donation as failed
 - `charge.dispute.created` - Log dispute in donation history
 
 ## Error Handling
+
 - Payment method validation
 - Insufficient funds handling
 - Network error retry logic
@@ -147,6 +164,7 @@ STRIPE_CURRENCY=usd
 - Refund validation and processing
 
 ## Security Features
+
 - Webhook signature verification
 - Payment method tokenization
 - PCI compliance through Stripe
@@ -156,19 +174,20 @@ STRIPE_CURRENCY=usd
 ## Usage Examples
 
 ### Frontend Integration
+
 ```javascript
 // Create payment intent
 const response = await fetch('/donations/payment-intent', {
   method: 'POST',
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    amount: 50.00,
+    amount: 50.0,
     campaignId: 'campaign-uuid',
-    providerId: 'provider-uuid'
-  })
+    providerId: 'provider-uuid',
+  }),
 });
 
 const { clientSecret, donationId } = await response.json();
@@ -178,21 +197,22 @@ const { error } = await stripe.confirmCardPayment(clientSecret, {
   payment_method: {
     card: cardElement,
     billing_details: {
-      name: 'Customer Name'
-    }
-  }
+      name: 'Customer Name',
+    },
+  },
 });
 
 if (!error) {
   // Confirm donation on backend
   await fetch(`/donations/confirm/${donationId}`, {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
 }
 ```
 
 ## Testing
+
 - Use Stripe test cards for development
 - Test webhook endpoints with Stripe CLI
 - Verify refund processing

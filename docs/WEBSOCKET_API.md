@@ -1,11 +1,13 @@
 # WebSocket Real-Time API Documentation
 
 ## Overview
+
 Real-time WebSocket API for instant notifications, SOS alerts, and live updates using Socket.IO with JWT authentication.
 
 ## Connection Setup
 
 ### Server Configuration
+
 ```typescript
 @WebSocketGateway({
   cors: {
@@ -17,25 +19,27 @@ Real-time WebSocket API for instant notifications, SOS alerts, and live updates 
 ```
 
 ### Client Connection
+
 ```javascript
 import io from 'socket.io-client';
 
 const socket = io('ws://localhost:3000/notifications', {
   auth: {
-    token: 'your-jwt-token'
-  }
+    token: 'your-jwt-token',
+  },
 });
 ```
 
 ## Authentication
+
 All WebSocket connections require JWT authentication via the `auth.token` parameter.
 
 ```javascript
 // Connection with authentication
 const socket = io('/notifications', {
   auth: {
-    token: localStorage.getItem('authToken')
-  }
+    token: localStorage.getItem('authToken'),
+  },
 });
 
 // Handle authentication errors
@@ -51,6 +55,7 @@ socket.on('connect_error', (error) => {
 ### Connection Events
 
 #### `connected`
+
 Emitted when client successfully connects and authenticates.
 
 ```javascript
@@ -61,6 +66,7 @@ socket.on('connected', (data) => {
 ```
 
 #### `disconnect`
+
 Emitted when client disconnects.
 
 ```javascript
@@ -72,6 +78,7 @@ socket.on('disconnect', (reason) => {
 ### Room Management
 
 #### `join_room`
+
 Join a specific room for targeted notifications.
 
 ```javascript
@@ -87,6 +94,7 @@ socket.emit('join_room', { room: 'campaign_123' });
 ```
 
 #### `leave_room`
+
 Leave a specific room.
 
 ```javascript
@@ -96,6 +104,7 @@ socket.emit('leave_room', { room: 'campaign_123' });
 ### Notification Events
 
 #### `sos_alert`
+
 Emergency SOS alert broadcast to all connected users.
 
 ```javascript
@@ -109,13 +118,14 @@ socket.on('sos_alert', (alert) => {
     timestamp: "2024-01-15T10:30:00Z"
   }
   */
-  
+
   // Show emergency notification UI
   showEmergencyAlert(alert);
 });
 ```
 
 #### `notification_update`
+
 Personal notification sent to specific user.
 
 ```javascript
@@ -132,13 +142,14 @@ socket.on('notification_update', (notification) => {
     createdAt: "2024-01-15T10:30:00Z"
   }
   */
-  
+
   // Update notification badge/list
   addNotificationToUI(notification);
 });
 ```
 
 #### `campaign_update`
+
 Campaign-specific updates sent to room subscribers.
 
 ```javascript
@@ -154,13 +165,14 @@ socket.on('campaign_update', (update) => {
     timestamp: "2024-01-15T10:30:00Z"
   }
   */
-  
+
   // Update campaign progress
   updateCampaignProgress(update);
 });
 ```
 
 #### `volunteer_assignment`
+
 Volunteer assignment notifications.
 
 ```javascript
@@ -180,6 +192,7 @@ socket.on('volunteer_assignment', (assignment) => {
 ```
 
 #### `provider_update`
+
 Provider-specific updates and alerts.
 
 ```javascript
@@ -200,6 +213,7 @@ socket.on('provider_update', (update) => {
 ## Client Implementation Examples
 
 ### React Hook for WebSocket
+
 ```javascript
 import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
@@ -213,7 +227,7 @@ export const useWebSocket = (token) => {
     if (!token) return;
 
     const newSocket = io('/notifications', {
-      auth: { token }
+      auth: { token },
     });
 
     newSocket.on('connected', (data) => {
@@ -226,7 +240,7 @@ export const useWebSocket = (token) => {
     });
 
     newSocket.on('notification_update', (notification) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
     });
 
     newSocket.on('sos_alert', (alert) => {
@@ -258,12 +272,13 @@ export const useWebSocket = (token) => {
     connected,
     notifications,
     joinRoom,
-    leaveRoom
+    leaveRoom,
   };
 };
 ```
 
 ### Vue.js Composition API
+
 ```javascript
 import { ref, onMounted, onUnmounted } from 'vue';
 import io from 'socket.io-client';
@@ -277,7 +292,7 @@ export function useWebSocket(token) {
     if (!token.value) return;
 
     socket.value = io('/notifications', {
-      auth: { token: token.value }
+      auth: { token: token.value },
     });
 
     socket.value.on('connected', () => {
@@ -303,19 +318,20 @@ export function useWebSocket(token) {
   return {
     socket,
     connected,
-    notifications
+    notifications,
   };
 }
 ```
 
 ### Angular Service
+
 ```typescript
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import io, { Socket } from 'socket.io-client';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WebSocketService {
   private socket: Socket;
@@ -327,7 +343,7 @@ export class WebSocketService {
 
   connect(token: string) {
     this.socket = io('/notifications', {
-      auth: { token }
+      auth: { token },
     });
 
     this.socket.on('connected', () => {
@@ -369,14 +385,18 @@ export class WebSocketService {
 ## Room Types and Usage
 
 ### User Rooms
+
 Automatically joined when connecting. Format: `user_{userId}`
+
 ```javascript
 // Automatic - no need to join manually
 // Receives personal notifications
 ```
 
 ### Campaign Rooms
+
 For campaign-specific updates. Format: `campaign_{campaignId}`
+
 ```javascript
 // Join campaign room to receive updates
 socket.emit('join_room', { room: 'campaign_123' });
@@ -390,7 +410,9 @@ socket.on('campaign_update', (update) => {
 ```
 
 ### Provider Rooms
+
 For service provider notifications. Format: `provider_{providerId}`
+
 ```javascript
 // Join provider room
 socket.emit('join_room', { room: 'provider_456' });
@@ -404,7 +426,9 @@ socket.on('provider_update', (update) => {
 ```
 
 ### Emergency Broadcast
+
 Global SOS alerts sent to all connected users
+
 ```javascript
 // No need to join - automatically received
 socket.on('sos_alert', (alert) => {
@@ -416,10 +440,11 @@ socket.on('sos_alert', (alert) => {
 ## Error Handling
 
 ### Connection Errors
+
 ```javascript
 socket.on('connect_error', (error) => {
   console.error('Connection failed:', error);
-  
+
   if (error.message === 'Authentication failed') {
     // Token expired or invalid
     redirectToLogin();
@@ -431,6 +456,7 @@ socket.on('connect_error', (error) => {
 ```
 
 ### Reconnection Logic
+
 ```javascript
 socket.on('disconnect', (reason) => {
   if (reason === 'io server disconnect') {
@@ -449,16 +475,19 @@ socket.on('reconnect', (attemptNumber) => {
 ## Security Considerations
 
 ### JWT Token Validation
+
 - Tokens are validated on connection
 - Invalid tokens result in immediate disconnection
 - Token expiration requires reconnection with new token
 
 ### Rate Limiting
+
 - Connection attempts are rate limited
 - Message sending is throttled per user
 - Room joining is limited to prevent abuse
 
 ### Data Sanitization
+
 - All incoming data is validated
 - XSS protection for message content
 - Room names are validated against patterns
@@ -466,33 +495,35 @@ socket.on('reconnect', (attemptNumber) => {
 ## Performance Optimization
 
 ### Connection Management
+
 ```javascript
 // Efficient connection handling
 const connectWithRetry = (token, maxRetries = 3) => {
   let retries = 0;
-  
+
   const connect = () => {
     const socket = io('/notifications', {
       auth: { token },
       timeout: 5000,
-      forceNew: true
+      forceNew: true,
     });
-    
+
     socket.on('connect_error', () => {
       if (retries < maxRetries) {
         retries++;
         setTimeout(connect, 1000 * retries);
       }
     });
-    
+
     return socket;
   };
-  
+
   return connect();
 };
 ```
 
 ### Memory Management
+
 ```javascript
 // Clean up listeners to prevent memory leaks
 const cleanup = () => {
@@ -511,25 +542,27 @@ useEffect(() => {
 ## Testing WebSocket Connections
 
 ### Unit Testing
+
 ```javascript
 // Mock socket.io for testing
 jest.mock('socket.io-client', () => {
   return jest.fn(() => ({
     on: jest.fn(),
     emit: jest.fn(),
-    disconnect: jest.fn()
+    disconnect: jest.fn(),
   }));
 });
 ```
 
 ### Integration Testing
+
 ```javascript
 // Test real WebSocket connection
 const testConnection = async () => {
   const socket = io('/notifications', {
-    auth: { token: 'test-token' }
+    auth: { token: 'test-token' },
   });
-  
+
   return new Promise((resolve) => {
     socket.on('connected', (data) => {
       expect(data.userId).toBeDefined();
@@ -543,12 +576,14 @@ const testConnection = async () => {
 ## Monitoring and Analytics
 
 ### Connection Metrics
+
 - Active connection count
 - Connection duration
 - Reconnection frequency
 - Message delivery rates
 
 ### Event Tracking
+
 - SOS alert response times
 - Notification delivery success rates
 - Room subscription patterns
