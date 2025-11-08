@@ -62,6 +62,14 @@ export class User {
   emailVerificationToken: string;
 
   @ApiProperty()
+  @Column({ type: 'varchar', length: 50, default: 'UTC' })
+  timezone: string;
+
+  @ApiProperty()
+  @Column({ type: 'varchar', length: 5, default: 'en' })
+  language: string;
+
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 

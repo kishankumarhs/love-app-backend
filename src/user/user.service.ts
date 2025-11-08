@@ -131,4 +131,26 @@ export class UserService {
     }
     return feedback;
   }
+
+  async findNearby(
+    latitude: number,
+    longitude: number,
+    radius: number = 10,
+  ): Promise<User[]> {
+    return this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('profile.latitude IS NOT NULL AND profile.longitude IS NOT NULL')
+      .andWhere(
+        `(
+          6371 * acos(
+            cos(radians(:latitude)) * cos(radians(profile.latitude)) *
+            cos(radians(profile.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(profile.latitude))
+          )
+        ) <= :radius`,
+        { latitude, longitude, radius },
+      )
+      .getMany();
+  }
 }

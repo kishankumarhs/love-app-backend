@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Query,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -95,6 +96,40 @@ export class UserController {
   @ApiResponse({ status: 201, type: UserProfile })
   createProfile(@Body() createProfileDto: CreateUserProfileDto) {
     return this.userService.createProfile(createProfileDto);
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, type: UserProfile })
+  getCurrentProfile(@Request() req) {
+    return this.userService.getProfile(req.user.id);
+  }
+
+  @Put('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, type: UserProfile })
+  updateCurrentProfile(
+    @Request() req,
+    @Body() updateProfileDto: UpdateUserProfileDto,
+  ) {
+    return this.userService.updateProfile(req.user.id, updateProfileDto);
+  }
+
+  @Get('nearby')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get nearby users' })
+  @ApiResponse({ status: 200, description: 'List of nearby users' })
+  getNearbyUsers(
+    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: number,
+    @Query('radius') radius: number = 10,
+  ) {
+    return this.userService.findNearby(latitude, longitude, radius);
   }
 
   @Get(':userId/profile')

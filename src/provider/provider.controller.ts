@@ -31,8 +31,25 @@ export class ProviderController {
   }
 
   @Get('search')
-  search(@Query('q') query: string) {
-    return this.providerService.search(query);
+  search(
+    @Query('q') query?: string,
+    @Query('type') type?: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
+    @Query('radius') radius?: number,
+  ) {
+    return this.providerService.search({
+      query,
+      type,
+      latitude,
+      longitude,
+      radius,
+    });
+  }
+
+  @Post('register')
+  register(@Body() createProviderDto: CreateProviderDto) {
+    return this.providerService.create(createProviderDto);
   }
 
   @Get(':id')

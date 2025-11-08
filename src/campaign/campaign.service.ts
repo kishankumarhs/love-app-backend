@@ -79,4 +79,45 @@ export class CampaignService {
       relations: ['provider'],
     });
   }
+
+  async search(filters: {
+    category?: string;
+    latitude?: number;
+    longitude?: number;
+    radius?: number;
+    status?: string;
+  }): Promise<Campaign[]> {
+    const query = this.campaignRepository
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.provider', 'provider');
+
+    if (filters.category) {
+      query.andWhere('campaign.category = :category', {
+        category: filters.category,
+      });
+    }
+
+    if (filters.status) {
+      query.andWhere('campaign.status = :status', { status: filters.status });
+    }
+
+    if (filters.latitude && filters.longitude && filters.radius) {
+      query.andWhere(
+        `(
+          6371 * acos(
+            cos(radians(:latitude)) * cos(radians(campaign.latitude)) *
+            cos(radians(campaign.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(campaign.latitude))
+          )
+        ) <= :radius`,
+        {
+          latitude: filters.latitude,
+          longitude: filters.longitude,
+          radius: filters.radius,
+        },
+      );
+    }
+
+    return query.orderBy('campaign.createdAt', 'DESC').getMany();
+  }
 }

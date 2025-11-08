@@ -1,12 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import databaseConfig from './config/database.config';
 import appConfig from './config/app.config';
 import jwtConfig from './config/jwt.config';
 import stripeConfig from './config/stripe.config';
+import { SecurityModule } from './security/security.module';
+import { CustomThrottlerGuard } from './common/guards/rate-limit.guard';
+import { SecurityMiddleware } from './common/middleware/security.middleware';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 // Core modules
 import { AuthModule } from './auth/auth.module';
@@ -22,6 +27,8 @@ import { ReviewModule } from './review/review.module';
 import { NotificationModule } from './notification/notification.module';
 import { AdminModule } from './admin/admin.module';
 import { AuditModule } from './audit/audit.module';
+import { I18nCustomModule } from './i18n/i18n.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -49,8 +56,25 @@ import { AuditModule } from './audit/audit.module';
     NotificationModule,
     AdminModule,
     AuditModule,
+    SecurityModule,
+    I18nCustomModule,
+    CommonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: CustomThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(SecurityMiddleware).forRoutes('*');
+  }
+}

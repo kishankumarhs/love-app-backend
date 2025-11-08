@@ -6,15 +6,43 @@ import {
   Patch,
   Param,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { SOSService } from './sos.service';
 import { CreateSOSTicketDto } from './dto/create-sos-ticket.dto';
 import { UpdateSOSTicketDto } from './dto/update-sos-ticket.dto';
 import { GuestSOSDto } from './dto/guest-sos.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('sos')
 export class SOSController {
   constructor(private readonly sosService: SOSService) {}
+
+  @Post()
+  @UseGuards(JwtAuthGuard)
+  create(@Body() createSOSTicketDto: CreateSOSTicketDto, @Request() req) {
+    return this.sosService.createSOSTicket({
+      ...createSOSTicketDto,
+      userId: req.user.id,
+    });
+  }
+
+  @Get('my-alerts')
+  @UseGuards(JwtAuthGuard)
+  getMyAlerts(@Request() req) {
+    return this.sosService.findAll({ userId: req.user.id });
+  }
+
+  @Get('nearby')
+  @UseGuards(JwtAuthGuard)
+  getNearbyAlerts(
+    @Query('latitude') latitude: number,
+    @Query('longitude') longitude: number,
+    @Query('radius') radius: number = 5,
+  ) {
+    return this.sosService.findNearby(latitude, longitude, radius);
+  }
 
   @Post('ticket')
   createTicket(@Body() createSOSTicketDto: CreateSOSTicketDto) {

@@ -168,4 +168,36 @@ export class VolunteerService {
       throw new NotFoundException('Volunteer not found');
     }
   }
+
+  async getOpportunities(): Promise<any[]> {
+    // Mock opportunities - in real implementation, this would fetch from campaigns or assignments
+    return [
+      {
+        id: '1',
+        title: 'Food Distribution',
+        description: 'Help distribute food to families in need',
+        location: 'Community Center',
+        date: new Date(),
+        volunteersNeeded: 5,
+      },
+      {
+        id: '2',
+        title: 'Elderly Care Support',
+        description: 'Assist elderly residents with daily activities',
+        location: 'Senior Center',
+        date: new Date(),
+        volunteersNeeded: 3,
+      },
+    ];
+  }
+
+  async joinOpportunity(opportunityId: string, userId: string): Promise<any> {
+    // In real implementation, this would create an assignment
+    return {
+      message: 'Successfully joined opportunity',
+      opportunityId,
+      userId,
+      joinedAt: new Date(),
+    };
+  }
 }
