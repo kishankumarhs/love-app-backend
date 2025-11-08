@@ -30,37 +30,47 @@ export class WebSocketService {
 
     // Store in Redis instead of memory
     await this.cacheService.hset('ws_connections', socketId, connection);
-    await this.cacheService.hset(`user_connections:${userId}`, socketId, connection);
-    
+    await this.cacheService.hset(
+      `user_connections:${userId}`,
+      socketId,
+      connection,
+    );
+
     this.logger.log(`Connection added: ${socketId} for user ${userId}`);
   }
 
   async removeConnection(socketId: string) {
-    const connection = await this.cacheService.hget<WebSocketConnection>('ws_connections', socketId);
+    const connection = await this.cacheService.hget<WebSocketConnection>(
+      'ws_connections',
+      socketId,
+    );
     if (connection) {
       await this.cacheService.hdel('ws_connections', socketId);
-      await this.cacheService.hdel(`user_connections:${connection.userId}`, socketId);
+      await this.cacheService.hdel(
+        `user_connections:${connection.userId}`,
+        socketId,
+      );
       this.logger.log(`Connection removed: ${socketId}`);
     }
   }
 
   async sendToUser(userId: string, event: string, data: any) {
     if (!this.server) return;
-    
+
     this.server.to(`user_${userId}`).emit(event, data);
     this.logger.log(`Sent ${event} to user ${userId}`);
   }
 
   async sendToRoom(room: string, event: string, data: any) {
     if (!this.server) return;
-    
+
     this.server.to(room).emit(event, data);
     this.logger.log(`Sent ${event} to room ${room}`);
   }
 
   async broadcast(event: string, data: any) {
     if (!this.server) return;
-    
+
     this.server.emit(event, data);
     this.logger.log(`Broadcasted ${event}`);
   }

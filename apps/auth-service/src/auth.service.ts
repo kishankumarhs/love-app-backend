@@ -17,14 +17,16 @@ export class AuthService {
 
   async register(data: any) {
     const { email, password, ...userData } = data;
-    
+
     // Check cache first
     const cachedUser = await this.cacheService.get(`user:email:${email}`);
     if (cachedUser) {
       throw new UnauthorizedException('User already exists');
     }
 
-    const existingUser = await this.userRepository.findOne({ where: { email } });
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
     if (existingUser) {
       throw new UnauthorizedException('User already exists');
     }
@@ -37,7 +39,7 @@ export class AuthService {
     });
 
     const savedUser = await this.userRepository.save(user);
-    
+
     // Cache user data
     await this.cacheService.set(`user:${savedUser.id}`, savedUser, 3600);
     await this.cacheService.set(`user:email:${email}`, savedUser, 3600);
@@ -48,7 +50,7 @@ export class AuthService {
 
   async login(data: any) {
     const { email, password } = data;
-    
+
     // Check cache first
     let user = await this.cacheService.get(`user:email:${email}`);
     if (!user) {
@@ -58,7 +60,7 @@ export class AuthService {
       }
     }
 
-    if (!user || !await bcrypt.compare(password, user.password)) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -89,9 +91,9 @@ export class AuthService {
         email: payload.email,
         role: payload.role,
       });
-      
+
       await this.cacheService.set(`token:${payload.sub}`, newAccessToken, 900);
-      
+
       return { success: true, data: { accessToken: newAccessToken } };
     } catch {
       throw new UnauthorizedException('Invalid refresh token');

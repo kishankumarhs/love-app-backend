@@ -8,7 +8,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
@@ -34,11 +39,11 @@ export class AuthController {
     @Timezone() timezone: string,
     @Language() language: string,
   ) {
-    return { 
+    return {
       message: 'Registration endpoint - implement in AuthService',
       timezone,
       language,
-      data: registerDto 
+      data: registerDto,
     };
   }
 
