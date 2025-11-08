@@ -1,8 +1,28 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete, Query, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Put,
+  Delete,
+  Query,
+  Request,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { VolunteerService } from './volunteer.service';
 import { VoucherService } from './services/voucher.service';
-import { CreateVolunteerDto, UpdateVolunteerDto } from './dto/create-volunteer.dto';
+import {
+  CreateVolunteerDto,
+  UpdateVolunteerDto,
+} from './dto/create-volunteer.dto';
 import { CreateVolunteerApplicationDto } from './dto/create-volunteer-application.dto';
 import { CreateWifiVoucherDto } from './dto/create-wifi-voucher.dto';
 import { ActivateVoucherDto } from './dto/activate-voucher.dto';
@@ -26,8 +46,14 @@ export class VolunteerController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Submit volunteer application' })
-  @ApiResponse({ status: 201, description: 'Application submitted successfully' })
-  submitApplication(@Request() req, @Body() applicationDto: CreateVolunteerApplicationDto) {
+  @ApiResponse({
+    status: 201,
+    description: 'Application submitted successfully',
+  })
+  submitApplication(
+    @Request() req,
+    @Body() applicationDto: CreateVolunteerApplicationDto,
+  ) {
     return this.volunteerService.submitApplication(req.user.id, applicationDto);
   }
 
@@ -36,7 +62,10 @@ export class VolunteerController {
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Approve volunteer application' })
-  @ApiResponse({ status: 200, description: 'Application approved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application approved successfully',
+  })
   approveApplication(@Param('id') id: string, @Request() req) {
     return this.volunteerService.approveApplication(id, req.user.id);
   }
@@ -46,7 +75,10 @@ export class VolunteerController {
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get volunteer applications' })
-  @ApiResponse({ status: 200, description: 'Applications retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Applications retrieved successfully',
+  })
   getApplications(@Query('status') status?: ApplicationStatus) {
     return this.volunteerService.getApplications(status);
   }
@@ -55,7 +87,10 @@ export class VolunteerController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get current user application' })
-  @ApiResponse({ status: 200, description: 'Application retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Application retrieved successfully',
+  })
   getMyApplication(@Request() req) {
     return this.volunteerService.getUserApplication(req.user.id);
   }
@@ -107,7 +142,10 @@ export class VolunteerController {
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.PROVIDER)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get all volunteers' })
-  @ApiResponse({ status: 200, description: 'List of volunteers with pagination' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of volunteers with pagination',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   findAll(@Query() paginationDto: PaginationDto) {
@@ -127,7 +165,10 @@ export class VolunteerController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get volunteer assignments' })
-  @ApiResponse({ status: 200, description: 'Assignments retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Assignments retrieved successfully',
+  })
   getAssignments(@Param('id') id: string) {
     return this.volunteerService.getAssignments(id);
   }
@@ -146,7 +187,10 @@ export class VolunteerController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update volunteer profile' })
   @ApiResponse({ status: 200, type: Volunteer })
-  update(@Param('id') id: string, @Body() updateVolunteerDto: UpdateVolunteerDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateVolunteerDto: UpdateVolunteerDto,
+  ) {
     return this.volunteerService.update(id, updateVolunteerDto);
   }
 

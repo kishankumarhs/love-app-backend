@@ -1,10 +1,20 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Volunteer, VolunteerStatus } from './entities/volunteer.entity';
-import { VolunteerApplication, ApplicationStatus } from './entities/volunteer-application.entity';
+import {
+  VolunteerApplication,
+  ApplicationStatus,
+} from './entities/volunteer-application.entity';
 import { VolunteerAssignment } from './entities/volunteer-assignment.entity';
-import { CreateVolunteerDto, UpdateVolunteerDto } from './dto/create-volunteer.dto';
+import {
+  CreateVolunteerDto,
+  UpdateVolunteerDto,
+} from './dto/create-volunteer.dto';
 import { CreateVolunteerApplicationDto } from './dto/create-volunteer-application.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
@@ -24,7 +34,10 @@ export class VolunteerService {
     return this.volunteerRepository.save(volunteer);
   }
 
-  async submitApplication(userId: string, applicationDto: CreateVolunteerApplicationDto): Promise<VolunteerApplication> {
+  async submitApplication(
+    userId: string,
+    applicationDto: CreateVolunteerApplicationDto,
+  ): Promise<VolunteerApplication> {
     const existingApplication = await this.applicationRepository.findOne({
       where: { userId, status: ApplicationStatus.PENDING },
     });
@@ -41,7 +54,10 @@ export class VolunteerService {
     return await this.applicationRepository.save(application);
   }
 
-  async approveApplication(applicationId: string, reviewerId: string): Promise<Volunteer> {
+  async approveApplication(
+    applicationId: string,
+    reviewerId: string,
+  ): Promise<Volunteer> {
     const application = await this.applicationRepository.findOne({
       where: { id: applicationId },
       relations: ['user'],
@@ -68,7 +84,9 @@ export class VolunteerService {
     return await this.volunteerRepository.save(volunteer);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<{ volunteers: Volunteer[]; total: number }> {
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<{ volunteers: Volunteer[]; total: number }> {
     const { page = 1, limit = 10 } = paginationDto;
     const [volunteers, total] = await this.volunteerRepository.findAndCount({
       skip: (page - 1) * limit,
@@ -100,18 +118,26 @@ export class VolunteerService {
     return volunteer;
   }
 
-  async update(id: string, updateVolunteerDto: UpdateVolunteerDto): Promise<Volunteer> {
+  async update(
+    id: string,
+    updateVolunteerDto: UpdateVolunteerDto,
+  ): Promise<Volunteer> {
     await this.volunteerRepository.update(id, updateVolunteerDto);
     return this.findOne(id);
   }
 
-  async updatePreferences(userId: string, preferences: any): Promise<Volunteer> {
+  async updatePreferences(
+    userId: string,
+    preferences: any,
+  ): Promise<Volunteer> {
     const volunteer = await this.findByUserId(userId);
     await this.volunteerRepository.update(volunteer.id, { preferences });
     return this.findByUserId(userId);
   }
 
-  async getApplications(status?: ApplicationStatus): Promise<VolunteerApplication[]> {
+  async getApplications(
+    status?: ApplicationStatus,
+  ): Promise<VolunteerApplication[]> {
     const where = status ? { status } : {};
     return await this.applicationRepository.find({
       where,

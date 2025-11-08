@@ -1,4 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Provider } from '../../provider/entities/provider.entity';
 import { Referral } from './referral.entity';
@@ -58,7 +67,7 @@ export class Request {
   @JoinColumn({ name: 'providerId' })
   provider: Provider;
 
-  @OneToMany(() => Referral, referral => referral.request)
+  @OneToMany(() => Referral, (referral) => referral.request)
   referrals: Referral[];
 
   @CreateDateColumn()

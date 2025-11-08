@@ -35,7 +35,9 @@ async function bootstrap() {
   // OpenAPI documentation
   const config = new DocumentBuilder()
     .setTitle('LOVE App API')
-    .setDescription('Backend API for LOVE App - Service-oriented application for providers, campaigns, SOS calls, donations, volunteers, and user management')
+    .setDescription(
+      'Backend API for LOVE App - Service-oriented application for providers, campaigns, SOS calls, donations, volunteers, and user management',
+    )
     .setVersion('1.0.0')
     .setContact('LOVE App Team', 'https://loveapp.com', 'support@loveapp.com')
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')

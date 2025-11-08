@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Campaign } from '../../campaign/entities/campaign.entity';
 
 @Entity('providers')
@@ -42,7 +49,7 @@ export class Provider {
   @Column({ default: true })
   isActive: boolean;
 
-  @OneToMany(() => Campaign, campaign => campaign.provider)
+  @OneToMany(() => Campaign, (campaign) => campaign.provider)
   campaigns: Campaign[];
 
   @CreateDateColumn()

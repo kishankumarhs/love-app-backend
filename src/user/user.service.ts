@@ -6,7 +6,10 @@ import { UserProfile } from './entities/user-profile.entity';
 import { Feedback } from './entities/feedback.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserProfileDto, UpdateUserProfileDto } from './dto/user-profile.dto';
+import {
+  CreateUserProfileDto,
+  UpdateUserProfileDto,
+} from './dto/user-profile.dto';
 import { CreateFeedbackDto, UpdateFeedbackDto } from './dto/feedback.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
@@ -26,7 +29,9 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async findAll(paginationDto: PaginationDto): Promise<{ users: User[]; total: number }> {
+  async findAll(
+    paginationDto: PaginationDto,
+  ): Promise<{ users: User[]; total: number }> {
     const { page = 1, limit = 10 } = paginationDto;
     const [users, total] = await this.userRepository.findAndCount({
       skip: (page - 1) * limit,
@@ -37,9 +42,9 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User> {
-    const user = await this.userRepository.findOne({ 
-      where: { id }, 
-      relations: ['profile'] 
+    const user = await this.userRepository.findOne({
+      where: { id },
+      relations: ['profile'],
     });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -64,15 +69,17 @@ export class UserService {
   }
 
   // Profile Management
-  async createProfile(createProfileDto: CreateUserProfileDto): Promise<UserProfile> {
+  async createProfile(
+    createProfileDto: CreateUserProfileDto,
+  ): Promise<UserProfile> {
     const profile = this.profileRepository.create(createProfileDto);
     return this.profileRepository.save(profile);
   }
 
   async getProfile(userId: string): Promise<UserProfile> {
-    const profile = await this.profileRepository.findOne({ 
-      where: { userId }, 
-      relations: ['user'] 
+    const profile = await this.profileRepository.findOne({
+      where: { userId },
+      relations: ['user'],
     });
     if (!profile) {
       throw new NotFoundException('Profile not found');
@@ -80,19 +87,26 @@ export class UserService {
     return profile;
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateUserProfileDto): Promise<UserProfile> {
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateUserProfileDto,
+  ): Promise<UserProfile> {
     const profile = await this.getProfile(userId);
     await this.profileRepository.update(profile.id, updateProfileDto);
     return this.getProfile(userId);
   }
 
   // Feedback Management
-  async createFeedback(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
+  async createFeedback(
+    createFeedbackDto: CreateFeedbackDto,
+  ): Promise<Feedback> {
     const feedback = this.feedbackRepository.create(createFeedbackDto);
     return this.feedbackRepository.save(feedback);
   }
 
-  async getFeedback(paginationDto: PaginationDto): Promise<{ feedback: Feedback[]; total: number }> {
+  async getFeedback(
+    paginationDto: PaginationDto,
+  ): Promise<{ feedback: Feedback[]; total: number }> {
     const { page = 1, limit = 10 } = paginationDto;
     const [feedback, total] = await this.feedbackRepository.findAndCount({
       skip: (page - 1) * limit,
@@ -103,11 +117,14 @@ export class UserService {
     return { feedback, total };
   }
 
-  async updateFeedback(id: string, updateFeedbackDto: UpdateFeedbackDto): Promise<Feedback> {
+  async updateFeedback(
+    id: string,
+    updateFeedbackDto: UpdateFeedbackDto,
+  ): Promise<Feedback> {
     await this.feedbackRepository.update(id, updateFeedbackDto);
-    const feedback = await this.feedbackRepository.findOne({ 
-      where: { id }, 
-      relations: ['user'] 
+    const feedback = await this.feedbackRepository.findOne({
+      where: { id },
+      relations: ['user'],
     });
     if (!feedback) {
       throw new NotFoundException('Feedback not found');

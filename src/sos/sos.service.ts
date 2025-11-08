@@ -19,7 +19,9 @@ export class SOSService {
     private emergencyCallService: EmergencyCallService,
   ) {}
 
-  async createSOSTicket(createSOSTicketDto: CreateSOSTicketDto): Promise<SOSTicket> {
+  async createSOSTicket(
+    createSOSTicketDto: CreateSOSTicketDto,
+  ): Promise<SOSTicket> {
     const ticket = this.sosTicketRepository.create({
       ...createSOSTicketDto,
       priority: this.determinePriority(createSOSTicketDto.emergencyType),
@@ -36,8 +38,13 @@ export class SOSService {
     return savedTicket;
   }
 
-  async findAll(filters?: { status?: string; userId?: string; emergencyType?: string }): Promise<SOSTicket[]> {
-    const query = this.sosTicketRepository.createQueryBuilder('ticket')
+  async findAll(filters?: {
+    status?: string;
+    userId?: string;
+    emergencyType?: string;
+  }): Promise<SOSTicket[]> {
+    const query = this.sosTicketRepository
+      .createQueryBuilder('ticket')
       .leftJoinAndSelect('ticket.user', 'user');
 
     if (filters?.status) {
@@ -49,7 +56,9 @@ export class SOSService {
     }
 
     if (filters?.emergencyType) {
-      query.andWhere('ticket.emergencyType = :emergencyType', { emergencyType: filters.emergencyType });
+      query.andWhere('ticket.emergencyType = :emergencyType', {
+        emergencyType: filters.emergencyType,
+      });
     }
 
     return query.orderBy('ticket.createdAt', 'DESC').getMany();
@@ -68,9 +77,12 @@ export class SOSService {
     return ticket;
   }
 
-  async updateTicket(id: string, updateSOSTicketDto: UpdateSOSTicketDto): Promise<SOSTicket> {
-    const ticket = await this.findOne(id);
-    
+  async updateTicket(
+    id: string,
+    updateSOSTicketDto: UpdateSOSTicketDto,
+  ): Promise<SOSTicket> {
+    await this.findOne(id);
+
     if (updateSOSTicketDto.status === 'resolved') {
       updateSOSTicketDto['resolvedAt'] = new Date();
     }
@@ -93,39 +105,51 @@ export class SOSService {
     });
   }
 
-  private async handleEmergencyCall(ticket: SOSTicket): Promise<void> {
+  private async handleEmergencyCall(sosTicket: SOSTicket): Promise<void> {
     try {
-      const emergencyNumber = await this.emergencyCallService.getLocalEmergencyNumber(ticket.address);
-      
+      const emergencyNumber =
+        await this.emergencyCallService.getLocalEmergencyNumber(
+          sosTicket.address,
+        );
+
       const callRequest = {
         phoneNumber: emergencyNumber,
-        emergencyType: ticket.emergencyType,
-        location: ticket.address,
-        description: ticket.description,
+        emergencyType: sosTicket.emergencyType,
+        location: sosTicket.address,
+        description: sosTicket.description,
         callerInfo: {
-          name: ticket.guestName || (ticket.user ? `${ticket.user.firstName} ${ticket.user.lastName}`.trim() : ''),
-          phone: ticket.guestPhone || ticket.user?.phone,
+          name:
+            sosTicket.guestName ||
+            (sosTicket.user
+              ? `${sosTicket.user.firstName} ${sosTicket.user.lastName}`.trim()
+              : ''),
+          phone: sosTicket.guestPhone || sosTicket.user?.phone,
         },
       };
 
-      const response = await this.emergencyCallService.makeEmergencyCall(callRequest);
-      
-      await this.sosTicketRepository.update(ticket.id, {
+      const response =
+        await this.emergencyCallService.makeEmergencyCall(callRequest);
+
+      await this.sosTicketRepository.update(sosTicket.id, {
         isEmergencyCallMade: true,
         emergencyCallId: response.callId,
         emergencyCallResponse: response.message,
       });
 
-      this.logger.log(`Emergency call made for ticket ${ticket.id}: ${response.callId}`);
+      this.logger.log(
+        `Emergency call made for ticket ${sosTicket.id}: ${response.callId}`,
+      );
     } catch (error) {
-      this.logger.error(`Failed to make emergency call for ticket ${ticket.id}: ${error.message}`);
+      this.logger.error(
+        `Failed to make emergency call for ticket ${sosTicket.id}: ${error.message}`,
+      );
     }
   }
 
   private determinePriority(emergencyType: string): string {
     const highPriorityTypes = ['medical', 'fire', 'violence', 'accident'];
     const mediumPriorityTypes = ['theft', 'harassment', 'mental_health'];
-    
+
     if (highPriorityTypes.includes(emergencyType.toLowerCase())) {
       return 'high';
     } else if (mediumPriorityTypes.includes(emergencyType.toLowerCase())) {

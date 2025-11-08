@@ -13,7 +13,12 @@ import {
   RawBodyRequest,
   Req,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { DonationsService } from './donations.service';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
@@ -33,7 +38,10 @@ export class DonationsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create payment intent for donation' })
-  @ApiResponse({ status: 201, description: 'Payment intent created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment intent created successfully',
+  })
   async createPaymentIntent(
     @Body() createPaymentIntentDto: CreatePaymentIntentDto,
     @Request() req,
@@ -66,19 +74,28 @@ export class DonationsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Save payment method' })
-  @ApiResponse({ status: 201, description: 'Payment method saved successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment method saved successfully',
+  })
   async savePaymentMethod(
     @Body() savePaymentMethodDto: SavePaymentMethodDto,
     @Request() req,
   ) {
-    return this.donationsService.savePaymentMethod(req.user.id, savePaymentMethodDto);
+    return this.donationsService.savePaymentMethod(
+      req.user.id,
+      savePaymentMethodDto,
+    );
   }
 
   @Get('payment-methods')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user payment methods' })
-  @ApiResponse({ status: 200, description: 'Payment methods retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment methods retrieved successfully',
+  })
   async getUserPaymentMethods(@Request() req) {
     return this.donationsService.getUserPaymentMethods(req.user.id);
   }
@@ -87,7 +104,10 @@ export class DonationsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get donation history' })
-  @ApiResponse({ status: 200, description: 'Donation history retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Donation history retrieved successfully',
+  })
   async getDonationHistory(
     @Request() req,
     @Query('campaignId') campaignId?: string,
@@ -114,9 +134,9 @@ export class DonationsController {
   ) {
     const payload = req.rawBody.toString();
     const event = this.stripeService.constructWebhookEvent(payload, signature);
-    
+
     await this.donationsService.handleWebhookEvent(event);
-    
+
     return { received: true };
   }
 }

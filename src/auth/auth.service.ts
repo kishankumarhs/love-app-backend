@@ -1,7 +1,11 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
-import { SignUpDto, SignInDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto } from './dto/auth.dto';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../user/entities/user.entity';
 
@@ -12,7 +16,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signUp(signUpDto: SignUpDto): Promise<{ user: User; token: string }> {
+  async signUp(signUpDto: RegisterDto): Promise<{ user: User; token: string }> {
     const existingUser = await this.userService.findByEmail(signUpDto.email);
     if (existingUser) {
       throw new ConflictException('User already exists');
@@ -28,7 +32,7 @@ export class AuthService {
     return { user, token };
   }
 
-  async signIn(signInDto: SignInDto): Promise<{ user: User; token: string }> {
+  async signIn(signInDto: LoginDto): Promise<{ user: User; token: string }> {
     const user = await this.userService.findByEmail(signInDto.email);
     if (!user || !(await bcrypt.compare(signInDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
@@ -40,7 +44,7 @@ export class AuthService {
 
   async googleLogin(req: any): Promise<{ user: User; token: string }> {
     const { email, firstName, lastName } = req.user;
-    
+
     let user = await this.userService.findByEmail(email);
     if (!user) {
       user = await this.userService.create({

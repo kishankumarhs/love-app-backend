@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review, ReviewStatus } from './entities/review.entity';
@@ -16,7 +20,10 @@ export class ReviewService {
     private moderationService: ModerationService,
   ) {}
 
-  async create(createReviewDto: CreateReviewDto, userInfo?: any): Promise<Review> {
+  async create(
+    createReviewDto: CreateReviewDto,
+    userInfo?: any,
+  ): Promise<Review> {
     // Check if user already reviewed this provider
     const existingReview = await this.reviewRepository.findOne({
       where: {
@@ -58,7 +65,8 @@ export class ReviewService {
     limit: number = 20,
     offset: number = 0,
   ): Promise<{ reviews: Review[]; total: number }> {
-    const query = this.reviewRepository.createQueryBuilder('review')
+    const query = this.reviewRepository
+      .createQueryBuilder('review')
       .leftJoinAndSelect('review.user', 'user')
       .leftJoinAndSelect('review.provider', 'provider')
       .orderBy('review.createdAt', 'DESC');
@@ -104,8 +112,9 @@ export class ReviewService {
 
     review.moderatedById = moderatedById;
     review.moderatedAt = new Date();
-    review.status = action === 'approve' ? ReviewStatus.APPROVED : ReviewStatus.REJECTED;
-    
+    review.status =
+      action === 'approve' ? ReviewStatus.APPROVED : ReviewStatus.REJECTED;
+
     if (action === 'reject' && rejectionReason) {
       review.rejectionReason = rejectionReason;
     }
@@ -136,9 +145,9 @@ export class ReviewService {
     description?: string,
   ): Promise<void> {
     const review = await this.findOne(reviewId);
-    
+
     await this.moderationService.reportContent(
-      'review' as any,
+      review as any,
       reviewId,
       reason as any,
       reportedById,
@@ -155,18 +164,25 @@ export class ReviewService {
     limit: number = 20,
     offset: number = 0,
   ): Promise<{ reviews: Review[]; total: number; averageRating: number }> {
-    const { reviews, total } = await this.findAll(status, providerId, limit, offset);
-    
-    const averageRating = reviews.length > 0 
-      ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-      : 0;
+    const { reviews, total } = await this.findAll(
+      status,
+      providerId,
+      limit,
+      offset,
+    );
+
+    const averageRating =
+      reviews.length > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) /
+          reviews.length
+        : 0;
 
     return { reviews, total, averageRating };
   }
 
   async remove(id: string, userInfo?: any): Promise<void> {
     const review = await this.findOne(id);
-    
+
     await this.reviewRepository.delete(id);
 
     // Log audit

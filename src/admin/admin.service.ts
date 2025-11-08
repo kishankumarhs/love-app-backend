@@ -1,16 +1,23 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, Like, In } from 'typeorm';
-import { AdminAnalytics, MetricType, PeriodType } from './entities/admin-analytics.entity';
+import { Repository, Between } from 'typeorm';
+import { AdminAnalytics } from './entities/admin-analytics.entity';
 import { AdminAction, AdminActionType } from './entities/admin-action.entity';
 import { SystemSetting } from './entities/system-setting.entity';
 import { User, UserStatus } from '../user/entities/user.entity';
 import { Provider } from '../provider/entities/provider.entity';
 import { Campaign } from '../campaign/entities/campaign.entity';
-import { Donation, DonationStatus } from '../donations/entities/donation.entity';
+import {
+  Donation,
+  DonationStatus,
+} from '../donations/entities/donation.entity';
 import { Volunteer } from '../volunteer/entities/volunteer.entity';
 import { AdminFiltersDto, AnalyticsFiltersDto } from './dto/admin-filters.dto';
-import { CreateAdminActionDto, UserManagementDto, ProviderManagementDto } from './dto/admin-action.dto';
+import {
+  CreateAdminActionDto,
+  UserManagementDto,
+  ProviderManagementDto,
+} from './dto/admin-action.dto';
 
 @Injectable()
 export class AdminService {
@@ -50,10 +57,17 @@ export class AdminService {
       this.userRepository.count(),
       this.providerRepository.count(),
       this.campaignRepository.count(),
-      this.donationRepository.count({ where: { status: DonationStatus.COMPLETED } }),
+      this.donationRepository.count({
+        where: { status: DonationStatus.COMPLETED },
+      }),
       this.volunteerRepository.count(),
-      this.userRepository.count({ where: { createdAt: Between(thirtyDaysAgo, today) } }),
-      this.donationRepository.sum('amount', { status: DonationStatus.COMPLETED, createdAt: Between(thirtyDaysAgo, today) }),
+      this.userRepository.count({
+        where: { createdAt: Between(thirtyDaysAgo, today) },
+      }),
+      this.donationRepository.sum('amount', {
+        status: DonationStatus.COMPLETED,
+        createdAt: Between(thirtyDaysAgo, today),
+      }),
     ]);
 
     return {
@@ -75,31 +89,43 @@ export class AdminService {
     const query = this.analyticsRepository.createQueryBuilder('analytics');
 
     if (filters.metricType) {
-      query.andWhere('analytics.metricType = :metricType', { metricType: filters.metricType });
+      query.andWhere('analytics.metricType = :metricType', {
+        metricType: filters.metricType,
+      });
     }
 
     if (filters.periodType) {
-      query.andWhere('analytics.periodType = :periodType', { periodType: filters.periodType });
+      query.andWhere('analytics.periodType = :periodType', {
+        periodType: filters.periodType,
+      });
     }
 
     if (filters.startDate) {
-      query.andWhere('analytics.periodStart >= :startDate', { startDate: filters.startDate });
+      query.andWhere('analytics.periodStart >= :startDate', {
+        startDate: filters.startDate,
+      });
     }
 
     if (filters.endDate) {
-      query.andWhere('analytics.periodEnd <= :endDate', { endDate: filters.endDate });
+      query.andWhere('analytics.periodEnd <= :endDate', {
+        endDate: filters.endDate,
+      });
     }
 
     return await query.orderBy('analytics.createdAt', 'DESC').getMany();
   }
 
   // User Management
-  async getUsers(filters: AdminFiltersDto): Promise<{ users: User[]; total: number }> {
+  async getUsers(
+    filters: AdminFiltersDto,
+  ): Promise<{ users: User[]; total: number }> {
     const query = this.userRepository.createQueryBuilder('user');
 
     if (filters.search) {
-      query.andWhere('(user.email ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search)', 
-        { search: `%${filters.search}%` });
+      query.andWhere(
+        '(user.email ILIKE :search OR user.firstName ILIKE :search OR user.lastName ILIKE :search)',
+        { search: `%${filters.search}%` },
+      );
     }
 
     if (filters.status) {
@@ -111,11 +137,15 @@ export class AdminService {
     }
 
     if (filters.startDate) {
-      query.andWhere('user.createdAt >= :startDate', { startDate: filters.startDate });
+      query.andWhere('user.createdAt >= :startDate', {
+        startDate: filters.startDate,
+      });
     }
 
     if (filters.endDate) {
-      query.andWhere('user.createdAt <= :endDate', { endDate: filters.endDate });
+      query.andWhere('user.createdAt <= :endDate', {
+        endDate: filters.endDate,
+      });
     }
 
     const total = await query.getCount();
@@ -129,13 +159,15 @@ export class AdminService {
   }
 
   async manageUser(dto: UserManagementDto, adminId: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id: dto.userId } });
+    const user = await this.userRepository.findOne({
+      where: { id: dto.userId },
+    });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     let actionType: AdminActionType;
-    
+
     switch (dto.action) {
       case 'suspend':
         user.status = UserStatus.SUSPENDED;
@@ -147,33 +179,43 @@ export class AdminService {
         break;
       case 'delete':
         await this.userRepository.delete(dto.userId);
-        await this.logAdminAction({
-          actionType: AdminActionType.USER_SUSPEND,
-          targetType: 'User',
-          targetId: dto.userId,
-          reason: dto.reason,
-        }, adminId);
+        await this.logAdminAction(
+          {
+            actionType: AdminActionType.USER_SUSPEND,
+            targetType: 'User',
+            targetId: dto.userId,
+            reason: dto.reason,
+          },
+          adminId,
+        );
         return user;
     }
 
     const updatedUser = await this.userRepository.save(user);
-    await this.logAdminAction({
-      actionType,
-      targetType: 'User',
-      targetId: dto.userId,
-      reason: dto.reason,
-    }, adminId);
+    await this.logAdminAction(
+      {
+        actionType,
+        targetType: 'User',
+        targetId: dto.userId,
+        reason: dto.reason,
+      },
+      adminId,
+    );
 
     return updatedUser;
   }
 
   // Provider Management
-  async getProviders(filters: AdminFiltersDto): Promise<{ providers: Provider[]; total: number }> {
+  async getProviders(
+    filters: AdminFiltersDto,
+  ): Promise<{ providers: Provider[]; total: number }> {
     const query = this.providerRepository.createQueryBuilder('provider');
 
     if (filters.search) {
-      query.andWhere('(provider.name ILIKE :search OR provider.email ILIKE :search)', 
-        { search: `%${filters.search}%` });
+      query.andWhere(
+        '(provider.name ILIKE :search OR provider.email ILIKE :search)',
+        { search: `%${filters.search}%` },
+      );
     }
 
     if (filters.status) {
@@ -191,14 +233,19 @@ export class AdminService {
     return { providers, total };
   }
 
-  async manageProvider(dto: ProviderManagementDto, adminId: string): Promise<Provider> {
-    const provider = await this.providerRepository.findOne({ where: { id: dto.providerId } });
+  async manageProvider(
+    dto: ProviderManagementDto,
+    adminId: string,
+  ): Promise<Provider> {
+    const provider = await this.providerRepository.findOne({
+      where: { id: dto.providerId },
+    });
     if (!provider) {
       throw new NotFoundException('Provider not found');
     }
 
     let actionType: AdminActionType;
-    
+
     switch (dto.action) {
       case 'approve':
         provider.isActive = true;
@@ -215,23 +262,31 @@ export class AdminService {
     }
 
     const updatedProvider = await this.providerRepository.save(provider);
-    await this.logAdminAction({
-      actionType,
-      targetType: 'Provider',
-      targetId: dto.providerId,
-      reason: dto.reason,
-    }, adminId);
+    await this.logAdminAction(
+      {
+        actionType,
+        targetType: 'Provider',
+        targetId: dto.providerId,
+        reason: dto.reason,
+      },
+      adminId,
+    );
 
     return updatedProvider;
   }
 
   // Campaign Management
-  async getCampaigns(filters: AdminFiltersDto): Promise<{ campaigns: Campaign[]; total: number }> {
-    const query = this.campaignRepository.createQueryBuilder('campaign')
+  async getCampaigns(
+    filters: AdminFiltersDto,
+  ): Promise<{ campaigns: Campaign[]; total: number }> {
+    const query = this.campaignRepository
+      .createQueryBuilder('campaign')
       .leftJoinAndSelect('campaign.provider', 'provider');
 
     if (filters.search) {
-      query.andWhere('campaign.title ILIKE :search', { search: `%${filters.search}%` });
+      query.andWhere('campaign.title ILIKE :search', {
+        search: `%${filters.search}%`,
+      });
     }
 
     if (filters.status) {
@@ -249,8 +304,11 @@ export class AdminService {
   }
 
   // Donation Management
-  async getDonations(filters: AdminFiltersDto): Promise<{ donations: Donation[]; total: number }> {
-    const query = this.donationRepository.createQueryBuilder('donation')
+  async getDonations(
+    filters: AdminFiltersDto,
+  ): Promise<{ donations: Donation[]; total: number }> {
+    const query = this.donationRepository
+      .createQueryBuilder('donation')
       .leftJoinAndSelect('donation.user', 'user')
       .leftJoinAndSelect('donation.campaign', 'campaign');
 
@@ -259,11 +317,15 @@ export class AdminService {
     }
 
     if (filters.startDate) {
-      query.andWhere('donation.createdAt >= :startDate', { startDate: filters.startDate });
+      query.andWhere('donation.createdAt >= :startDate', {
+        startDate: filters.startDate,
+      });
     }
 
     if (filters.endDate) {
-      query.andWhere('donation.createdAt <= :endDate', { endDate: filters.endDate });
+      query.andWhere('donation.createdAt <= :endDate', {
+        endDate: filters.endDate,
+      });
     }
 
     const total = await query.getCount();
@@ -277,13 +339,18 @@ export class AdminService {
   }
 
   // Volunteer Management
-  async getVolunteers(filters: AdminFiltersDto): Promise<{ volunteers: Volunteer[]; total: number }> {
-    const query = this.volunteerRepository.createQueryBuilder('volunteer')
+  async getVolunteers(
+    filters: AdminFiltersDto,
+  ): Promise<{ volunteers: Volunteer[]; total: number }> {
+    const query = this.volunteerRepository
+      .createQueryBuilder('volunteer')
       .leftJoinAndSelect('volunteer.user', 'user');
 
     if (filters.search) {
-      query.andWhere('(user.firstName ILIKE :search OR user.lastName ILIKE :search)', 
-        { search: `%${filters.search}%` });
+      query.andWhere(
+        '(user.firstName ILIKE :search OR user.lastName ILIKE :search)',
+        { search: `%${filters.search}%` },
+      );
     }
 
     if (filters.status) {
@@ -305,29 +372,42 @@ export class AdminService {
     return await this.settingRepository.find({ order: { settingKey: 'ASC' } });
   }
 
-  async updateSetting(key: string, value: string, adminId: string): Promise<SystemSetting> {
-    const setting = await this.settingRepository.findOne({ where: { settingKey: key } });
+  async updateSetting(
+    key: string,
+    value: string,
+    adminId: string,
+  ): Promise<SystemSetting> {
+    const setting = await this.settingRepository.findOne({
+      where: { settingKey: key },
+    });
     if (!setting) {
       throw new NotFoundException('Setting not found');
     }
 
     setting.settingValue = value;
     setting.updatedById = adminId;
-    
+
     return await this.settingRepository.save(setting);
   }
 
   // Admin Actions
-  async getAdminActions(filters: AdminFiltersDto): Promise<{ actions: AdminAction[]; total: number }> {
-    const query = this.actionRepository.createQueryBuilder('action')
+  async getAdminActions(
+    filters: AdminFiltersDto,
+  ): Promise<{ actions: AdminAction[]; total: number }> {
+    const query = this.actionRepository
+      .createQueryBuilder('action')
       .leftJoinAndSelect('action.admin', 'admin');
 
     if (filters.startDate) {
-      query.andWhere('action.createdAt >= :startDate', { startDate: filters.startDate });
+      query.andWhere('action.createdAt >= :startDate', {
+        startDate: filters.startDate,
+      });
     }
 
     if (filters.endDate) {
-      query.andWhere('action.createdAt <= :endDate', { endDate: filters.endDate });
+      query.andWhere('action.createdAt <= :endDate', {
+        endDate: filters.endDate,
+      });
     }
 
     const total = await query.getCount();
@@ -340,7 +420,10 @@ export class AdminService {
     return { actions, total };
   }
 
-  private async logAdminAction(dto: CreateAdminActionDto, adminId: string): Promise<AdminAction> {
+  private async logAdminAction(
+    dto: CreateAdminActionDto,
+    adminId: string,
+  ): Promise<AdminAction> {
     const action = this.actionRepository.create({
       ...dto,
       adminId,

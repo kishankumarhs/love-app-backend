@@ -1,9 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between } from 'typeorm';
-import { AdminAnalytics, MetricType, PeriodType } from '../entities/admin-analytics.entity';
+import {
+  AdminAnalytics,
+  MetricType,
+  PeriodType,
+} from '../entities/admin-analytics.entity';
 import { User } from '../../user/entities/user.entity';
-import { Donation, DonationStatus } from '../../donations/entities/donation.entity';
+import {
+  Donation,
+  DonationStatus,
+} from '../../donations/entities/donation.entity';
 import { Campaign } from '../../campaign/entities/campaign.entity';
 import { Provider } from '../../provider/entities/provider.entity';
 import { Volunteer } from '../../volunteer/entities/volunteer.entity';
@@ -40,7 +47,10 @@ export class AnalyticsService {
     ]);
   }
 
-  private async calculateUserMetrics(startDate: Date, endDate: Date): Promise<void> {
+  private async calculateUserMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<void> {
     const newUsers = await this.userRepository.count({
       where: { createdAt: Between(startDate, endDate) },
     });
@@ -69,13 +79,21 @@ export class AnalyticsService {
     await this.analyticsRepository.save(metrics);
   }
 
-  private async calculateDonationMetrics(startDate: Date, endDate: Date): Promise<void> {
+  private async calculateDonationMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<void> {
     const dailyDonations = await this.donationRepository
       .createQueryBuilder('donation')
       .select('COUNT(*)', 'count')
       .addSelect('SUM(amount)', 'total')
-      .where('donation.createdAt BETWEEN :startDate AND :endDate', { startDate, endDate })
-      .andWhere('donation.status = :status', { status: DonationStatus.COMPLETED })
+      .where('donation.createdAt BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .andWhere('donation.status = :status', {
+        status: DonationStatus.COMPLETED,
+      })
       .getRawOne();
 
     const metrics = [
@@ -100,7 +118,10 @@ export class AnalyticsService {
     await this.analyticsRepository.save(metrics);
   }
 
-  private async calculateCampaignMetrics(startDate: Date, endDate: Date): Promise<void> {
+  private async calculateCampaignMetrics(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<void> {
     const newCampaigns = await this.campaignRepository.count({
       where: { createdAt: Between(startDate, endDate) },
     });

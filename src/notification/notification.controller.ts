@@ -1,13 +1,32 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Put,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { NotificationService } from './notification.service';
 import { TemplateService } from './services/template.service';
 import { NotificationGateway } from './gateways/notification.gateway';
 import { CreateNotificationDto } from './dto/create-notification.dto';
-import { CreateNotificationPreferenceDto, UpdateNotificationPreferenceDto } from './dto/notification-preference.dto';
+import {
+  CreateNotificationPreferenceDto,
+  UpdateNotificationPreferenceDto,
+} from './dto/notification-preference.dto';
 import { Notification } from './entities/notification.entity';
 import { NotificationPreference } from './entities/notification-preference.entity';
-import { TemplateType, TemplateCategory } from './entities/notification-template.entity';
+import {
+  TemplateType,
+  TemplateCategory,
+} from './entities/notification-template.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -38,7 +57,8 @@ export class NotificationController {
   @ApiOperation({ summary: 'Send SOS alert' })
   @ApiResponse({ status: 201, description: 'SOS alert sent successfully' })
   sendSOSAlert(
-    @Body() body: {
+    @Body()
+    body: {
       userIds: string[];
       location: string;
       emergencyType: string;
@@ -60,7 +80,8 @@ export class NotificationController {
   @ApiOperation({ summary: 'Create notification template' })
   @ApiResponse({ status: 201, description: 'Template created successfully' })
   createTemplate(
-    @Body() body: {
+    @Body()
+    body: {
       name: string;
       type: TemplateType;
       category: TemplateCategory;
@@ -83,7 +104,10 @@ export class NotificationController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get WebSocket status' })
-  @ApiResponse({ status: 200, description: 'WebSocket status retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'WebSocket status retrieved successfully',
+  })
   getWebSocketStatus() {
     return {
       activeConnections: this.notificationGateway.getActiveConnections(),
@@ -105,7 +129,9 @@ export class NotificationController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create notification preferences' })
   @ApiResponse({ status: 201, type: NotificationPreference })
-  createPreferences(@Body() createPreferenceDto: CreateNotificationPreferenceDto) {
+  createPreferences(
+    @Body() createPreferenceDto: CreateNotificationPreferenceDto,
+  ) {
     return this.notificationService.createPreferences(createPreferenceDto);
   }
 
@@ -123,7 +149,13 @@ export class NotificationController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update notification preferences' })
   @ApiResponse({ status: 200, type: NotificationPreference })
-  updatePreferences(@Param('userId') userId: string, @Body() updatePreferenceDto: UpdateNotificationPreferenceDto) {
-    return this.notificationService.updatePreferences(userId, updatePreferenceDto);
+  updatePreferences(
+    @Param('userId') userId: string,
+    @Body() updatePreferenceDto: UpdateNotificationPreferenceDto,
+  ) {
+    return this.notificationService.updatePreferences(
+      userId,
+      updatePreferenceDto,
+    );
   }
 }

@@ -25,25 +25,28 @@ export class EmergencyCallService {
 
   constructor(private configService: ConfigService) {}
 
-  async makeEmergencyCall(request: EmergencyCallRequest): Promise<EmergencyCallResponse> {
+  async makeEmergencyCall(
+    request: EmergencyCallRequest,
+  ): Promise<EmergencyCallResponse> {
     try {
       // In production, integrate with actual emergency services API
       // For now, simulate the call
       const callId = `EMRG_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-      
+
       this.logger.warn(`EMERGENCY CALL INITIATED: ${JSON.stringify(request)}`);
-      
+
       // Simulate API call to emergency services
       const response: EmergencyCallResponse = {
         callId,
         status: 'initiated',
-        message: 'Emergency call has been initiated and forwarded to appropriate services',
+        message:
+          'Emergency call has been initiated and forwarded to appropriate services',
         timestamp: new Date(),
       };
 
       // Log for audit trail
       this.logger.log(`Emergency call response: ${JSON.stringify(response)}`);
-      
+
       return response;
     } catch (error) {
       this.logger.error(`Failed to make emergency call: ${error.message}`);
@@ -60,8 +63,13 @@ export class EmergencyCallService {
     return location?.includes('US') ? '911' : '112';
   }
 
-  async notifyEmergencyContacts(ticketId: string, emergencyType: string): Promise<void> {
-    this.logger.log(`Notifying emergency contacts for ticket: ${ticketId}, type: ${emergencyType}`);
+  async notifyEmergencyContacts(
+    ticketId: string,
+    emergencyType: string,
+  ): Promise<void> {
+    this.logger.log(
+      `Notifying emergency contacts for ticket: ${ticketId}, type: ${emergencyType}`,
+    );
     // Implementation for notifying emergency contacts
   }
 }

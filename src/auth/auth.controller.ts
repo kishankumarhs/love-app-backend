@@ -1,8 +1,17 @@
-import { Controller, Post, Body, Get, UseGuards, Req, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Req } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { SignUpDto, SignInDto, VerifyEmailDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto } from './dto/auth.dto';
+
+export class VerifyEmailDto {
+  token: string;
+}
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AllowGuest } from './decorators/allow-guest.decorator';
 
@@ -15,7 +24,7 @@ export class AuthController {
   @AllowGuest()
   @ApiOperation({ summary: 'User registration' })
   @ApiResponse({ status: 201, description: 'User registered successfully' })
-  async signUp(@Body() signUpDto: SignUpDto) {
+  async signUp(@Body() signUpDto: RegisterDto) {
     return this.authService.signUp(signUpDto);
   }
 
@@ -23,7 +32,7 @@ export class AuthController {
   @AllowGuest()
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'User logged in successfully' })
-  async signIn(@Body() signInDto: SignInDto) {
+  async signIn(@Body() signInDto: LoginDto) {
     return this.authService.signIn(signInDto);
   }
 

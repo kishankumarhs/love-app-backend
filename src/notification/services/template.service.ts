@@ -2,7 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as Handlebars from 'handlebars';
-import { NotificationTemplate, TemplateType, TemplateCategory } from '../entities/notification-template.entity';
+import {
+  NotificationTemplate,
+  TemplateType,
+  TemplateCategory,
+} from '../entities/notification-template.entity';
 
 @Injectable()
 export class TemplateService {
@@ -23,9 +27,12 @@ export class TemplateService {
     return template;
   }
 
-  async renderTemplate(templateName: string, data: Record<string, any>): Promise<{ subject?: string; content: string }> {
+  async renderTemplate(
+    templateName: string,
+    data: Record<string, any>,
+  ): Promise<{ subject?: string; content: string }> {
     const template = await this.getTemplate(templateName);
-    
+
     const contentTemplate = Handlebars.compile(template.templateContent);
     const content = contentTemplate(data);
 
@@ -38,7 +45,9 @@ export class TemplateService {
     return { subject, content };
   }
 
-  async getTemplatesByCategory(category: TemplateCategory): Promise<NotificationTemplate[]> {
+  async getTemplatesByCategory(
+    category: TemplateCategory,
+  ): Promise<NotificationTemplate[]> {
     return await this.templateRepository.find({
       where: { category, isActive: true },
       order: { name: 'ASC' },

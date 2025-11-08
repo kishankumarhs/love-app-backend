@@ -2,7 +2,6 @@ import { Controller, Get } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
-  ApiResponse,
   ApiOkResponse,
   ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
@@ -36,7 +35,8 @@ export class AppController {
   @Get('health')
   @ApiOperation({
     summary: 'Detailed health status',
-    description: 'Returns detailed health information including timestamp and service name',
+    description:
+      'Returns detailed health information including timestamp and service name',
     operationId: 'getHealthStatus',
   })
   @ApiOkResponse({

@@ -8,10 +8,14 @@ import {
   UseGuards,
   Request,
   Query,
-  Patch,
   Res,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -24,7 +28,11 @@ import { AuditService } from './services/audit.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewStatus } from './entities/review.entity';
 import { ReportType, ReportFormat } from './entities/report.entity';
-import { ModerationStatus, ContentType, ReportReason } from './entities/moderation-queue.entity';
+import {
+  ModerationStatus,
+  ContentType,
+  ReportReason,
+} from './entities/moderation-queue.entity';
 
 @ApiTags('reviews')
 @Controller('reviews')
@@ -48,7 +56,10 @@ export class ReviewController {
       ipAddress: req.ip,
       userAgent: req.get('User-Agent'),
     };
-    return this.reviewService.create({ ...createReviewDto, userId: req.user.id }, userInfo);
+    return this.reviewService.create(
+      { ...createReviewDto, userId: req.user.id },
+      userInfo,
+    );
   }
 
   @Get()
@@ -65,13 +76,21 @@ export class ReviewController {
 
   @Get('provider/:providerId')
   @ApiOperation({ summary: 'Get provider reviews' })
-  @ApiResponse({ status: 200, description: 'Provider reviews retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Provider reviews retrieved successfully',
+  })
   getProviderReviews(
     @Param('providerId') providerId: string,
     @Query('limit') limit: number = 20,
     @Query('offset') offset: number = 0,
   ) {
-    return this.reviewService.getProviderReviews(providerId, ReviewStatus.APPROVED, limit, offset);
+    return this.reviewService.getProviderReviews(
+      providerId,
+      ReviewStatus.APPROVED,
+      limit,
+      offset,
+    );
   }
 
   @Post(':id/report')
@@ -84,7 +103,12 @@ export class ReviewController {
     @Body() body: { reason: ReportReason; description?: string },
     @Request() req,
   ) {
-    return this.reviewService.reportReview(id, body.reason, req.user.id, body.description);
+    return this.reviewService.reportReview(
+      id,
+      body.reason,
+      req.user.id,
+      body.description,
+    );
   }
 
   @Post(':id/moderate')
@@ -104,7 +128,13 @@ export class ReviewController {
       ipAddress: req.ip,
       userAgent: req.get('User-Agent'),
     };
-    return this.reviewService.moderateReview(id, body.action, req.user.id, body.rejectionReason, userInfo);
+    return this.reviewService.moderateReview(
+      id,
+      body.action,
+      req.user.id,
+      body.rejectionReason,
+      userInfo,
+    );
   }
 
   @Get('moderation/queue')
@@ -112,14 +142,23 @@ export class ReviewController {
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get moderation queue' })
-  @ApiResponse({ status: 200, description: 'Moderation queue retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Moderation queue retrieved successfully',
+  })
   getModerationQueue(
     @Query('status') status?: ModerationStatus,
     @Query('contentType') contentType?: ContentType,
     @Query('limit') limit: number = 50,
     @Query('offset') offset: number = 0,
   ) {
-    return this.moderationService.getModerationQueue(status, contentType, undefined, limit, offset);
+    return this.moderationService.getModerationQueue(
+      status,
+      contentType,
+      undefined,
+      limit,
+      offset,
+    );
   }
 
   @Post('moderation/:id/resolve')
@@ -133,7 +172,12 @@ export class ReviewController {
     @Body() body: { action?: 'approve' | 'reject' | 'dismiss'; notes?: string },
     @Request() req,
   ) {
-    return this.moderationService.resolveModeration(id, req.user.id, body.notes, body.action);
+    return this.moderationService.resolveModeration(
+      id,
+      req.user.id,
+      body.notes,
+      body.action,
+    );
   }
 
   @Post('reports')
@@ -143,7 +187,8 @@ export class ReviewController {
   @ApiOperation({ summary: 'Create admin report' })
   @ApiResponse({ status: 201, description: 'Report created successfully' })
   createReport(
-    @Body() body: {
+    @Body()
+    body: {
       name: string;
       type: ReportType;
       filters?: Record<string, any>;
@@ -188,7 +233,10 @@ export class ReviewController {
   @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get audit logs' })
-  @ApiResponse({ status: 200, description: 'Audit logs retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Audit logs retrieved successfully',
+  })
   getAuditLogs(
     @Query('entityType') entityType?: string,
     @Query('entityId') entityId?: string,

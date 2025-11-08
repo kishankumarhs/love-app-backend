@@ -2,48 +2,61 @@ version: '3.8'
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:password@db:5432/loveapp
+      - JWT_SECRET=your-jwt-secret
+      - STRIPE_SECRET_KEY=sk_test_your_stripe_key
+      - TWILIO_ACCOUNT_SID=your_twilio_sid
+      - TWILIO_AUTH_TOKEN=your_twilio_token
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_USER=your-email@gmail.com
+      - EMAIL_PASS=your-app-password
     depends_on:
-      postgres:
-        condition: service_healthy
+      - db
+      - redis
     volumes:
-      - .:/app
-      - /app/node_modules
-    command: yarn start:dev
+      - ./uploads:/app/uploads
+    restart: unless-stopped
 
-  postgres:
+  db:
     image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=loveapp
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: love_app_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d love_app_dev"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      - ./src/migrations:/docker-entrypoint-initdb.d
+    restart: unless-stopped
 
-  pgadmin:
-    image: dpage/pgadmin4:latest
+  redis:
+    image: redis:7-alpine
     ports:
-      - "8080:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@loveapp.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-    depends_on:
-      - postgres
+      - "6379:6379"
     volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      - redis_data:/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    restart: unless-stopped
 
 volumes:
   postgres_data:
-  pgadmin_data:
-  
+  redis_data:

@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { CreateReferralDto } from './dto/create-referral.dto';
@@ -29,7 +38,10 @@ export class RequestsController {
   }
 
   @Patch(':id')
-  updateRequest(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
+  updateRequest(
+    @Param('id') id: string,
+    @Body() updateRequestDto: UpdateRequestDto,
+  ) {
     return this.requestsService.updateRequest(id, updateRequestDto);
   }
 
@@ -49,7 +61,10 @@ export class RequestsController {
   }
 
   @Patch('referrals/:id')
-  updateReferral(@Param('id') id: string, @Body() updateReferralDto: UpdateReferralDto) {
+  updateReferral(
+    @Param('id') id: string,
+    @Body() updateReferralDto: UpdateReferralDto,
+  ) {
     return this.requestsService.updateReferral(id, updateReferralDto);
   }
 
