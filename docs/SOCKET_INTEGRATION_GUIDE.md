@@ -3,6 +3,7 @@
 ## Quick Start
 
 ### 1. Install Client Library
+
 ```bash
 npm install socket.io-client
 # or
@@ -10,17 +11,19 @@ yarn add socket.io-client
 ```
 
 ### 2. Basic Connection
+
 ```javascript
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:3000/notifications', {
   auth: {
-    token: 'your-jwt-token'
-  }
+    token: 'your-jwt-token',
+  },
 });
 ```
 
 ### 3. Listen for Events
+
 ```javascript
 socket.on('connected', (data) => {
   console.log('Connected:', data);
@@ -36,6 +39,7 @@ socket.on('sos_alert', (alert) => {
 ### React Integration
 
 #### Custom Hook
+
 ```javascript
 // hooks/useSocket.js
 import { useEffect, useState, useCallback } from 'react';
@@ -50,14 +54,14 @@ export const useSocket = (token) => {
     if (!token) return;
 
     const newSocket = io('/notifications', {
-      auth: { token }
+      auth: { token },
     });
 
     newSocket.on('connected', () => setConnected(true));
     newSocket.on('disconnect', () => setConnected(false));
-    
+
     newSocket.on('notification_update', (notification) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
     });
 
     setSocket(newSocket);
@@ -65,15 +69,19 @@ export const useSocket = (token) => {
     return () => newSocket.close();
   }, [token]);
 
-  const joinRoom = useCallback((room) => {
-    socket?.emit('join_room', { room });
-  }, [socket]);
+  const joinRoom = useCallback(
+    (room) => {
+      socket?.emit('join_room', { room });
+    },
+    [socket],
+  );
 
   return { socket, connected, notifications, joinRoom };
 };
 ```
 
 #### Component Usage
+
 ```javascript
 // components/NotificationProvider.jsx
 import React, { createContext, useContext } from 'react';
@@ -94,13 +102,16 @@ export const NotificationProvider = ({ children, token }) => {
 export const useNotifications = () => {
   const context = useContext(SocketContext);
   if (!context) {
-    throw new Error('useNotifications must be used within NotificationProvider');
+    throw new Error(
+      'useNotifications must be used within NotificationProvider',
+    );
   }
   return context;
 };
 ```
 
 #### Emergency Alert Component
+
 ```javascript
 // components/EmergencyAlert.jsx
 import React, { useEffect, useState } from 'react';
@@ -127,10 +138,18 @@ export const EmergencyAlert = () => {
   return (
     <div className="emergency-alert">
       <h3>🚨 EMERGENCY ALERT</h3>
-      <p><strong>Type:</strong> {alert.emergencyType}</p>
-      <p><strong>Location:</strong> {alert.location}</p>
-      <p><strong>Description:</strong> {alert.description}</p>
-      <p><strong>Time:</strong> {new Date(alert.timestamp).toLocaleString()}</p>
+      <p>
+        <strong>Type:</strong> {alert.emergencyType}
+      </p>
+      <p>
+        <strong>Location:</strong> {alert.location}
+      </p>
+      <p>
+        <strong>Description:</strong> {alert.description}
+      </p>
+      <p>
+        <strong>Time:</strong> {new Date(alert.timestamp).toLocaleString()}
+      </p>
       <button onClick={() => setAlert(null)}>Dismiss</button>
     </div>
   );
@@ -140,6 +159,7 @@ export const EmergencyAlert = () => {
 ### Vue.js Integration
 
 #### Composition API
+
 ```javascript
 // composables/useSocket.js
 import { ref, onMounted, onUnmounted } from 'vue';
@@ -154,7 +174,7 @@ export function useSocket(token) {
     if (!token.value) return;
 
     socket.value = io('/notifications', {
-      auth: { token: token.value }
+      auth: { token: token.value },
     });
 
     socket.value.on('connected', () => {
@@ -178,22 +198,24 @@ export function useSocket(token) {
     socket,
     connected,
     notifications,
-    joinRoom
+    joinRoom,
   };
 }
 ```
 
 #### Component Usage
+
 ```vue
 <!-- components/NotificationCenter.vue -->
 <template>
   <div class="notification-center">
-    <div v-if="!connected" class="connection-status">
-      Connecting...
-    </div>
-    
-    <div v-for="notification in notifications" :key="notification.id" 
-         class="notification-item">
+    <div v-if="!connected" class="connection-status">Connecting...</div>
+
+    <div
+      v-for="notification in notifications"
+      :key="notification.id"
+      class="notification-item"
+    >
       <h4>{{ notification.title }}</h4>
       <p>{{ notification.message }}</p>
       <small>{{ formatDate(notification.createdAt) }}</small>
@@ -207,7 +229,7 @@ import { useAuthStore } from '../stores/auth';
 
 const authStore = useAuthStore();
 const { socket, connected, notifications, joinRoom } = useSocket(
-  computed(() => authStore.token)
+  computed(() => authStore.token),
 );
 
 const formatDate = (date) => {
@@ -219,6 +241,7 @@ const formatDate = (date) => {
 ### Angular Integration
 
 #### Service
+
 ```typescript
 // services/socket.service.ts
 import { Injectable } from '@angular/core';
@@ -226,7 +249,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import io, { Socket } from 'socket.io-client';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SocketService {
   private socket: Socket;
@@ -238,7 +261,7 @@ export class SocketService {
 
   connect(token: string): void {
     this.socket = io('/notifications', {
-      auth: { token }
+      auth: { token },
     });
 
     this.socket.on('connected', () => {
@@ -263,6 +286,7 @@ export class SocketService {
 ```
 
 #### Component
+
 ```typescript
 // components/notification-center.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
@@ -276,20 +300,22 @@ import { AuthService } from '../services/auth.service';
       <div *ngIf="!(socketService.connected$ | async)" class="connecting">
         Connecting...
       </div>
-      
-      <div *ngFor="let notification of (socketService.notifications$ | async)" 
-           class="notification-item">
+
+      <div
+        *ngFor="let notification of socketService.notifications$ | async"
+        class="notification-item"
+      >
         <h4>{{ notification.title }}</h4>
         <p>{{ notification.message }}</p>
-        <small>{{ notification.createdAt | date:'short' }}</small>
+        <small>{{ notification.createdAt | date: 'short' }}</small>
       </div>
     </div>
-  `
+  `,
 })
 export class NotificationCenterComponent implements OnInit, OnDestroy {
   constructor(
     public socketService: SocketService,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -308,6 +334,7 @@ export class NotificationCenterComponent implements OnInit, OnDestroy {
 ## Mobile Integration
 
 ### React Native
+
 ```javascript
 // services/SocketService.js
 import io from 'socket.io-client';
@@ -324,7 +351,7 @@ class SocketService {
     if (!token) return;
 
     this.socket = io('http://your-server.com/notifications', {
-      auth: { token }
+      auth: { token },
     });
 
     this.socket.on('connected', (data) => {
@@ -355,40 +382,41 @@ export default new SocketService();
 ```
 
 ### Flutter (using socket_io_client)
+
 ```dart
 // services/socket_service.dart
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
   IO.Socket? socket;
-  
+
   void connect(String token) {
-    socket = IO.io('http://your-server.com/notifications', 
+    socket = IO.io('http://your-server.com/notifications',
       IO.OptionBuilder()
         .setAuth({'token': token})
         .build()
     );
-    
+
     socket?.on('connected', (data) {
       print('Connected: $data');
     });
-    
+
     socket?.on('sos_alert', (alert) {
       _showEmergencyNotification(alert);
     });
-    
+
     socket?.connect();
   }
-  
+
   void _showEmergencyNotification(Map<String, dynamic> alert) {
     // Use flutter_local_notifications
     // Show emergency notification
   }
-  
+
   void joinRoom(String room) {
     socket?.emit('join_room', {'room': room});
   }
-  
+
   void disconnect() {
     socket?.disconnect();
   }
@@ -398,6 +426,7 @@ class SocketService {
 ## Backend Integration Examples
 
 ### Sending Notifications from Controllers
+
 ```typescript
 // controllers/campaign.controller.ts
 @Controller('campaigns')
@@ -409,22 +438,26 @@ export class CampaignController {
 
   @Post(':id/donate')
   async donate(@Param('id') campaignId: string, @Body() donationData: any) {
-    const result = await this.campaignService.processDonation(campaignId, donationData);
-    
+    const result = await this.campaignService.processDonation(
+      campaignId,
+      donationData,
+    );
+
     // Send real-time update to campaign subscribers
     this.notificationGateway.sendCampaignUpdate(campaignId, {
       type: 'donation_received',
       amount: donationData.amount,
       newTotal: result.newTotal,
-      donorName: donationData.anonymous ? 'Anonymous' : donationData.name
+      donorName: donationData.anonymous ? 'Anonymous' : donationData.name,
     });
-    
+
     return result;
   }
 }
 ```
 
 ### Service Integration
+
 ```typescript
 // services/emergency.service.ts
 @Injectable()
@@ -437,22 +470,22 @@ export class EmergencyService {
   async createSOSAlert(alertData: CreateSOSAlertDto) {
     // Save to database
     const alert = await this.sosRepository.save(alertData);
-    
+
     // Get nearby volunteers and responders
     const nearbyUsers = await this.userService.findNearbyUsers(
       alertData.location,
-      5000 // 5km radius
+      5000, // 5km radius
     );
-    
+
     // Send real-time alert
     this.notificationGateway.sendSOSAlert({
       id: alert.id,
       location: alert.location,
       emergencyType: alert.type,
       description: alert.description,
-      timestamp: alert.createdAt.toISOString()
+      timestamp: alert.createdAt.toISOString(),
     });
-    
+
     return alert;
   }
 }
@@ -461,6 +494,7 @@ export class EmergencyService {
 ## Error Handling Best Practices
 
 ### Connection Resilience
+
 ```javascript
 class ResilientSocket {
   constructor(url, options = {}) {
@@ -474,50 +508,50 @@ class ResilientSocket {
 
   connect() {
     this.socket = io(this.url, this.options);
-    
+
     this.socket.on('connect', () => {
       this.reconnectAttempts = 0;
       console.log('Connected to server');
     });
-    
+
     this.socket.on('disconnect', (reason) => {
       console.log('Disconnected:', reason);
       if (reason === 'io server disconnect') {
         this.reconnect();
       }
     });
-    
+
     this.socket.on('connect_error', (error) => {
       console.error('Connection error:', error);
       this.reconnect();
     });
-    
+
     // Restore listeners
     this.listeners.forEach((callback, event) => {
       this.socket.on(event, callback);
     });
   }
-  
+
   reconnect() {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error('Max reconnection attempts reached');
       return;
     }
-    
+
     this.reconnectAttempts++;
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    
+
     setTimeout(() => {
       console.log(`Reconnecting... (attempt ${this.reconnectAttempts})`);
       this.connect();
     }, delay);
   }
-  
+
   on(event, callback) {
     this.listeners.set(event, callback);
     this.socket?.on(event, callback);
   }
-  
+
   emit(event, data) {
     this.socket?.emit(event, data);
   }
@@ -525,6 +559,7 @@ class ResilientSocket {
 ```
 
 ### Token Refresh Handling
+
 ```javascript
 class AuthenticatedSocket {
   constructor(getToken, refreshToken) {
@@ -532,14 +567,14 @@ class AuthenticatedSocket {
     this.refreshToken = refreshToken;
     this.socket = null;
   }
-  
+
   async connect() {
     const token = await this.getToken();
-    
+
     this.socket = io('/notifications', {
-      auth: { token }
+      auth: { token },
     });
-    
+
     this.socket.on('connect_error', async (error) => {
       if (error.message === 'Authentication failed') {
         try {
@@ -559,6 +594,7 @@ class AuthenticatedSocket {
 ## Performance Optimization
 
 ### Message Batching
+
 ```javascript
 class BatchedSocket {
   constructor(socket) {
@@ -568,23 +604,23 @@ class BatchedSocket {
     this.batchTimeout = 100; // ms
     this.timeoutId = null;
   }
-  
+
   emit(event, data) {
     this.messageQueue.push({ event, data });
-    
+
     if (this.messageQueue.length >= this.batchSize) {
       this.flush();
     } else if (!this.timeoutId) {
       this.timeoutId = setTimeout(() => this.flush(), this.batchTimeout);
     }
   }
-  
+
   flush() {
     if (this.messageQueue.length === 0) return;
-    
+
     this.socket.emit('batch_messages', this.messageQueue);
     this.messageQueue = [];
-    
+
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
       this.timeoutId = null;
@@ -594,28 +630,29 @@ class BatchedSocket {
 ```
 
 ### Memory Management
+
 ```javascript
 class ManagedSocket {
   constructor() {
     this.eventListeners = new Map();
     this.maxListeners = 50;
   }
-  
+
   on(event, callback) {
     if (!this.eventListeners.has(event)) {
       this.eventListeners.set(event, new Set());
     }
-    
+
     const listeners = this.eventListeners.get(event);
     if (listeners.size >= this.maxListeners) {
       console.warn(`Too many listeners for event: ${event}`);
       return;
     }
-    
+
     listeners.add(callback);
     this.socket.on(event, callback);
   }
-  
+
   off(event, callback) {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
@@ -623,10 +660,10 @@ class ManagedSocket {
       this.socket.off(event, callback);
     }
   }
-  
+
   removeAllListeners() {
     this.eventListeners.forEach((listeners, event) => {
-      listeners.forEach(callback => {
+      listeners.forEach((callback) => {
         this.socket.off(event, callback);
       });
     });
@@ -638,6 +675,7 @@ class ManagedSocket {
 ## Testing Socket Connections
 
 ### Unit Testing
+
 ```javascript
 // __tests__/socket.test.js
 import { io } from 'socket.io-client';
@@ -682,6 +720,7 @@ describe('Socket Connection', () => {
 ```
 
 ### Integration Testing
+
 ```javascript
 // __tests__/integration.test.js
 import request from 'supertest';
@@ -697,12 +736,12 @@ describe('Socket Integration', () => {
     const response = await request(app)
       .post('/auth/login')
       .send({ email: 'test@example.com', password: 'password' });
-    
+
     authToken = response.body.token;
-    
+
     // Connect socket
     clientSocket = io('http://localhost:3000/notifications', {
-      auth: { token: authToken }
+      auth: { token: authToken },
     });
   });
 
@@ -720,7 +759,7 @@ describe('Socket Integration', () => {
       .send({
         location: 'Test Location',
         emergencyType: 'Medical',
-        description: 'Test emergency'
+        description: 'Test emergency',
       });
   });
 });

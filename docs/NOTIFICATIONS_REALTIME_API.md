@@ -1,9 +1,11 @@
 # Notifications and Real-Time Updates API
 
 ## Overview
+
 Complete notification system with email/SMS template integration and real-time WebSocket updates for SOS alerts and notifications.
 
 ## Features
+
 - Email and SMS template management with Handlebars
 - Real-time WebSocket notifications for SOS and updates
 - Twilio SMS integration
@@ -15,6 +17,7 @@ Complete notification system with email/SMS template integration and real-time W
 ## API Endpoints
 
 ### Notifications
+
 ```http
 POST /notifications
 Authorization: Bearer <token>
@@ -31,6 +34,7 @@ Content-Type: application/json
 ```
 
 ### SOS Alert
+
 ```http
 POST /notifications/sos-alert
 Authorization: Bearer <token>
@@ -45,6 +49,7 @@ Content-Type: application/json
 ```
 
 ### Create Template
+
 ```http
 POST /notifications/templates
 Authorization: Bearer <token>
@@ -61,18 +66,21 @@ Content-Type: application/json
 ```
 
 ### WebSocket Status
+
 ```http
 GET /notifications/websocket/status
 Authorization: Bearer <token>
 ```
 
 ### User Notifications
+
 ```http
 GET /notifications/user/:userId
 Authorization: Bearer <token>
 ```
 
 ### Notification Preferences
+
 ```http
 GET /notifications/preferences/:userId
 Authorization: Bearer <token>
@@ -91,6 +99,7 @@ Content-Type: application/json
 ## WebSocket Connection
 
 ### Connection
+
 ```javascript
 import io from 'socket.io-client';
 
@@ -106,6 +115,7 @@ socket.on('connected', (data) => {
 ```
 
 ### Events
+
 ```javascript
 // Join specific room
 socket.emit('join_room', { room: 'campaign_123' });
@@ -132,6 +142,7 @@ socket.on('campaign_update', (data) => {
 ## Database Schema
 
 ### Notifications Table (Updated)
+
 - `id` (UUID, Primary Key)
 - `title` (String)
 - `message` (Text)
@@ -146,6 +157,7 @@ socket.on('campaign_update', (data) => {
 - `created_at`
 
 ### Notification Templates Table
+
 - `id` (UUID, Primary Key)
 - `name` (String, Unique)
 - `type` (Enum: email, sms, push)
@@ -157,6 +169,7 @@ socket.on('campaign_update', (data) => {
 - `created_at`, `updated_at`
 
 ### WebSocket Connections Table
+
 - `id` (UUID, Primary Key)
 - `user_id` (UUID, Foreign Key)
 - `socket_id` (String)
@@ -165,6 +178,7 @@ socket.on('campaign_update', (data) => {
 - `user_agent`, `ip_address`
 
 ### Real-Time Events Table
+
 - `id` (UUID, Primary Key)
 - `event_type` (Enum: sos_created, sos_updated, notification_sent, campaign_updated, donation_received)
 - `entity_type`, `entity_id` (String, UUID)
@@ -175,6 +189,7 @@ socket.on('campaign_update', (data) => {
 - `created_at`
 
 ### Notification Delivery Log Table
+
 - `id` (UUID, Primary Key)
 - `notification_id` (UUID, Foreign Key)
 - `delivery_method` (Enum: email, sms, push, websocket)
@@ -187,6 +202,7 @@ socket.on('campaign_update', (data) => {
 ## Template System
 
 ### Handlebars Templates
+
 ```handlebars
 <!-- Email Template -->
 <h2>Emergency Alert</h2>
@@ -200,6 +216,7 @@ EMERGENCY ALERT: {{emergencyType}} reported at {{location}}. Time: {{timestamp}}
 ```
 
 ### Default Templates
+
 - `sos_alert_email` - Emergency email notifications
 - `sos_alert_sms` - Emergency SMS notifications
 - `campaign_donation_email` - Donation confirmation emails
@@ -207,6 +224,7 @@ EMERGENCY ALERT: {{emergencyType}} reported at {{location}}. Time: {{timestamp}}
 - `notification_general_push` - General push notifications
 
 ## Environment Configuration
+
 ```env
 # Email Configuration
 MAIL_HOST=smtp.gmail.com
@@ -224,6 +242,7 @@ TWILIO_PHONE_NUMBER=+1234567890
 ## Usage Examples
 
 ### Send SOS Alert
+
 ```javascript
 // Backend service
 await notificationService.sendSOSAlert(
@@ -241,6 +260,7 @@ await notificationService.sendSOSAlert(
 ```
 
 ### Template Rendering
+
 ```javascript
 // Render email template
 const { subject, content } = await templateService.renderTemplate(
@@ -262,6 +282,7 @@ await emailService.sendEmail(
 ```
 
 ### WebSocket Integration
+
 ```javascript
 // Frontend React component
 useEffect(() => {
@@ -284,6 +305,7 @@ useEffect(() => {
 ```
 
 ### Real-Time Campaign Updates
+
 ```javascript
 // Join campaign room
 socket.emit('join_room', { room: `campaign_${campaignId}` });
@@ -305,6 +327,7 @@ notificationGateway.sendCampaignUpdate(campaignId, {
 ```
 
 ## Security Features
+
 - JWT authentication for WebSocket connections
 - Role-based access control for admin functions
 - Template validation and sanitization
@@ -312,6 +335,7 @@ notificationGateway.sendCampaignUpdate(campaignId, {
 - Connection cleanup for inactive sockets
 
 ## Performance Optimizations
+
 - Connection pooling for database queries
 - Template caching for frequently used templates
 - Batch notification processing
@@ -319,6 +343,7 @@ notificationGateway.sendCampaignUpdate(campaignId, {
 - Automatic cleanup of old connections
 
 ## Testing
+
 - Test WebSocket connection and disconnection
 - Verify template rendering with various data
 - Test email and SMS delivery
