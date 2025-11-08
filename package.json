@@ -1,5 +1,5 @@
 {
-  "name": "Backend",
+  "name": "@love-app/backend",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -33,9 +33,6 @@
     "@nestjs/swagger": "^11.2.1",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.8",
-    "bcryptjs": "^3.0.3",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2",
     "handlebars": "^4.7.8",
     "@types/stripe": "^8.0.417",
     "bcryptjs": "^3.0.3",
@@ -51,9 +48,7 @@
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "socket.io": "^4.8.1",
-    "swagger-ui-express": "^5.0.1",
     "twilio": "^5.10.4",
-    "typeorm": "^0.3.27"
     "stripe": "^19.3.0",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.27",

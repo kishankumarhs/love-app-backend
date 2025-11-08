@@ -103,7 +103,7 @@ export class SOSService {
         location: ticket.address,
         description: ticket.description,
         callerInfo: {
-          name: ticket.guestName || ticket.user?.name,
+          name: ticket.guestName || (ticket.user ? `${ticket.user.firstName} ${ticket.user.lastName}`.trim() : ''),
           phone: ticket.guestPhone || ticket.user?.phone,
         },
       };

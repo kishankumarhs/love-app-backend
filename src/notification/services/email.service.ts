@@ -12,7 +12,7 @@ export class EmailService {
     private configService: ConfigService,
     private templateService: TemplateService,
   ) {
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: this.configService.get('MAIL_HOST'),
       port: this.configService.get('MAIL_PORT'),
       secure: false,
