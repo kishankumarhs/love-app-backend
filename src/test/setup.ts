@@ -34,6 +34,7 @@ export const mockRepository = {
     orderBy: jest.fn().mockReturnThis(),
     skip: jest.fn().mockReturnThis(),
     take: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
     getMany: jest.fn(),
     getOne: jest.fn(),
     getManyAndCount: jest.fn(),

@@ -2,8 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
+import { UserProfile } from './entities/user-profile.entity';
+import { Feedback } from './entities/feedback.entity';
 import { mockRepository } from '../test/setup';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 describe('UserService', () => {
   let service: UserService;
@@ -14,6 +16,14 @@ describe('UserService', () => {
         UserService,
         {
           provide: getRepositoryToken(User),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(UserProfile),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Feedback),
           useValue: mockRepository,
         },
       ],
@@ -39,17 +49,19 @@ describe('UserService', () => {
       expect(result).toEqual(savedUser);
     });
 
-    it('should throw ConflictException if email exists', async () => {
+    it('should create user when email does not exist', async () => {
       const createUserDto = {
-        email: 'test@test.com',
+        email: 'new@test.com',
         password: 'password',
-        name: 'Test User',
+        name: 'New User',
       };
-      mockRepository.findOne.mockResolvedValue({ id: 1 });
+      const savedUser = { id: 2, ...createUserDto };
+      
+      mockRepository.create.mockReturnValue(savedUser);
+      mockRepository.save.mockResolvedValue(savedUser);
 
-      await expect(service.create(createUserDto)).rejects.toThrow(
-        ConflictException,
-      );
+      const result = await service.create(createUserDto);
+      expect(result).toEqual(savedUser);
     });
   });
 

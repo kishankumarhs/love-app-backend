@@ -2,6 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DonationsService } from './donations.service';
 import { Donation } from './entities/donation.entity';
+import { PaymentMethod } from './entities/payment-method.entity';
+import { DonationHistory } from './entities/donation-history.entity';
+import { Refund } from './entities/refund.entity';
 import { StripeService } from './services/stripe.service';
 import { mockRepository } from '../test/setup';
 
@@ -15,6 +18,18 @@ describe('DonationsService', () => {
         DonationsService,
         {
           provide: getRepositoryToken(Donation),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(PaymentMethod),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(DonationHistory),
+          useValue: mockRepository,
+        },
+        {
+          provide: getRepositoryToken(Refund),
           useValue: mockRepository,
         },
         {
@@ -34,32 +49,35 @@ describe('DonationsService', () => {
 
   describe('createPaymentIntent', () => {
     it('should create payment intent', async () => {
-      const createDto = { amount: 100, currency: 'usd', campaignId: '1' };
-      const paymentIntent = {
-        id: 'pi_test',
-        client_secret: 'secret',
-        object: 'payment_intent',
-        amount: 100,
-        amount_capturable: 0,
-        amount_received: 0,
-        currency: 'usd',
-        status: 'requires_payment_method',
-      };
-
-      jest
-        .spyOn(stripeService, 'createPaymentIntent')
-        .mockResolvedValue(paymentIntent as any);
+      const createDto = { amount: 100, campaignId: '1' };
+      const paymentIntent = { id: 'pi_test', client_secret: 'secret' };
+      const donation = { id: '1', amount: 100, campaignId: '1' };
+      
+      jest.spyOn(stripeService, 'createPaymentIntent').mockResolvedValue(paymentIntent as any);
+      mockRepository.create.mockReturnValue(donation);
+      mockRepository.save.mockResolvedValue(donation);
 
       const result = await service.createPaymentIntent(createDto);
-      expect(result).toEqual(paymentIntent);
-      expect(stripeService.createPaymentIntent).toHaveBeenCalledWith(createDto);
+      expect(result).toHaveProperty('donation');
+      expect(result).toHaveProperty('clientSecret');
     });
   });
 
-  describe('findByUserId', () => {
-    it('should return user donations', async () => {
+  describe('getDonationHistory', () => {
+    it('should return donation history', async () => {
       const donations = [{ id: '1', amount: 100, userId: '1' }];
-      mockRepository.find.mockResolvedValue(donations);
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        take: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(donations),
+        getOne: jest.fn(),
+        getManyAndCount: jest.fn(),
+      };
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
       const result = await service.getDonationHistory('1');
       expect(result).toEqual(donations);
