@@ -2,6 +2,18 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 
+export enum VolunteerStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  SUSPENDED = 'suspended',
+}
+
+export enum VerificationStatus {
+  PENDING = 'pending',
+  VERIFIED = 'verified',
+  REJECTED = 'rejected',
+}
+
 @Entity('volunteers')
 export class Volunteer {
   @ApiProperty()
@@ -21,6 +33,15 @@ export class Volunteer {
   availability: string;
 
   @ApiProperty()
+  @Column('jsonb', { default: '{}' })
+  locationPreferences: {
+    preferredAreas?: string[];
+    maxDistance?: number;
+    transportationMode?: string;
+    availableRegions?: string[];
+  };
+
+  @ApiProperty()
   @Column('json', { nullable: true })
   preferences: {
     notifications?: {
@@ -32,6 +53,14 @@ export class Volunteer {
     maxDistance?: number;
     timeCommitment?: string;
   };
+
+  @ApiProperty({ enum: VolunteerStatus })
+  @Column({ type: 'varchar', length: 20, default: VolunteerStatus.ACTIVE })
+  status: VolunteerStatus;
+
+  @ApiProperty({ enum: VerificationStatus })
+  @Column({ type: 'varchar', length: 20, default: VerificationStatus.PENDING })
+  verificationStatus: VerificationStatus;
 
   @OneToOne(() => User)
   @JoinColumn()

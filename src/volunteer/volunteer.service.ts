@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Volunteer } from './entities/volunteer.entity';
+import { Volunteer, VolunteerStatus } from './entities/volunteer.entity';
+import { VolunteerApplication, ApplicationStatus } from './entities/volunteer-application.entity';
+import { VolunteerAssignment } from './entities/volunteer-assignment.entity';
 import { CreateVolunteerDto, UpdateVolunteerDto } from './dto/create-volunteer.dto';
+import { CreateVolunteerApplicationDto } from './dto/create-volunteer-application.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Injectable()
@@ -10,11 +13,59 @@ export class VolunteerService {
   constructor(
     @InjectRepository(Volunteer)
     private volunteerRepository: Repository<Volunteer>,
+    @InjectRepository(VolunteerApplication)
+    private applicationRepository: Repository<VolunteerApplication>,
+    @InjectRepository(VolunteerAssignment)
+    private assignmentRepository: Repository<VolunteerAssignment>,
   ) {}
 
   async create(createVolunteerDto: CreateVolunteerDto): Promise<Volunteer> {
     const volunteer = this.volunteerRepository.create(createVolunteerDto);
     return this.volunteerRepository.save(volunteer);
+  }
+
+  async submitApplication(userId: string, applicationDto: CreateVolunteerApplicationDto): Promise<VolunteerApplication> {
+    const existingApplication = await this.applicationRepository.findOne({
+      where: { userId, status: ApplicationStatus.PENDING },
+    });
+
+    if (existingApplication) {
+      throw new BadRequestException('You already have a pending application');
+    }
+
+    const application = this.applicationRepository.create({
+      ...applicationDto,
+      userId,
+    });
+
+    return await this.applicationRepository.save(application);
+  }
+
+  async approveApplication(applicationId: string, reviewerId: string): Promise<Volunteer> {
+    const application = await this.applicationRepository.findOne({
+      where: { id: applicationId },
+      relations: ['user'],
+    });
+
+    if (!application) {
+      throw new NotFoundException('Application not found');
+    }
+
+    application.status = ApplicationStatus.APPROVED;
+    application.reviewedById = reviewerId;
+    application.reviewedAt = new Date();
+    await this.applicationRepository.save(application);
+
+    const volunteer = this.volunteerRepository.create({
+      userId: application.userId,
+      interests: application.interests,
+      skills: application.skills,
+      availability: application.availability,
+      locationPreferences: application.locationPreferences,
+      status: VolunteerStatus.ACTIVE,
+    });
+
+    return await this.volunteerRepository.save(volunteer);
   }
 
   async findAll(paginationDto: PaginationDto): Promise<{ volunteers: Volunteer[]; total: number }> {
@@ -58,6 +109,31 @@ export class VolunteerService {
     const volunteer = await this.findByUserId(userId);
     await this.volunteerRepository.update(volunteer.id, { preferences });
     return this.findByUserId(userId);
+  }
+
+  async getApplications(status?: ApplicationStatus): Promise<VolunteerApplication[]> {
+    const where = status ? { status } : {};
+    return await this.applicationRepository.find({
+      where,
+      relations: ['user'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getUserApplication(userId: string): Promise<VolunteerApplication> {
+    return await this.applicationRepository.findOne({
+      where: { userId },
+      relations: ['user', 'reviewedBy'],
+      order: { createdAt: 'DESC' },
+    });
+  }
+
+  async getAssignments(volunteerId: string): Promise<VolunteerAssignment[]> {
+    return await this.assignmentRepository.find({
+      where: { volunteerId },
+      relations: ['campaign', 'provider'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async remove(id: string): Promise<void> {
