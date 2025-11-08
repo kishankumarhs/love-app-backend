@@ -1,8 +1,16 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { WifiVoucher, VoucherStatus } from '../entities/wifi-voucher.entity';
-import { VoucherUsageLog, VoucherEventType } from '../entities/voucher-usage-log.entity';
+import {
+  VoucherUsageLog,
+  VoucherEventType,
+} from '../entities/voucher-usage-log.entity';
 import { CreateWifiVoucherDto } from '../dto/create-wifi-voucher.dto';
 import { ActivateVoucherDto } from '../dto/activate-voucher.dto';
 
@@ -17,11 +25,15 @@ export class VoucherService {
     private usageLogRepository: Repository<VoucherUsageLog>,
   ) {}
 
-  async createVoucher(createVoucherDto: CreateWifiVoucherDto): Promise<WifiVoucher> {
+  async createVoucher(
+    createVoucherDto: CreateWifiVoucherDto,
+  ): Promise<WifiVoucher> {
     const code = this.generateVoucherCode();
-    const expiresAt = createVoucherDto.expiresAt 
+    const expiresAt = createVoucherDto.expiresAt
       ? new Date(createVoucherDto.expiresAt)
-      : new Date(Date.now() + (createVoucherDto.durationHours || 24) * 60 * 60 * 1000);
+      : new Date(
+          Date.now() + (createVoucherDto.durationHours || 24) * 60 * 60 * 1000,
+        );
 
     const voucher = this.voucherRepository.create({
       code,
@@ -36,7 +48,7 @@ export class VoucherService {
     });
 
     const savedVoucher = await this.voucherRepository.save(voucher);
-    
+
     await this.logVoucherEvent(savedVoucher.id, VoucherEventType.CREATED, {
       code: savedVoucher.code,
       expiresAt: savedVoucher.expiresAt,
@@ -45,7 +57,9 @@ export class VoucherService {
     return savedVoucher;
   }
 
-  async activateVoucher(activateVoucherDto: ActivateVoucherDto): Promise<WifiVoucher> {
+  async activateVoucher(
+    activateVoucherDto: ActivateVoucherDto,
+  ): Promise<WifiVoucher> {
     const { code, deviceInfo } = activateVoucherDto;
 
     const voucher = await this.voucherRepository.findOne({
@@ -103,7 +117,10 @@ export class VoucherService {
     });
   }
 
-  async revokeVoucher(voucherId: string, reason?: string): Promise<WifiVoucher> {
+  async revokeVoucher(
+    voucherId: string,
+    reason?: string,
+  ): Promise<WifiVoucher> {
     const voucher = await this.voucherRepository.findOne({
       where: { id: voucherId },
     });
@@ -134,7 +151,7 @@ export class VoucherService {
     for (const voucher of expiredVouchers) {
       voucher.status = VoucherStatus.EXPIRED;
       await this.voucherRepository.save(voucher);
-      
+
       await this.logVoucherEvent(voucher.id, VoucherEventType.EXPIRED, {
         expiredAt: new Date(),
       });

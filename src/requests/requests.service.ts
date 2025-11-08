@@ -22,8 +22,13 @@ export class RequestsService {
     return this.requestRepository.save(request);
   }
 
-  async findAllRequests(filters?: { status?: string; category?: string; userId?: string }): Promise<Request[]> {
-    const query = this.requestRepository.createQueryBuilder('request')
+  async findAllRequests(filters?: {
+    status?: string;
+    category?: string;
+    userId?: string;
+  }): Promise<Request[]> {
+    const query = this.requestRepository
+      .createQueryBuilder('request')
       .leftJoinAndSelect('request.user', 'user')
       .leftJoinAndSelect('request.provider', 'provider')
       .leftJoinAndSelect('request.referrals', 'referrals');
@@ -33,7 +38,9 @@ export class RequestsService {
     }
 
     if (filters?.category) {
-      query.andWhere('request.category = :category', { category: filters.category });
+      query.andWhere('request.category = :category', {
+        category: filters.category,
+      });
     }
 
     if (filters?.userId) {
@@ -56,9 +63,12 @@ export class RequestsService {
     return request;
   }
 
-  async updateRequest(id: string, updateRequestDto: UpdateRequestDto): Promise<Request> {
+  async updateRequest(
+    id: string,
+    updateRequestDto: UpdateRequestDto,
+  ): Promise<Request> {
     const updateData = { ...updateRequestDto };
-    
+
     if (updateRequestDto.status === 'completed') {
       updateData['completedAt'] = new Date();
     }
@@ -67,7 +77,9 @@ export class RequestsService {
     return this.findOneRequest(id);
   }
 
-  async createReferral(createReferralDto: CreateReferralDto): Promise<Referral> {
+  async createReferral(
+    createReferralDto: CreateReferralDto,
+  ): Promise<Referral> {
     const referral = this.referralRepository.create(createReferralDto);
     return this.referralRepository.save(referral);
   }
@@ -80,9 +92,12 @@ export class RequestsService {
     });
   }
 
-  async updateReferral(id: string, updateReferralDto: UpdateReferralDto): Promise<Referral> {
+  async updateReferral(
+    id: string,
+    updateReferralDto: UpdateReferralDto,
+  ): Promise<Referral> {
     const updateData = { ...updateReferralDto };
-    
+
     if (updateReferralDto.status === 'completed') {
       updateData['completedAt'] = new Date();
     }
@@ -92,7 +107,7 @@ export class RequestsService {
     }
 
     await this.referralRepository.update(id, updateData);
-    
+
     const referral = await this.referralRepository.findOne({
       where: { id },
       relations: ['request', 'provider', 'referrer'],

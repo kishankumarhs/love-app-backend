@@ -24,9 +24,13 @@ describe('UserService', () => {
 
   describe('create', () => {
     it('should create a new user', async () => {
-      const createUserDto = { email: 'test@test.com', password: 'password', name: 'Test User' };
+      const createUserDto = {
+        email: 'test@test.com',
+        password: 'password',
+        name: 'Test User',
+      };
       const savedUser = { id: 1, ...createUserDto };
-      
+
       mockRepository.findOne.mockResolvedValue(null);
       mockRepository.create.mockReturnValue(savedUser);
       mockRepository.save.mockResolvedValue(savedUser);
@@ -36,10 +40,16 @@ describe('UserService', () => {
     });
 
     it('should throw ConflictException if email exists', async () => {
-      const createUserDto = { email: 'test@test.com', password: 'password', name: 'Test User' };
+      const createUserDto = {
+        email: 'test@test.com',
+        password: 'password',
+        name: 'Test User',
+      };
       mockRepository.findOne.mockResolvedValue({ id: 1 });
 
-      await expect(service.create(createUserDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
     });
   });
 
@@ -48,13 +58,13 @@ describe('UserService', () => {
       const user = { id: 1, email: 'test@test.com' };
       mockRepository.findOne.mockResolvedValue(user);
 
-      const result = await service.findOne(1);
+      const result = await service.findOne('1');
       expect(result).toEqual(user);
     });
 
     it('should throw NotFoundException if user not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
-      await expect(service.findOne(1)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('1')).rejects.toThrow(NotFoundException);
     });
   });
 });

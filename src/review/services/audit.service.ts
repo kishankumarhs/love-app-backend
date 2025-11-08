@@ -51,7 +51,8 @@ export class AuditService {
     limit: number = 100,
     offset: number = 0,
   ): Promise<{ logs: AuditLog[]; total: number }> {
-    const query = this.auditLogRepository.createQueryBuilder('audit')
+    const query = this.auditLogRepository
+      .createQueryBuilder('audit')
       .leftJoinAndSelect('audit.user', 'user')
       .orderBy('audit.createdAt', 'DESC');
 
@@ -96,7 +97,10 @@ export class AuditService {
     }
 
     const changes: Record<string, any> = {};
-    const allKeys = new Set([...Object.keys(oldValues), ...Object.keys(newValues)]);
+    const allKeys = new Set([
+      ...Object.keys(oldValues),
+      ...Object.keys(newValues),
+    ]);
 
     for (const key of allKeys) {
       const oldValue = oldValues[key];

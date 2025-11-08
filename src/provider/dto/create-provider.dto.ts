@@ -1,4 +1,11 @@
-import { IsString, IsArray, IsNumber, IsEmail, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsArray,
+  IsNumber,
+  IsEmail,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateProviderDto {
   @IsString()

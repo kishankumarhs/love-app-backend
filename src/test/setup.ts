@@ -2,7 +2,10 @@ import { Test } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
-export const createTestingModule = async (providers: any[] = [], imports: any[] = []) => {
+export const createTestingModule = async (
+  providers: any[] = [],
+  imports: any[] = [],
+) => {
   return await Test.createTestingModule({
     imports: [
       ConfigModule.forRoot({ isGlobal: true }),

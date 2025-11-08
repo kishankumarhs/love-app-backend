@@ -17,22 +17,31 @@ export class CampaignService {
     return this.campaignRepository.save(campaign);
   }
 
-  async findAll(filters?: { category?: string; providerId?: string; status?: string }): Promise<Campaign[]> {
-    const query = this.campaignRepository.createQueryBuilder('campaign')
+  async findAll(filters?: {
+    category?: string;
+    providerId?: string;
+    status?: string;
+  }): Promise<Campaign[]> {
+    const query = this.campaignRepository
+      .createQueryBuilder('campaign')
       .leftJoinAndSelect('campaign.provider', 'provider');
-    
+
     if (filters?.category) {
-      query.andWhere('campaign.category = :category', { category: filters.category });
+      query.andWhere('campaign.category = :category', {
+        category: filters.category,
+      });
     }
-    
+
     if (filters?.providerId) {
-      query.andWhere('campaign.providerId = :providerId', { providerId: filters.providerId });
+      query.andWhere('campaign.providerId = :providerId', {
+        providerId: filters.providerId,
+      });
     }
-    
+
     if (filters?.status) {
       query.andWhere('campaign.status = :status', { status: filters.status });
     }
-    
+
     return query.getMany();
   }
 
@@ -41,15 +50,18 @@ export class CampaignService {
       where: { id },
       relations: ['provider'],
     });
-    
+
     if (!campaign) {
       throw new NotFoundException('Campaign not found');
     }
-    
+
     return campaign;
   }
 
-  async update(id: string, updateCampaignDto: UpdateCampaignDto): Promise<Campaign> {
+  async update(
+    id: string,
+    updateCampaignDto: UpdateCampaignDto,
+  ): Promise<Campaign> {
     await this.campaignRepository.update(id, updateCampaignDto);
     return this.findOne(id);
   }

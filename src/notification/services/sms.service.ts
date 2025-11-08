@@ -14,7 +14,7 @@ export class SMSService {
   ) {
     const accountSid = this.configService.get('TWILIO_ACCOUNT_SID');
     const authToken = this.configService.get('TWILIO_AUTH_TOKEN');
-    
+
     if (accountSid && authToken) {
       this.twilioClient = new Twilio(accountSid, authToken);
     }
@@ -47,7 +47,10 @@ export class SMSService {
     data: Record<string, any>,
   ): Promise<boolean> {
     try {
-      const { content } = await this.templateService.renderTemplate(templateName, data);
+      const { content } = await this.templateService.renderTemplate(
+        templateName,
+        data,
+      );
       return await this.sendSMS(to, content);
     } catch (error) {
       this.logger.error(`Failed to send templated SMS to ${to}`, error);

@@ -1,5 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, IsDateString, IsEnum, IsNumber, Min } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsDateString,
+  IsEnum,
+  IsNumber,
+  Min,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class AdminFiltersDto {

@@ -1,7 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ModerationQueue, ModerationStatus, ContentType, ReportReason } from '../entities/moderation-queue.entity';
+import {
+  ModerationQueue,
+  ModerationStatus,
+  ContentType,
+  ReportReason,
+} from '../entities/moderation-queue.entity';
 import { Review, ReviewStatus } from '../entities/review.entity';
 
 @Injectable()
@@ -50,7 +55,8 @@ export class ModerationService {
     limit: number = 50,
     offset: number = 0,
   ): Promise<{ items: ModerationQueue[]; total: number }> {
-    const query = this.moderationQueueRepository.createQueryBuilder('moderation')
+    const query = this.moderationQueueRepository
+      .createQueryBuilder('moderation')
       .leftJoinAndSelect('moderation.reportedBy', 'reportedBy')
       .leftJoinAndSelect('moderation.assignedTo', 'assignedTo')
       .leftJoinAndSelect('moderation.resolvedBy', 'resolvedBy')
@@ -66,7 +72,9 @@ export class ModerationService {
     }
 
     if (assignedToId) {
-      query.andWhere('moderation.assignedToId = :assignedToId', { assignedToId });
+      query.andWhere('moderation.assignedToId = :assignedToId', {
+        assignedToId,
+      });
     }
 
     const [items, total] = await query
@@ -77,7 +85,10 @@ export class ModerationService {
     return { items, total };
   }
 
-  async assignModerationItem(itemId: string, assignedToId: string): Promise<ModerationQueue> {
+  async assignModerationItem(
+    itemId: string,
+    assignedToId: string,
+  ): Promise<ModerationQueue> {
     const item = await this.moderationQueueRepository.findOne({
       where: { id: itemId },
     });
@@ -113,13 +124,22 @@ export class ModerationService {
 
     // Apply moderation action to content
     if (item.contentType === ContentType.REVIEW && action) {
-      await this.applyReviewModerationAction(item.contentId, action, resolvedById, resolutionNotes);
+      await this.applyReviewModerationAction(
+        item.contentId,
+        action,
+        resolvedById,
+        resolutionNotes,
+      );
     }
 
     return await this.moderationQueueRepository.save(item);
   }
 
-  async dismissModeration(itemId: string, resolvedById: string, reason?: string): Promise<ModerationQueue> {
+  async dismissModeration(
+    itemId: string,
+    resolvedById: string,
+    reason?: string,
+  ): Promise<ModerationQueue> {
     const item = await this.moderationQueueRepository.findOne({
       where: { id: itemId },
     });

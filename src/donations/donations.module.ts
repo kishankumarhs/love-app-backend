@@ -12,7 +12,12 @@ import stripeConfig from '../config/stripe.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Donation, PaymentMethod, DonationHistory, Refund]),
+    TypeOrmModule.forFeature([
+      Donation,
+      PaymentMethod,
+      DonationHistory,
+      Refund,
+    ]),
     ConfigModule.forFeature(stripeConfig),
   ],
   controllers: [DonationsController],

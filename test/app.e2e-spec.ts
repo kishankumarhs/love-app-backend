@@ -44,13 +44,11 @@ describe('AppController (e2e)', () => {
     });
 
     it('should login with valid credentials', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/register')
-        .send({
-          email: 'test@test.com',
-          password: 'password123',
-          name: 'Test User',
-        });
+      await request(app.getHttpServer()).post('/auth/register').send({
+        email: 'test@test.com',
+        password: 'password123',
+        name: 'Test User',
+      });
 
       return request(app.getHttpServer())
         .post('/auth/login')

@@ -5,7 +5,12 @@ import * as XLSX from 'xlsx';
 import * as csvWriter from 'csv-writer';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Report, ReportType, ReportStatus, ReportFormat } from '../entities/report.entity';
+import {
+  Report,
+  ReportType,
+  ReportStatus,
+  ReportFormat,
+} from '../entities/report.entity';
 import { User } from '../../user/entities/user.entity';
 import { Provider } from '../../provider/entities/provider.entity';
 import { Campaign } from '../../campaign/entities/campaign.entity';
@@ -81,7 +86,9 @@ export class ReportService {
     return report;
   }
 
-  async downloadReport(id: string): Promise<{ filePath: string; fileName: string }> {
+  async downloadReport(
+    id: string,
+  ): Promise<{ filePath: string; fileName: string }> {
     const report = await this.getReport(id);
 
     if (report.status !== ReportStatus.COMPLETED || !report.filePath) {
@@ -98,12 +105,22 @@ export class ReportService {
   private async processReport(reportId: string): Promise<void> {
     try {
       const report = await this.getReport(reportId);
-      
-      // Update status to processing
-      await this.reportRepository.update(reportId, { status: ReportStatus.PROCESSING });
 
-      const data = await this.fetchReportData(report.type, report.filters, report.columns);
-      const filePath = await this.generateReportFile(data, report.format, report.name);
+      // Update status to processing
+      await this.reportRepository.update(reportId, {
+        status: ReportStatus.PROCESSING,
+      });
+
+      const data = await this.fetchReportData(
+        report.type,
+        report.filters,
+        report.columns,
+      );
+      const filePath = await this.generateReportFile(
+        data,
+        report.format,
+        report.name,
+      );
       const fileSize = fs.statSync(filePath).size;
 
       // Update report with file info
@@ -131,33 +148,66 @@ export class ReportService {
     switch (type) {
       case ReportType.USERS:
         query = this.userRepository.createQueryBuilder('user');
-        defaultColumns = ['id', 'email', 'firstName', 'lastName', 'role', 'createdAt'];
+        defaultColumns = [
+          'id',
+          'email',
+          'firstName',
+          'lastName',
+          'role',
+          'createdAt',
+        ];
         break;
       case ReportType.PROVIDERS:
         query = this.providerRepository.createQueryBuilder('provider');
-        defaultColumns = ['id', 'name', 'email', 'phone', 'address', 'createdAt'];
+        defaultColumns = [
+          'id',
+          'name',
+          'email',
+          'phone',
+          'address',
+          'createdAt',
+        ];
         break;
       case ReportType.CAMPAIGNS:
-        query = this.campaignRepository.createQueryBuilder('campaign')
+        query = this.campaignRepository
+          .createQueryBuilder('campaign')
           .leftJoinAndSelect('campaign.provider', 'provider');
-        defaultColumns = ['id', 'title', 'description', 'goalAmount', 'currentAmount', 'status', 'createdAt'];
+        defaultColumns = [
+          'id',
+          'title',
+          'description',
+          'goalAmount',
+          'currentAmount',
+          'status',
+          'createdAt',
+        ];
         break;
       case ReportType.DONATIONS:
-        query = this.donationRepository.createQueryBuilder('donation')
+        query = this.donationRepository
+          .createQueryBuilder('donation')
           .leftJoinAndSelect('donation.user', 'user')
           .leftJoinAndSelect('donation.campaign', 'campaign');
         defaultColumns = ['id', 'amount', 'status', 'createdAt'];
         break;
       case ReportType.REVIEWS:
-        query = this.reviewRepository.createQueryBuilder('review')
+        query = this.reviewRepository
+          .createQueryBuilder('review')
           .leftJoinAndSelect('review.user', 'user')
           .leftJoinAndSelect('review.provider', 'provider');
         defaultColumns = ['id', 'rating', 'comment', 'status', 'createdAt'];
         break;
       case ReportType.VOLUNTEERS:
-        query = this.volunteerRepository.createQueryBuilder('volunteer')
+        query = this.volunteerRepository
+          .createQueryBuilder('volunteer')
           .leftJoinAndSelect('volunteer.user', 'user');
-        defaultColumns = ['id', 'interests', 'skills', 'availability', 'status', 'createdAt'];
+        defaultColumns = [
+          'id',
+          'interests',
+          'skills',
+          'availability',
+          'status',
+          'createdAt',
+        ];
         break;
       default:
         throw new Error(`Unsupported report type: ${type}`);
@@ -169,12 +219,14 @@ export class ReportService {
     const results = await query.getMany();
     const selectedColumns = columns.length > 0 ? columns : defaultColumns;
 
-    return results.map(item => this.extractColumns(item, selectedColumns));
+    return results.map((item) => this.extractColumns(item, selectedColumns));
   }
 
   private applyFilters(query: any, filters: Record<string, any>): void {
     if (filters.startDate) {
-      query.andWhere('createdAt >= :startDate', { startDate: filters.startDate });
+      query.andWhere('createdAt >= :startDate', {
+        startDate: filters.startDate,
+      });
     }
     if (filters.endDate) {
       query.andWhere('createdAt <= :endDate', { endDate: filters.endDate });
@@ -189,12 +241,12 @@ export class ReportService {
 
   private extractColumns(item: any, columns: string[]): Record<string, any> {
     const result: Record<string, any> = {};
-    
+
     for (const column of columns) {
       const value = this.getNestedValue(item, column);
       result[column] = value;
     }
-    
+
     return result;
   }
 
@@ -233,7 +285,10 @@ export class ReportService {
       return;
     }
 
-    const headers = Object.keys(data[0]).map(key => ({ id: key, title: key }));
+    const headers = Object.keys(data[0]).map((key) => ({
+      id: key,
+      title: key,
+    }));
     const writer = csvWriter.createObjectCsvWriter({
       path: filePath,
       header: headers,

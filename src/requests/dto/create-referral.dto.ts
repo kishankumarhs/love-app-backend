@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUUID, IsBoolean, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsUUID, IsDateString } from 'class-validator';
 
 export class CreateReferralDto {
   @IsUUID()

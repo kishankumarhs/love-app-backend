@@ -20,7 +20,7 @@ export class EmailService {
 
   async sendVerificationEmail(email: string, token: string): Promise<void> {
     const verificationUrl = `${this.configService.get<string>('APP_URL')}/auth/verify-email?token=${token}`;
-    
+
     await this.transporter.sendMail({
       from: this.configService.get<string>('MAIL_FROM'),
       to: email,

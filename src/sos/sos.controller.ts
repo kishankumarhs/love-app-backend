@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { SOSService } from './sos.service';
 import { CreateSOSTicketDto } from './dto/create-sos-ticket.dto';
 import { UpdateSOSTicketDto } from './dto/update-sos-ticket.dto';
@@ -33,7 +41,10 @@ export class SOSController {
   }
 
   @Patch('tickets/:id')
-  updateTicket(@Param('id') id: string, @Body() updateSOSTicketDto: UpdateSOSTicketDto) {
+  updateTicket(
+    @Param('id') id: string,
+    @Body() updateSOSTicketDto: UpdateSOSTicketDto,
+  ) {
     return this.sosService.updateTicket(id, updateSOSTicketDto);
   }
 
@@ -44,7 +55,7 @@ export class SOSController {
 
   @Post('emergency-call/:ticketId')
   async triggerEmergencyCall(@Param('ticketId') ticketId: string) {
-    const ticket = await this.sosService.findOne(ticketId);
+    await this.sosService.findOne(ticketId);
     // Emergency call logic is handled in service
     return { message: 'Emergency call initiated', ticketId };
   }

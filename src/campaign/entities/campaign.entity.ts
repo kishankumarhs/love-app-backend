@@ -1,4 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Provider } from '../../provider/entities/provider.entity';
 
 @Entity('campaigns')
@@ -39,7 +47,7 @@ export class Campaign {
   @Column('uuid')
   providerId: string;
 
-  @ManyToOne(() => Provider, provider => provider.campaigns)
+  @ManyToOne(() => Provider, (provider) => provider.campaigns)
   @JoinColumn({ name: 'providerId' })
   provider: Provider;
 

@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
 import { NotificationTemplate } from './notification-template.entity';
@@ -58,7 +65,11 @@ export class Notification {
   priority: NotificationPriority;
 
   @ApiProperty({ enum: NotificationCategory })
-  @Column({ type: 'varchar', length: 50, default: NotificationCategory.GENERAL })
+  @Column({
+    type: 'varchar',
+    length: 50,
+    default: NotificationCategory.GENERAL,
+  })
   category: NotificationCategory;
 
   @ManyToOne(() => NotificationTemplate, { nullable: true })

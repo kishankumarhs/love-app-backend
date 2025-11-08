@@ -1,12 +1,19 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Donation, DonationStatus } from './entities/donation.entity';
 import { PaymentMethod } from './entities/payment-method.entity';
-import { DonationHistory, DonationEventType } from './entities/donation-history.entity';
+import {
+  DonationHistory,
+  DonationEventType,
+} from './entities/donation-history.entity';
 import { Refund, RefundStatus } from './entities/refund.entity';
 import { StripeService } from './services/stripe.service';
-import { CreateDonationDto } from './dto/create-donation.dto';
 import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 import { CreateRefundDto } from './dto/create-refund.dto';
 import { SavePaymentMethodDto } from './dto/save-payment-method.dto';
@@ -28,7 +35,8 @@ export class DonationsService {
   ) {}
 
   async createPaymentIntent(createPaymentIntentDto: CreatePaymentIntentDto) {
-    const { amount, campaignId, userId, paymentMethodId, providerId } = createPaymentIntentDto;
+    const { amount, campaignId, userId, paymentMethodId, providerId } =
+      createPaymentIntentDto;
 
     try {
       const metadata = {
@@ -180,13 +188,15 @@ export class DonationsService {
     }
   }
 
-  async savePaymentMethod(userId: string, savePaymentMethodDto: SavePaymentMethodDto) {
+  async savePaymentMethod(
+    userId: string,
+    savePaymentMethodDto: SavePaymentMethodDto,
+  ) {
     const { stripePaymentMethodId, setAsDefault } = savePaymentMethodDto;
 
     try {
-      const stripePaymentMethod = await this.stripeService.retrievePaymentMethod(
-        stripePaymentMethodId,
-      );
+      const stripePaymentMethod =
+        await this.stripeService.retrievePaymentMethod(stripePaymentMethodId);
 
       if (setAsDefault) {
         await this.paymentMethodRepository.update(
@@ -221,7 +231,8 @@ export class DonationsService {
   }
 
   async getDonationHistory(userId?: string, campaignId?: string) {
-    const query = this.donationRepository.createQueryBuilder('donation')
+    const query = this.donationRepository
+      .createQueryBuilder('donation')
       .leftJoinAndSelect('donation.campaign', 'campaign')
       .leftJoinAndSelect('donation.user', 'user')
       .leftJoinAndSelect('donation.provider', 'provider')
@@ -311,7 +322,8 @@ export class DonationsService {
 
     if (donation && donation.status === DonationStatus.PENDING) {
       donation.status = DonationStatus.FAILED;
-      donation.failureReason = paymentIntent.last_payment_error?.message || 'Payment failed';
+      donation.failureReason =
+        paymentIntent.last_payment_error?.message || 'Payment failed';
 
       await this.donationRepository.save(donation);
       await this.createDonationHistory(

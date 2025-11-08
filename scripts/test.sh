@@ -1,1 +1,36 @@
-#!/bin/bash\n\n# Love App Backend Testing Script\n\nset -e\n\necho \"🧪 Running Love App Backend Tests...\"\n\n# Install dependencies\necho \"📦 Installing dependencies...\"\nyarn install\n\n# Run linting\necho \"🔍 Running ESLint...\"\nyarn lint\n\n# Run unit tests\necho \"🔬 Running unit tests...\"\nyarn test\n\n# Run integration tests\necho \"🔗 Running integration tests...\"\nyarn test:e2e\n\n# Generate test coverage\necho \"📊 Generating test coverage...\"\nyarn test:cov\n\n# Check test coverage threshold\necho \"📈 Checking coverage threshold...\"\nif [ -f coverage/lcov.info ]; then\n    COVERAGE=$(grep -o 'SF:.*' coverage/lcov.info | wc -l)\n    echo \"Coverage files: $COVERAGE\"\nfi\n\necho \"✅ All tests passed successfully!\"\n
+#!/bin/bash
+
+# Love App Backend Testing Script
+
+set -e
+
+echo "🧪 Running Love App Backend Tests..."
+
+# Install dependencies
+echo "📦 Installing dependencies..."
+yarn install
+
+# Run linting
+echo "🔍 Running ESLint..."
+yarn lint
+
+# Run unit tests
+echo "🔬 Running unit tests..."
+yarn test
+
+# Run integration tests
+echo "🔗 Running integration tests..."
+yarn test:e2e
+
+# Generate test coverage
+echo "📊 Generating test coverage..."
+yarn test:cov
+
+# Check test coverage threshold
+echo "📈 Checking coverage threshold..."
+if [ -f coverage/lcov.info ]; then
+    COVERAGE=$(grep -o 'SF:.*' coverage/lcov.info | wc -l)
+    echo "Coverage files: $COVERAGE"
+fi
+
+echo "✅ All tests passed successfully!"

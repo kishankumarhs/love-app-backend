@@ -1,24 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { AuthService } from './auth.service';
-import { User } from '../users/entities/user.entity';
-import { mockRepository } from '../test/setup';
-import * as bcrypt from 'bcrypt';
+import { UserService } from '../user/user.service';
+import * as bcrypt from 'bcryptjs';
 
-jest.mock('bcrypt');
+jest.mock('bcryptjs');
 
 describe('AuthService', () => {
   let service: AuthService;
-  let jwtService: JwtService;
+  let userService: UserService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         {
-          provide: getRepositoryToken(User),
-          useValue: mockRepository,
+          provide: UserService,
+          useValue: {
+            findByEmail: jest.fn(),
+            create: jest.fn(),
+            findOne: jest.fn(),
+          },
         },
         {
           provide: JwtService,
@@ -31,32 +33,67 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    jwtService = module.get<JwtService>(JwtService);
+    userService = module.get<UserService>(UserService);
   });
 
-  describe('validateUser', () => {
-    it('should return user data when credentials are valid', async () => {
-      const user = { id: 1, email: 'test@test.com', password: 'hashedPassword' };
-      mockRepository.findOne.mockResolvedValue(user);
+  describe('signIn', () => {
+    it('should return user and token when credentials are valid', async () => {
+      const user = {
+        id: '1',
+        email: 'test@test.com',
+        password: 'hashedPassword',
+        firstName: 'Test',
+        lastName: 'User',
+        phone: null,
+        role: 'USER',
+        isEmailVerified: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      jest.spyOn(userService, 'findByEmail').mockResolvedValue(user as any);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.validateUser('test@test.com', 'password');
-      expect(result).toEqual({ id: 1, email: 'test@test.com' });
+      const result = await service.signIn({
+        email: 'test@test.com',
+        password: 'password',
+      });
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
     });
 
-    it('should return null when credentials are invalid', async () => {
-      mockRepository.findOne.mockResolvedValue(null);
-      const result = await service.validateUser('test@test.com', 'password');
-      expect(result).toBeNull();
+    it('should throw error when credentials are invalid', async () => {
+      jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
+      await expect(
+        service.signIn({ email: 'test@test.com', password: 'password' }),
+      ).rejects.toThrow();
     });
   });
 
-  describe('login', () => {
-    it('should return access token', async () => {
-      const user = { id: 1, email: 'test@test.com', role: 'USER' };
-      const result = await service.login(user);
-      expect(result).toEqual({ access_token: 'test-token' });
-      expect(jwtService.sign).toHaveBeenCalledWith({ email: user.email, sub: user.id, role: user.role });
+  describe('signUp', () => {
+    it('should create user and return token', async () => {
+      const user = {
+        id: '1',
+        email: 'test@test.com',
+        firstName: 'Test',
+        lastName: 'User',
+        password: 'hashedPassword',
+        phone: null,
+        role: 'USER',
+        isEmailVerified: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      jest.spyOn(userService, 'findByEmail').mockResolvedValue(null);
+      jest.spyOn(userService, 'create').mockResolvedValue(user as any);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
+
+      const result = await service.signUp({
+        email: 'test@test.com',
+        password: 'password',
+        name: 'Test User',
+      });
+      expect(result).toHaveProperty('user');
+      expect(result).toHaveProperty('token');
     });
   });
 });

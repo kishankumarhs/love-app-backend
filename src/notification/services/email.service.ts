@@ -52,7 +52,10 @@ export class EmailService {
     data: Record<string, any>,
   ): Promise<boolean> {
     try {
-      const { subject, content } = await this.templateService.renderTemplate(templateName, data);
+      const { subject, content } = await this.templateService.renderTemplate(
+        templateName,
+        data,
+      );
       return await this.sendEmail(to, subject || 'Notification', content);
     } catch (error) {
       this.logger.error(`Failed to send templated email to ${to}`, error);

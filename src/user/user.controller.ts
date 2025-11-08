@@ -1,9 +1,28 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete, Query, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Put,
+  Delete,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserProfileDto, UpdateUserProfileDto } from './dto/user-profile.dto';
+import {
+  CreateUserProfileDto,
+  UpdateUserProfileDto,
+} from './dto/user-profile.dto';
 import { CreateFeedbackDto, UpdateFeedbackDto } from './dto/feedback.dto';
 import { User, UserRole } from './entities/user.entity';
 import { UserProfile } from './entities/user-profile.entity';
@@ -92,7 +111,10 @@ export class UserController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({ status: 200, type: UserProfile })
-  updateProfile(@Param('userId') userId: string, @Body() updateProfileDto: UpdateUserProfileDto) {
+  updateProfile(
+    @Param('userId') userId: string,
+    @Body() updateProfileDto: UpdateUserProfileDto,
+  ) {
     return this.userService.updateProfile(userId, updateProfileDto);
   }
 
@@ -124,7 +146,10 @@ export class UserController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update feedback status (Admin only)' })
   @ApiResponse({ status: 200, type: Feedback })
-  updateFeedback(@Param('id') id: string, @Body() updateFeedbackDto: UpdateFeedbackDto) {
+  updateFeedback(
+    @Param('id') id: string,
+    @Body() updateFeedbackDto: UpdateFeedbackDto,
+  ) {
     return this.userService.updateFeedback(id, updateFeedbackDto);
   }
 }

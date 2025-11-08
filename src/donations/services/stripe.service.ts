@@ -12,7 +12,7 @@ export class StripeService {
     if (!secretKey) {
       throw new Error('Stripe secret key is not configured');
     }
-    
+
     this.stripe = new Stripe(secretKey, {
       apiVersion: '2025-10-29.clover',
     });
@@ -47,7 +47,9 @@ export class StripeService {
     }
   }
 
-  async confirmPaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent> {
+  async confirmPaymentIntent(
+    paymentIntentId: string,
+  ): Promise<Stripe.PaymentIntent> {
     try {
       return await this.stripe.paymentIntents.confirm(paymentIntentId);
     } catch (error) {
@@ -56,7 +58,9 @@ export class StripeService {
     }
   }
 
-  async retrievePaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent> {
+  async retrievePaymentIntent(
+    paymentIntentId: string,
+  ): Promise<Stripe.PaymentIntent> {
     try {
       return await this.stripe.paymentIntents.retrieve(paymentIntentId);
     } catch (error) {
@@ -90,7 +94,9 @@ export class StripeService {
     }
   }
 
-  async retrievePaymentMethod(paymentMethodId: string): Promise<Stripe.PaymentMethod> {
+  async retrievePaymentMethod(
+    paymentMethodId: string,
+  ): Promise<Stripe.PaymentMethod> {
     try {
       return await this.stripe.paymentMethods.retrieve(paymentMethodId);
     } catch (error) {
@@ -126,13 +132,19 @@ export class StripeService {
   }
 
   constructWebhookEvent(payload: string, signature: string): Stripe.Event {
-    const webhookSecret = this.configService.get<string>('stripe.webhookSecret');
+    const webhookSecret = this.configService.get<string>(
+      'stripe.webhookSecret',
+    );
     if (!webhookSecret) {
       throw new Error('Stripe webhook secret is not configured');
     }
 
     try {
-      return this.stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+      return this.stripe.webhooks.constructEvent(
+        payload,
+        signature,
+        webhookSecret,
+      );
     } catch (error) {
       this.logger.error('Failed to construct webhook event', error);
       throw error;

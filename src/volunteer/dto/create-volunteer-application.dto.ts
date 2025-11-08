@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsString, IsOptional, IsObject, ValidateNested } from 'class-validator';
+import { IsArray, IsString, IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class LocationPreferencesDto {
