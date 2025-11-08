@@ -1,52 +1,69 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Provider } from '../../provider/entities/provider.entity';
-
-export enum RequestStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  COMPLETED = 'completed',
-}
+import { Referral } from './referral.entity';
 
 @Entity('requests')
 export class Request {
-  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @ApiProperty()
-  @Column()
-  title: string;
-
-  @ApiProperty()
-  @Column('text')
-  description: string;
-
-  @ApiProperty({ enum: RequestStatus })
-  @Column({ type: 'enum', enum: RequestStatus, default: RequestStatus.PENDING })
-  status: RequestStatus;
-
-  @ManyToOne(() => User)
-  @JoinColumn()
-  user: User;
 
   @Column()
   userId: string;
 
-  @ManyToOne(() => Provider, { nullable: true })
-  @JoinColumn()
-  provider: Provider;
+  @Column()
+  title: string;
+
+  @Column('text')
+  description: string;
+
+  @Column()
+  category: string;
+
+  @Column()
+  urgency: string;
+
+  @Column({ default: 'pending' })
+  status: string;
 
   @Column({ nullable: true })
   providerId: string;
 
-  @ApiProperty()
+  @Column({ nullable: true })
+  assignedTo: string;
+
+  @Column('decimal', { precision: 10, scale: 7, nullable: true })
+  latitude: number;
+
+  @Column('decimal', { precision: 10, scale: 7, nullable: true })
+  longitude: number;
+
+  @Column({ nullable: true })
+  address: string;
+
+  @Column({ nullable: true })
+  preferredContactMethod: string;
+
+  @Column({ nullable: true })
+  notes: string;
+
+  @Column({ nullable: true })
+  completedAt: Date;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ManyToOne(() => Provider, { nullable: true })
+  @JoinColumn({ name: 'providerId' })
+  provider: Provider;
+
+  @OneToMany(() => Referral, referral => referral.request)
+  referrals: Referral[];
+
   @CreateDateColumn()
   createdAt: Date;
 
-  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 }
