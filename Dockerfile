@@ -1,1 +1,53 @@
-# Build stage\nFROM node:18-alpine AS builder\n\nWORKDIR /app\n\n# Copy package files\nCOPY package*.json ./\nCOPY yarn.lock ./\n\n# Install dependencies\nRUN yarn install --frozen-lockfile\n\n# Copy source code\nCOPY . .\n\n# Build application\nRUN yarn build\n\n# Production stage\nFROM node:18-alpine AS production\n\nWORKDIR /app\n\n# Install dumb-init for proper signal handling\nRUN apk add --no-cache dumb-init\n\n# Create non-root user\nRUN addgroup -g 1001 -S nodejs\nRUN adduser -S nestjs -u 1001\n\n# Copy package files\nCOPY package*.json ./\nCOPY yarn.lock ./\n\n# Install production dependencies\nRUN yarn install --frozen-lockfile --production && yarn cache clean\n\n# Copy built application\nCOPY --from=builder --chown=nestjs:nodejs /app/dist ./dist\nCOPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules\n\n# Switch to non-root user\nUSER nestjs\n\n# Expose port\nEXPOSE 3000\n\n# Health check\nHEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\\n  CMD node healthcheck.js\n\n# Start application\nCMD [\"dumb-init\", \"node\", \"dist/main\"]\n
+# Build stage
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock ./
+
+# Install dependencies
+RUN yarn install --frozen-lockfile
+
+# Copy source code
+COPY . .
+
+# Build application
+RUN yarn build
+
+# Production stage
+FROM node:18-alpine AS production
+
+WORKDIR /app
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs
+RUN adduser -S nestjs -u 1001
+
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock ./
+
+# Install production dependencies
+RUN yarn install --frozen-lockfile --production && yarn cache clean
+
+# Copy built application
+COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+
+# Switch to non-root user
+USER nestjs
+
+# Expose port
+EXPOSE 3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node healthcheck.js
+
+# Start application
+CMD ["dumb-init", "node", "dist/main"]
