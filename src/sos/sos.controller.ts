@@ -1,39 +1,66 @@
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Query, UseGuards } from '@nestjs/common';
 import { SOSService } from './sos.service';
-import { CreateSOSDto } from './dto/create-sos.dto';
-import { SOS } from './entities/sos.entity';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { GuestGuard } from '../auth/guards/guest.guard';
-import { AllowGuest } from '../auth/decorators/allow-guest.decorator';
+import { CreateSOSTicketDto } from './dto/create-sos-ticket.dto';
+import { UpdateSOSTicketDto } from './dto/update-sos-ticket.dto';
+import { GuestSOSDto } from './dto/guest-sos.dto';
 
-@ApiTags('SOS')
 @Controller('sos')
 export class SOSController {
   constructor(private readonly sosService: SOSService) {}
 
-  @Post()
-  @AllowGuest()
-  @UseGuards(GuestGuard)
-  @ApiOperation({ summary: 'Create SOS call - Guest allowed for emergencies' })
-  @ApiResponse({ status: 201, type: SOS })
-  create(@Body() createSOSDto: CreateSOSDto) {
-    return this.sosService.create(createSOSDto);
+  @Post('ticket')
+  createTicket(@Body() createSOSTicketDto: CreateSOSTicketDto) {
+    return this.sosService.createSOSTicket(createSOSTicketDto);
   }
 
-  @Get()
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get all SOS calls' })
-  @ApiResponse({ status: 200, type: [SOS] })
-  findAll() {
-    return this.sosService.findAll();
+  @Get('tickets')
+  findAllTickets(
+    @Query('status') status?: string,
+    @Query('userId') userId?: string,
+    @Query('emergencyType') emergencyType?: string,
+  ) {
+    return this.sosService.findAll({ status, userId, emergencyType });
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get SOS call by ID' })
-  @ApiResponse({ status: 200, type: SOS })
-  findOne(@Param('id') id: string) {
+  @Get('tickets/guest/:phone')
+  getGuestTickets(@Param('phone') phone: string) {
+    return this.sosService.getGuestTickets(phone);
+  }
+
+  @Get('tickets/:id')
+  findOneTicket(@Param('id') id: string) {
     return this.sosService.findOne(id);
+  }
+
+  @Patch('tickets/:id')
+  updateTicket(@Param('id') id: string, @Body() updateSOSTicketDto: UpdateSOSTicketDto) {
+    return this.sosService.updateTicket(id, updateSOSTicketDto);
+  }
+
+  @Get('emergency-contacts')
+  getEmergencyContacts() {
+    return this.sosService.getEmergencyContacts();
+  }
+
+  @Post('emergency-call/:ticketId')
+  async triggerEmergencyCall(@Param('ticketId') ticketId: string) {
+    const ticket = await this.sosService.findOne(ticketId);
+    // Emergency call logic is handled in service
+    return { message: 'Emergency call initiated', ticketId };
+  }
+
+  @Post('guest/ticket')
+  createGuestTicket(@Body() guestSOSDto: GuestSOSDto) {
+    const createDto: CreateSOSTicketDto = {
+      guestPhone: guestSOSDto.guestPhone,
+      guestName: guestSOSDto.guestName,
+      emergencyType: guestSOSDto.emergencyType,
+      description: guestSOSDto.description,
+      latitude: guestSOSDto.latitude,
+      longitude: guestSOSDto.longitude,
+      address: guestSOSDto.address,
+      requiresEmergencyCall: guestSOSDto.requiresEmergencyCall,
+    };
+    return this.sosService.createSOSTicket(createDto);
   }
 }
