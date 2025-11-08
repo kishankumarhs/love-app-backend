@@ -330,22 +330,6 @@ GET /health
 # External service status
 ```
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
-
-### Development Guidelines
-
-- Follow TypeScript best practices
-- Write comprehensive tests
-- Update documentation
-- Follow security guidelines
-- Add translations for new features
-
 ## 📝 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -357,7 +341,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 🐛 **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
 - 💬 **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
 
-## 🙏 Acknowledgments
+## 🙏 Technologies
 
 - Built with [NestJS](https://nestjs.com/)
 - Powered by [TypeScript](https://www.typescriptlang.org/)
@@ -366,7 +350,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Notifications by [Twilio](https://www.twilio.com/)
 
 ---
-
-<p align="center">
-  Made with ❤️ for community support and social impact
-</p>
