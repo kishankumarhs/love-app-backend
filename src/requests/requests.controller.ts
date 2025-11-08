@@ -72,4 +72,19 @@ export class RequestsController {
   getReferralHistory(@Param('userId') userId: string) {
     return this.requestsService.getReferralHistory(userId);
   }
+
+  @Post(':id/help')
+  requestHelp(@Param('id') id: string, @Body() body: any) {
+    return this.requestsService.requestHelp(id, body);
+  }
+
+  @Post(':id/refer')
+  referSomeone(@Param('id') id: string, @Body() body: any) {
+    return this.requestsService.referSomeone(id, body);
+  }
+
+  @Post(':id/donate')
+  donate(@Param('id') id: string, @Body() body: any) {
+    return this.requestsService.donate(id, body);
+  }
 }

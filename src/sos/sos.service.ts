@@ -146,6 +146,32 @@ export class SOSService {
     }
   }
 
+  async findNearby(
+    latitude: number,
+    longitude: number,
+    radius: number = 5,
+  ): Promise<SOSTicket[]> {
+    const query = this.sosTicketRepository
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.user', 'user')
+      .where('ticket.status IN (:...statuses)', {
+        statuses: ['open', 'in_progress'],
+      })
+      .andWhere(
+        `(
+          6371 * acos(
+            cos(radians(:latitude)) * cos(radians(ticket.latitude)) *
+            cos(radians(ticket.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(ticket.latitude))
+          )
+        ) <= :radius`,
+        { latitude, longitude, radius },
+      )
+      .orderBy('ticket.createdAt', 'DESC');
+
+    return query.getMany();
+  }
+
   private determinePriority(emergencyType: string): string {
     const highPriorityTypes = ['medical', 'fire', 'violence', 'accident'];
     const mediumPriorityTypes = ['theft', 'harassment', 'mental_health'];

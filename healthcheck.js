@@ -1,1 +1,24 @@
-const http = require('http');\n\nconst options = {\n  host: 'localhost',\n  port: 3000,\n  path: '/health',\n  timeout: 2000,\n};\n\nconst request = http.request(options, (res) => {\n  console.log(`STATUS: ${res.statusCode}`);\n  if (res.statusCode === 200) {\n    process.exit(0);\n  } else {\n    process.exit(1);\n  }\n});\n\nrequest.on('error', (err) => {\n  console.log('ERROR:', err.message);\n  process.exit(1);\n});\n\nrequest.end();\n
+import { request as _request } from 'http';
+
+const options = {
+  host: 'localhost',
+  port: 3000,
+  path: '/health',
+  timeout: 2000,
+};
+
+const request = _request(options, (res) => {
+  console.log(`STATUS: ${res.statusCode}`);
+  if (res.statusCode === 200) {
+    process.exit(0);
+  } else {
+    process.exit(1);
+  }
+});
+
+request.on('error', (err) => {
+  console.log('ERROR:', err.message);
+  process.exit(1);
+});
+
+request.end();

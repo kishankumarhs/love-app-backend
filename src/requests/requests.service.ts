@@ -136,4 +136,30 @@ export class RequestsService {
       throw new NotFoundException('Request not found');
     }
   }
+
+  async requestHelp(id: string, body: any): Promise<any> {
+    const request = await this.findOneRequest(id);
+    await this.requestRepository.update(id, { status: 'help_requested' });
+    return { message: 'Help requested successfully', request };
+  }
+
+  async referSomeone(id: string, body: any): Promise<any> {
+    const request = await this.findOneRequest(id);
+    const referral = await this.createReferral({
+      requestId: id,
+      providerId: body.providerId,
+      referredBy: body.referredBy,
+      notes: body.notes,
+    });
+    return { message: 'Referral created successfully', referral };
+  }
+
+  async donate(id: string, body: any): Promise<any> {
+    const request = await this.findOneRequest(id);
+    return {
+      message: 'Donation initiated',
+      requestId: id,
+      amount: body.amount,
+    };
+  }
 }

@@ -73,13 +73,45 @@ export class ProviderService {
     }
   }
 
-  async search(query: string): Promise<Provider[]> {
-    return this.providerRepository
-      .createQueryBuilder('provider')
-      .where(
-        'provider.name ILIKE :query OR provider.description ILIKE :query',
-        { query: `%${query}%` },
-      )
-      .getMany();
+  async search(filters: {
+    query?: string;
+    type?: string;
+    latitude?: number;
+    longitude?: number;
+    radius?: number;
+  }): Promise<Provider[]> {
+    const query = this.providerRepository.createQueryBuilder('provider');
+
+    if (filters.query) {
+      query.andWhere(
+        'provider.name ILIKE :searchQuery OR provider.description ILIKE :searchQuery',
+        { searchQuery: `%${filters.query}%` },
+      );
+    }
+
+    if (filters.type) {
+      query.andWhere(':type = ANY(provider.categories)', {
+        type: filters.type,
+      });
+    }
+
+    if (filters.latitude && filters.longitude && filters.radius) {
+      query.andWhere(
+        `(
+          6371 * acos(
+            cos(radians(:latitude)) * cos(radians(provider.latitude)) *
+            cos(radians(provider.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(provider.latitude))
+          )
+        ) <= :radius`,
+        {
+          latitude: filters.latitude,
+          longitude: filters.longitude,
+          radius: filters.radius,
+        },
+      );
+    }
+
+    return query.getMany();
   }
 }

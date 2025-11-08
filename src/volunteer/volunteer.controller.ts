@@ -83,6 +83,42 @@ export class VolunteerController {
     return this.volunteerService.getApplications(status);
   }
 
+  @Post('apply')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Apply as volunteer' })
+  @ApiResponse({
+    status: 201,
+    description: 'Application submitted successfully',
+  })
+  apply(@Request() req, @Body() applicationDto: CreateVolunteerApplicationDto) {
+    return this.volunteerService.submitApplication(req.user.id, applicationDto);
+  }
+
+  @Get('opportunities')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get volunteer opportunities' })
+  @ApiResponse({
+    status: 200,
+    description: 'Opportunities retrieved successfully',
+  })
+  getOpportunities() {
+    return this.volunteerService.getOpportunities();
+  }
+
+  @Post('opportunities/:id/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Join volunteer opportunity' })
+  @ApiResponse({
+    status: 200,
+    description: 'Joined opportunity successfully',
+  })
+  joinOpportunity(@Param('id') id: string, @Request() req) {
+    return this.volunteerService.joinOpportunity(id, req.user.id);
+  }
+
   @Get('applications/my')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

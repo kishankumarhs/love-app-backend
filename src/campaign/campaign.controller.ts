@@ -30,6 +30,23 @@ export class CampaignController {
     return this.campaignService.findAll({ category, providerId, status });
   }
 
+  @Get('search')
+  search(
+    @Query('category') category?: string,
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
+    @Query('radius') radius?: number,
+    @Query('status') status?: string,
+  ) {
+    return this.campaignService.search({
+      category,
+      latitude,
+      longitude,
+      radius,
+      status,
+    });
+  }
+
   @Get('provider/:providerId')
   findByProvider(@Param('providerId') providerId: string) {
     return this.campaignService.findByProvider(providerId);
