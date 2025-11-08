@@ -18,9 +18,15 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "test:all": "./scripts/test.sh",
+    "deploy": "./scripts/deploy.sh",
+    "docker:build": "docker build -t loveapp-backend .",
     "docker:dev": "docker-compose up --build",
     "docker:down": "docker-compose down",
-    "db:setup": "docker-compose up postgres -d"
+    "docker:run": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "db:setup": "docker-compose up postgres -d",
+    "migration:run": "./run-migrations.sh"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

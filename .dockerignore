@@ -1,12 +1,1 @@
-node_modules
-npm-debug.log
-dist
-.git
-.gitignore
-README.md
-.env
-.nyc_output
-coverage
-.nyc_output
-.coverage
-.vscode
+node_modules\nnpm-debug.log\nYarn-error.log\n.git\n.gitignore\nREADME.md\n.env\n.nyc_output\ncoverage\n.coverage\n.env.local\n.env.development.local\n.env.test.local\n.env.production.local\ndist\n*.log\n.DS_Store\n.vscode\n.idea\n*.swp\n*.swo\n*~\n

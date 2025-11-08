@@ -1,14 +1,1 @@
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY package*.json yarn.lock ./
-RUN yarn install --frozen-lockfile
-
-COPY . .
-
-RUN yarn build
-
-EXPOSE 3000
-
-CMD ["node", "dist/main"]
+# Build stage\nFROM node:18-alpine AS builder\n\nWORKDIR /app\n\n# Copy package files\nCOPY package*.json ./\nCOPY yarn.lock ./\n\n# Install dependencies\nRUN yarn install --frozen-lockfile\n\n# Copy source code\nCOPY . .\n\n# Build application\nRUN yarn build\n\n# Production stage\nFROM node:18-alpine AS production\n\nWORKDIR /app\n\n# Install dumb-init for proper signal handling\nRUN apk add --no-cache dumb-init\n\n# Create non-root user\nRUN addgroup -g 1001 -S nodejs\nRUN adduser -S nestjs -u 1001\n\n# Copy package files\nCOPY package*.json ./\nCOPY yarn.lock ./\n\n# Install production dependencies\nRUN yarn install --frozen-lockfile --production && yarn cache clean\n\n# Copy built application\nCOPY --from=builder --chown=nestjs:nodejs /app/dist ./dist\nCOPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules\n\n# Switch to non-root user\nUSER nestjs\n\n# Expose port\nEXPOSE 3000\n\n# Health check\nHEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\\n  CMD node healthcheck.js\n\n# Start application\nCMD [\"dumb-init\", \"node\", \"dist/main\"]\n
