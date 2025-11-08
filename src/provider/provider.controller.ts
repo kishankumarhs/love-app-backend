@@ -1,32 +1,43 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { CreateProviderDto } from './dto/create-provider.dto';
-import { Provider } from './entities/provider.entity';
+import { UpdateProviderDto } from './dto/update-provider.dto';
 
-@ApiTags('Providers')
 @Controller('providers')
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create provider' })
-  @ApiResponse({ status: 201, type: Provider })
   create(@Body() createProviderDto: CreateProviderDto) {
     return this.providerService.create(createProviderDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all providers' })
-  @ApiResponse({ status: 200, type: [Provider] })
-  findAll() {
-    return this.providerService.findAll();
+  findAll(
+    @Query('category') category?: string,
+    @Query('location') location?: string,
+    @Query('capacity') capacity?: number,
+  ) {
+    return this.providerService.findAll({ category, location, capacity });
+  }
+
+  @Get('search')
+  search(@Query('q') query: string) {
+    return this.providerService.search(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get provider by ID' })
-  @ApiResponse({ status: 200, type: Provider })
   findOne(@Param('id') id: string) {
     return this.providerService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateProviderDto: UpdateProviderDto) {
+    return this.providerService.update(id, updateProviderDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.providerService.remove(id);
   }
 }

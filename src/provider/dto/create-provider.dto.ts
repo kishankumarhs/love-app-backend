@@ -1,44 +1,41 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, IsArray, IsUrl, IsPhoneNumber, IsUUID } from 'class-validator';
+import { IsString, IsArray, IsNumber, IsEmail, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateProviderDto {
-  @ApiProperty()
   @IsString()
   name: string;
 
-  @ApiProperty()
   @IsString()
   description: string;
 
-  @ApiProperty()
+  @IsArray()
+  @IsString({ each: true })
+  categories: string[];
+
+  @IsString()
+  eligibility: string;
+
   @IsString()
   address: string;
 
-  @ApiProperty()
   @IsNumber()
   latitude: number;
 
-  @ApiProperty()
   @IsNumber()
   longitude: number;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsPhoneNumber()
-  phone?: string;
+  @IsString()
+  operatingHours: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsUrl()
-  website?: string;
+  @IsNumber()
+  capacity: number;
 
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  services?: string[];
+  @IsEmail()
+  contactEmail: string;
 
-  @ApiProperty()
-  @IsUUID()
-  userId: string;
+  @IsString()
+  contactPhone: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }

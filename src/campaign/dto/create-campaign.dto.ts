@@ -1,29 +1,31 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsDateString, IsUUID, Min } from 'class-validator';
+import { IsString, IsNumber, IsDateString, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateCampaignDto {
-  @ApiProperty()
   @IsString()
   title: string;
 
-  @ApiProperty()
   @IsString()
   description: string;
 
-  @ApiProperty()
-  @IsNumber()
-  @Min(0)
-  targetAmount: number;
+  @IsString()
+  category: string;
 
-  @ApiProperty()
   @IsDateString()
   startDate: string;
 
-  @ApiProperty()
   @IsDateString()
   endDate: string;
 
-  @ApiProperty()
+  @IsNumber()
+  targetAmount: number;
+
+  @IsNumber()
+  volunteersNeeded: number;
+
   @IsUUID()
   providerId: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
 }
