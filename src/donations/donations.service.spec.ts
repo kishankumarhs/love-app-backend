@@ -52,8 +52,10 @@ describe('DonationsService', () => {
       const createDto = { amount: 100, campaignId: '1' };
       const paymentIntent = { id: 'pi_test', client_secret: 'secret' };
       const donation = { id: '1', amount: 100, campaignId: '1' };
-      
-      jest.spyOn(stripeService, 'createPaymentIntent').mockResolvedValue(paymentIntent as any);
+
+      jest
+        .spyOn(stripeService, 'createPaymentIntent')
+        .mockResolvedValue(paymentIntent as any);
       mockRepository.create.mockReturnValue(donation);
       mockRepository.save.mockResolvedValue(donation);
 

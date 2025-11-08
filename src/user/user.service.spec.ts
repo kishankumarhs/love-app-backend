@@ -56,7 +56,7 @@ describe('UserService', () => {
         name: 'New User',
       };
       const savedUser = { id: 2, ...createUserDto };
-      
+
       mockRepository.create.mockReturnValue(savedUser);
       mockRepository.save.mockResolvedValue(savedUser);
 
