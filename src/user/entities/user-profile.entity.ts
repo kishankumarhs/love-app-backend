@@ -1,37 +1,40 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../../user/entities/user.entity';
+import { User } from './user.entity';
 
-@Entity('volunteers')
-export class Volunteer {
+@Entity('user_profiles')
+export class UserProfile {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @ApiProperty()
-  @Column('simple-array', { nullable: true })
-  interests: string[];
-
-  @ApiProperty()
-  @Column('simple-array', { nullable: true })
-  skills: string[];
+  @Column({ nullable: true })
+  bio: string;
 
   @ApiProperty()
   @Column({ nullable: true })
-  availability: string;
+  avatar: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  dateOfBirth: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  address: string;
+
+  @ApiProperty()
+  @Column('decimal', { precision: 10, scale: 8, nullable: true })
+  latitude: number;
+
+  @ApiProperty()
+  @Column('decimal', { precision: 11, scale: 8, nullable: true })
+  longitude: number;
 
   @ApiProperty()
   @Column('json', { nullable: true })
-  preferences: {
-    notifications?: {
-      email?: boolean;
-      sms?: boolean;
-      push?: boolean;
-    };
-    volunteerTypes?: string[];
-    maxDistance?: number;
-    timeCommitment?: string;
-  };
+  preferences: any;
 
   @OneToOne(() => User)
   @JoinColumn()

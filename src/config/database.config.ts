@@ -13,5 +13,7 @@ export default registerAs(
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: process.env.NODE_ENV === 'development',
     logging: process.env.NODE_ENV === 'development',
+    retryAttempts: 10,
+    retryDelay: 3000,
   }),
 );

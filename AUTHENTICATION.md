@@ -3,30 +3,35 @@
 ## ✅ Step 3 Complete: Authentication Module
 
 ### 🔐 **JWT Authentication**
+
 - **JWT Strategy**: Token-based authentication with user validation
 - **JWT Service**: Token generation and verification
 - **JWT Guard**: Protects routes requiring authentication
 - **Token Expiry**: 7 days default expiration
 
 ### 🌐 **OAuth Integration**
+
 - **Google OAuth**: Complete Google Sign-In flow
 - **Apple OAuth**: Ready for Apple Sign-In (strategy created)
 - **OAuth Callback**: Automatic user creation for new OAuth users
 - **Email Verification**: OAuth users automatically verified
 
 ### 🛡️ **Role-Based Access Control (RBAC)**
+
 - **Roles Guard**: Enforces role-based permissions
 - **Roles Decorator**: `@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)`
 - **User Roles**: USER, PROVIDER, VOLUNTEER, ADMIN, SUPER_ADMIN
 - **Protected Endpoints**: Admin-only user listing
 
 ### 👤 **Guest User Gating**
+
 - **Guest Guard**: Controls guest user access
 - **Allow Guest Decorator**: `@AllowGuest()` for emergency endpoints
 - **SOS Emergency Access**: Guests can create SOS calls for emergencies
 - **Restricted Access**: Guests blocked from sensitive operations
 
 ### 📧 **Email Verification System**
+
 - **Email Service**: Nodemailer integration for sending emails
 - **Verification Tokens**: JWT-based email verification
 - **Email Templates**: HTML email templates for verification
@@ -35,6 +40,7 @@
 ### 🔑 **Authentication Flows**
 
 #### **Sign Up Flow**
+
 ```
 POST /auth/signup
 - Email/password validation
@@ -45,6 +51,7 @@ POST /auth/signup
 ```
 
 #### **Sign In Flow**
+
 ```
 POST /auth/signin
 - Credential validation
@@ -54,6 +61,7 @@ POST /auth/signin
 ```
 
 #### **Google OAuth Flow**
+
 ```
 GET /auth/google → Google OAuth
 GET /auth/google/callback → Token generation
@@ -63,6 +71,7 @@ GET /auth/google/callback → Token generation
 ```
 
 #### **Email Verification**
+
 ```
 POST /auth/verify-email
 - Token validation
@@ -70,6 +79,7 @@ POST /auth/verify-email
 ```
 
 #### **Logout Flow**
+
 ```
 POST /auth/logout (Protected)
 - Token invalidation message
@@ -77,6 +87,7 @@ POST /auth/logout (Protected)
 ```
 
 ### 🔒 **Security Features**
+
 - **Password Hashing**: bcrypt with salt rounds
 - **JWT Secret**: Environment-based secret key
 - **Token Validation**: Automatic user existence check
@@ -98,6 +109,7 @@ POST /auth/logout (Protected)
 ### 🛠️ **Implementation Examples**
 
 #### **Protected Route with Role**
+
 ```typescript
 @Get('admin-only')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -109,6 +121,7 @@ async adminOnly() {
 ```
 
 #### **Guest-Allowed Emergency Endpoint**
+
 ```typescript
 @Post('emergency')
 @AllowGuest()
@@ -119,12 +132,14 @@ async emergency(@Body() data: any) {
 ```
 
 ### 🔧 **Configuration**
+
 - **Environment Variables**: JWT secret, OAuth credentials, mail settings
 - **JWT Expiration**: Configurable token lifetime
 - **OAuth Providers**: Google (implemented), Apple (ready)
 - **Email Service**: SMTP configuration for verification emails
 
 ### 🚀 **Ready Features**
+
 - Complete authentication system
 - Role-based access control
 - Guest user management

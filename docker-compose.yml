@@ -8,7 +8,8 @@ services:
     environment:
       - NODE_ENV=development
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - .:/app
       - /app/node_modules
@@ -24,6 +25,25 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d love_app_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@loveapp.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
 
 volumes:
   postgres_data:
+  pgadmin_data:
+  
