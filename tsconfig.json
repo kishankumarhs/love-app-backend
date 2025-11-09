@@ -6,6 +6,7 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "ES2021",
     "sourceMap": true,
     "outDir": "./dist",
@@ -16,6 +17,28 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@love-app/auth": ["libs/auth/src"],
+      "@love-app/auth/*": ["libs/auth/src/*"],
+      "@love-app/users": ["libs/users/src"],
+      "@love-app/users/*": ["libs/users/src/*"],
+      "@love-app/providers": ["libs/providers/src"],
+      "@love-app/providers/*": ["libs/providers/src/*"],
+      "@love-app/donations": ["libs/donations/src"],
+      "@love-app/donations/*": ["libs/donations/src/*"],
+      "@love-app/volunteers": ["libs/volunteers/src"],
+      "@love-app/volunteers/*": ["libs/volunteers/src/*"],
+      "@love-app/slots": ["libs/slots/src"],
+      "@love-app/slots/*": ["libs/slots/src/*"],
+      "@love-app/notifications": ["libs/notifications/src"],
+      "@love-app/notifications/*": ["libs/notifications/src/*"],
+      "@love-app/audit": ["libs/audit/src"],
+      "@love-app/audit/*": ["libs/audit/src/*"],
+      "@love-app/connectivity": ["libs/connectivity/src"],
+      "@love-app/connectivity/*": ["libs/connectivity/src/*"],
+      "@love-app/common": ["libs/common/src"],
+      "@love-app/common/*": ["libs/common/src/*"]
+    }
   }
 }

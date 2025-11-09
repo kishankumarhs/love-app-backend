@@ -1,0 +1,441 @@
+{
+  "info": {
+    "name": "Love App MVP Backend",
+    "description": "Complete API collection for Love App MVP with authentication, providers, donations, slots, and more",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Auto-authentication script",
+          "if (!pm.globals.get('authToken') && pm.request.url.path.join('/') !== 'api/v1/auth/login') {",
+          "  const loginRequest = {",
+          "    url: pm.environment.get('baseUrl') + '/api/v1/auth/login',",
+          "    method: 'POST',",
+          "    header: {",
+          "      'Content-Type': 'application/json'",
+          "    },",
+          "    body: {",
+          "      mode: 'raw',",
+          "      raw: JSON.stringify({",
+          "        email: pm.environment.get('testEmail') || 'admin@loveapp.com',",
+          "        password: pm.environment.get('testPassword') || 'password123'",
+          "      })",
+          "    }",
+          "  };",
+          "  ",
+          "  pm.sendRequest(loginRequest, (err, response) => {",
+          "    if (!err && response.json().token) {",
+          "      pm.globals.set('authToken', response.json().token);",
+          "    }",
+          "  });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"role\": \"seeker\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@loveapp.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const response = pm.response.json();",
+                  "  pm.globals.set('authToken', response.token);",
+                  "  pm.globals.set('userId', response.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Google OAuth",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/google",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "google"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Providers",
+      "item": [
+        {
+          "name": "Register as Provider",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Community Food Bank\",\n  \"phone\": \"+1-555-0123\",\n  \"address\": \"123 Main St, Anytown, ST 12345\",\n  \"latitude\": 40.7128,\n  \"longitude\": -74.0060,\n  \"domain\": \"foodbank.org\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/providers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "providers"]
+            }
+          }
+        },
+        {
+          "name": "Search Providers",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/providers/search?latitude=40.7128&longitude=-74.0060&radius=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "providers", "search"],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "radius",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Provider Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/providers/{{providerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "providers", "{{providerId}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Employee",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@foodbank.org\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Employee\",\n  \"phone\": \"+1-555-0124\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/providers/{{providerId}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "providers", "{{providerId}}", "employees"]
+            }
+          }
+        },
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/providers/{{providerId}}/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "providers", "{{providerId}}", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Donations",
+      "item": [
+        {
+          "name": "Create Stripe Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 50.00,\n  \"success_url\": \"http://localhost:3000/success\",\n  \"cancel_url\": \"http://localhost:3000/cancel\",\n  \"campaign_id\": \"{{campaignId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/donations/stripe/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "donations", "stripe", "checkout"]
+            }
+          }
+        },
+        {
+          "name": "Create PayPal Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 25.00,\n  \"return_url\": \"http://localhost:3000/success\",\n  \"cancel_url\": \"http://localhost:3000/cancel\",\n  \"provider_org_id\": \"{{providerId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/donations/paypal/order",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "donations", "paypal", "order"]
+            }
+          }
+        },
+        {
+          "name": "Get Donation History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/donations/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "donations", "history"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Slots & Scheduling",
+      "item": [
+        {
+          "name": "Create Slot Policy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"service_id\": \"{{serviceId}}\",\n  \"slot_size\": 30,\n  \"max_per_slot\": 10,\n  \"operating_hours\": {\n    \"monday\": {\"start\": \"09:00\", \"end\": \"17:00\"},\n    \"tuesday\": {\"start\": \"09:00\", \"end\": \"17:00\"},\n    \"wednesday\": {\"start\": \"09:00\", \"end\": \"17:00\"},\n    \"thursday\": {\"start\": \"09:00\", \"end\": \"17:00\"},\n    \"friday\": {\"start\": \"09:00\", \"end\": \"17:00\"}\n  },\n  \"booking_lead_time\": 60,\n  \"cancel_cutoff\": 30\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/slots/policy",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "slots", "policy"]
+            }
+          }
+        },
+        {
+          "name": "Get Available Slots",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/slots?date=2024-01-15&service_id={{serviceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "slots"],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2024-01-15"
+                },
+                {
+                  "key": "service_id",
+                  "value": "{{serviceId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Book Slot",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/slots/{{slotId}}/book",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "slots", "{{slotId}}", "book"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Connectivity",
+      "item": [
+        {
+          "name": "Generate WiFi Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ttl\": 3600,\n  \"metadata\": {\n    \"location\": \"Main Hall\",\n    \"issued_by\": \"Staff Member\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/connectivity/token",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "connectivity", "token"]
+            }
+          }
+        },
+        {
+          "name": "Validate WiFi Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"ABC123DEF456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/connectivity/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "connectivity", "validate"]
+            }
+          }
+        },
+        {
+          "name": "Get Token Stats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/connectivity/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "connectivity", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Send Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientId\": \"{{userId}}\",\n  \"templateKey\": \"referral_accepted\",\n  \"variables\": {\n    \"providerName\": \"Community Food Bank\",\n    \"serviceName\": \"Free Meal Service\",\n    \"scheduledDate\": \"January 15, 2024 at 12:00 PM\"\n  },\n  \"type\": \"email\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "send"]
+            }
+          }
+        },
+        {
+          "name": "Get Notification History",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/notifications/history/{{userId}}?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "notifications", "history", "{{userId}}"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

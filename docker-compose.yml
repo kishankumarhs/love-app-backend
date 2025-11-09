@@ -1,40 +1,57 @@
 version: '3.8'
 
 services:
-  app:
+  api:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:password@db:5432/loveapp
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=love_app_dev
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - JWT_SECRET=your-jwt-secret
       - STRIPE_SECRET_KEY=sk_test_your_stripe_key
+      - PAYPAL_CLIENT_ID=your_paypal_client_id
+      - PAYPAL_CLIENT_SECRET=your_paypal_client_secret
       - TWILIO_ACCOUNT_SID=your_twilio_sid
       - TWILIO_AUTH_TOKEN=your_twilio_token
-      - EMAIL_HOST=smtp.gmail.com
-      - EMAIL_USER=your-email@gmail.com
-      - EMAIL_PASS=your-app-password
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_USER=your-email@gmail.com
+      - MAIL_PASSWORD=your-app-password
     depends_on:
-      - db
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
-      - ./uploads:/app/uploads
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
     restart: unless-stopped
 
-  db:
+  postgres:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_DB=loveapp
+      - POSTGRES_DB=love_app_dev
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./src/migrations:/docker-entrypoint-initdb.d
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
   redis:
@@ -43,6 +60,11 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     restart: unless-stopped
 
   nginx:
@@ -54,7 +76,7 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
     depends_on:
-      - app
+      - api
     restart: unless-stopped
 
 volumes:
