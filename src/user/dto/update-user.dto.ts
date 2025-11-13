@@ -1,8 +1,8 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { IsString, IsOptional, IsPhoneNumber, IsEnum } from 'class-validator';
-import { UserRole, UserStatus } from '../entities/user.entity';
+import { User, UserRole, UserStatus } from '../entities/user.entity';
 
-export class UpdateUserDto {
+export class UpdateUserDto extends PartialType(User) {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

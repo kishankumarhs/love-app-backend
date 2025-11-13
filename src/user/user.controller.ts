@@ -98,6 +98,8 @@ export class UserController {
     return this.userService.createProfile(createProfileDto);
   }
 
+  // Profile Management
+
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')

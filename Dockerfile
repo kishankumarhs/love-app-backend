@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY . .
 RUN yarn build
 
 # Production stage
-FROM node:18-alpine AS production
+FROM node:20-alpine AS production
 
 WORKDIR /app
 
@@ -35,9 +35,10 @@ COPY yarn.lock ./
 # Install production dependencies
 RUN yarn install --frozen-lockfile --production && yarn cache clean
 
-# Copy built application
+# Copy built application and config files
 COPY --from=builder --chown=nestjs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nestjs:nodejs /app/node_modules ./node_modules
+COPY --chown=nestjs:nodejs tsconfig*.json ./
 
 # Switch to non-root user
 USER nestjs
@@ -45,9 +46,5 @@ USER nestjs
 # Expose port
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
-
 # Start application
-CMD ["dumb-init", "node", "dist/main"]
+CMD ["node","dist/main"]

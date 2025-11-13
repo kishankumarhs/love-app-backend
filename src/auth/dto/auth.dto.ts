@@ -47,6 +47,17 @@ export class RegisterDto {
   @Transform(({ value }) => value?.trim())
   firstName: string;
 
+  @ApiProperty({ example: 30, description: 'Age' })
+  @IsOptional()
+  @Transform(({ value }) => parseInt(value, 10))
+  age: number;
+
+  @ApiProperty({ example: 'Hindu', description: 'Religion' })
+  @IsOptional()
+  @SanitizeHtml()
+  @Transform(({ value }) => value?.trim())
+  religion: string;
+
   @ApiProperty({ example: 'Doe', description: 'Last name' })
   @IsString()
   @MinLength(1)

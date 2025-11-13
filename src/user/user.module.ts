@@ -5,9 +5,10 @@ import { UserProfile } from './entities/user-profile.entity';
 import { Feedback } from './entities/feedback.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { Countries } from './entities/countires.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserProfile, Feedback])],
+  imports: [TypeOrmModule.forFeature([User, UserProfile, Feedback, Countries])],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

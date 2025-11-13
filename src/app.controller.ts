@@ -4,8 +4,10 @@ import {
   ApiOperation,
   ApiOkResponse,
   ApiInternalServerErrorResponse,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { AppService } from './app.service';
+import { Countries } from './user/entities/countires.entity';
 
 @ApiTags('Health Check')
 @Controller()
@@ -69,5 +71,12 @@ export class AppController {
       timestamp: new Date().toISOString(),
       service: 'LOVE App Backend',
     };
+  }
+
+  @Get('country-list')
+  @ApiOperation({ summary: 'Create user profile' })
+  @ApiResponse({ status: 201, type: Countries })
+  getCountries() {
+    return this.appService.getCountries();
   }
 }

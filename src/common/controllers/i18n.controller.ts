@@ -34,12 +34,15 @@ export class I18nController {
   @Get('time')
   @ApiOperation({ summary: 'Get current time in specified timezone' })
   @ApiQuery({ name: 'timezone', required: false, example: 'America/New_York' })
-  @ApiResponse({ status: 200, description: 'Current time in specified timezone' })
+  @ApiResponse({
+    status: 200,
+    description: 'Current time in specified timezone',
+  })
   getCurrentTime(@Query('timezone') timezone: string = 'UTC') {
     if (!this.timezoneService.isValidTimezone(timezone)) {
       timezone = 'UTC';
     }
-    
+
     return {
       timezone,
       currentTime: this.timezoneService.getCurrentTimeInTimezone(timezone),

@@ -1,5 +1,4 @@
 import { Transform } from 'class-transformer';
-import { IsString, IsEmail, IsOptional } from 'class-validator';
 
 // Sanitize HTML and prevent XSS
 export function SanitizeHtml() {
@@ -20,7 +19,7 @@ export function SanitizeSql() {
     if (typeof value === 'string') {
       const sqlPatterns = [
         /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION|SCRIPT)\b)/gi,
-        /(--|\/\*|\*\/|;|'|")/g,
+        /(--|\/\*|\*\/|;|'|")/gi,
       ];
       let sanitized = value;
       sqlPatterns.forEach((pattern) => {

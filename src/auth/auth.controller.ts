@@ -8,13 +8,19 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/auth.dto';
+import { FirebaseAuthDto } from './dto/firebase-auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
-import { Timezone, Language } from '../common/decorators/timezone.decorator';
+import { AuthResponse } from 'src/common/types';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -29,17 +35,9 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Bad request - validation failed' })
   @ApiResponse({ status: 409, description: 'User already exists' })
   @ApiResponse({ status: 429, description: 'Too many requests' })
-  async register(
-    @Body() registerDto: RegisterDto,
-    @Timezone() timezone: string,
-    @Language() language: string,
-  ) {
-    return { 
-      message: 'Registration endpoint - implement in AuthService',
-      timezone,
-      language,
-      data: registerDto 
-    };
+  async register(@Body() registerDto: RegisterDto): Promise<AuthResponse> {
+    const res = await this.authService.signUp(registerDto);
+    return res;
   }
 
   @Post('login')
@@ -51,7 +49,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 429, description: 'Too many login attempts' })
   async login(@Body() loginDto: LoginDto) {
-    return { message: 'Login endpoint - implement in AuthService' };
+    const res = await this.authService.signIn(loginDto);
+    return res;
   }
 
   @Get('profile')
@@ -60,19 +59,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user profile' })
   @ApiResponse({ status: 200, description: 'Profile retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getProfile(@Request() req) {
+  async getProfile(@Request() req) {
     return req.user;
-  }
-
-  @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.OK)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'User logout' })
-  @ApiResponse({ status: 200, description: 'Logout successful' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(@Request() req) {
-    return { message: 'Logout successful' };
   }
 
   @Post('refresh')
@@ -82,6 +70,19 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   @ApiResponse({ status: 429, description: 'Too many requests' })
   async refresh(@Body('refreshToken') refreshToken: string) {
-    return { message: 'Token refresh endpoint - implement in AuthService' };
+    const res = this.authService.refreshToken(refreshToken);
+    return { token: res };
+  }
+
+  @Post('firebase')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @ApiOperation({
+    summary: 'Authenticate with Firebase (Google/Apple Sign-In)',
+  })
+  @ApiResponse({ status: 200, description: 'Authentication successful' })
+  @ApiResponse({ status: 401, description: 'Invalid Firebase token' })
+  async firebaseAuth(@Body() firebaseAuthDto: FirebaseAuthDto) {
+    return this.authService.firebaseAuth(firebaseAuthDto.idToken);
   }
 }

@@ -54,6 +54,12 @@ export class Campaign {
   @CreateDateColumn()
   createdAt: Date;
 
+  @Column('json')
+  location: {
+    type: 'Point';
+    coordinates: [number, number];
+  };
+
   @UpdateDateColumn()
   updatedAt: Date;
 }
