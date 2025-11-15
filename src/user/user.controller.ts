@@ -39,9 +39,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
-  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({ status: 201, type: User })
   create(@Body() createUserDto: CreateUserDto) {

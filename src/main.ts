@@ -102,15 +102,6 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
-    .addApiKey(
-      {
-        type: 'apiKey',
-        name: 'X-API-Key',
-        in: 'header',
-        description: 'API Key for external integrations',
-      },
-      'API-Key',
-    )
     .addTag('Authentication', 'User authentication endpoints')
     .addTag('Users', 'User management endpoints')
     .addTag('Providers', 'Service provider endpoints')

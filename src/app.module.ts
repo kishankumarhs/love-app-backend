@@ -17,7 +17,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ProviderModule } from './provider/provider.module';
-import { CampaignModule } from './campaign/campaign.module';
+// import { CampaignModule } from './campaign/campaign.module';
 // import { RequestsModule } from './requests/requests.module';
 // import { DonationsModule } from './donations/donations.module';
 // import { SOSModule } from './sos/sos.module';
@@ -32,6 +32,7 @@ import { CommonModule } from './common/common.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { Countries } from './user/entities/countires.entity';
 import firebaseConfig from './config/firebase.config';
+import { CampaignModule } from './campaign/campaign.module';
 
 @Module({
   imports: [
@@ -56,7 +57,7 @@ import firebaseConfig from './config/firebase.config';
     AuthModule,
     UserModule,
     ProviderModule,
-    CampaignModule,
+    // CampaignModule,
     // RequestsModule,
     // DonationsModule,
     // SOSModule,
