@@ -2,17 +2,25 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Provider } from './entities/provider.entity';
-import { CreateProviderDto } from './dto/create-provider.dto';
+import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
+import { UserService } from 'src/user/user.service';
+import { UserRole } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProviderService {
   constructor(
     @InjectRepository(Provider)
     private providerRepository: Repository<Provider>,
+    private userService: UserService,
   ) {}
 
-  async create(createProviderDto: CreateProviderDto): Promise<Provider> {
+  async create(createProviderDto: CreateProvider): Promise<Provider> {
+    await this.userService.update(createProviderDto.userId, {
+      country: createProviderDto.country,
+      role: UserRole.PROVIDER,
+    });
+
     const provider = this.providerRepository.create(createProviderDto);
     return this.providerRepository.save(provider);
   }
@@ -48,7 +56,7 @@ export class ProviderService {
   async findOne(id: string): Promise<Provider> {
     const provider = await this.providerRepository.findOne({
       where: { id },
-      relations: ['campaigns'],
+      relations: ['campaigns', 'userId'],
     });
 
     if (!provider) {

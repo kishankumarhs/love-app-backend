@@ -46,6 +46,18 @@ export class User {
   @Column({ nullable: true })
   phone: string;
 
+  @ApiProperty()
+  @Column({ nullable: true })
+  country: string;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  age: number;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  religion: string;
+
   @ApiProperty({ enum: UserRole })
   @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
   role: UserRole;
@@ -57,9 +69,6 @@ export class User {
   @ApiProperty()
   @Column({ default: false })
   isEmailVerified: boolean;
-
-  @Column({ nullable: true })
-  emailVerificationToken: string;
 
   @ApiProperty()
   @Column({ type: 'varchar', length: 50, default: 'UTC' })
