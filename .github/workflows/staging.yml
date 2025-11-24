@@ -1,0 +1,83 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    environment: staging
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: love_app_staging
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+        env:
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USER: postgres
+          DATABASE_PASSWORD: postgres
+          DATABASE_NAME: love_app_staging
+          JWT_SECRET: staging-jwt-secret
+          NODE_ENV: staging
+
+      - name: Build application
+        run: npm run build
+
+      - name: Deploy to staging server
+        env:
+          STAGING_HOST: ${{ secrets.STAGING_HOST }}
+          STAGING_USER: ${{ secrets.STAGING_USER }}
+          STAGING_KEY: ${{ secrets.STAGING_KEY }}
+          STAGING_PATH: ${{ secrets.STAGING_PATH }}
+        run: |
+          echo "$STAGING_KEY" > staging_key
+          chmod 600 staging_key
+
+          # Create deployment package
+          tar -czf staging.tar.gz dist/ package.json package-lock.json
+
+          # Copy to staging server
+          scp -i staging_key -o StrictHostKeyChecking=no staging.tar.gz ${STAGING_USER}@${STAGING_HOST}:${STAGING_PATH}/
+
+          # Deploy on staging server
+          ssh -i staging_key -o StrictHostKeyChecking=no ${STAGING_USER}@${STAGING_HOST} << 'ENDSSH'
+            cd ${STAGING_PATH}
+            tar -xzf staging.tar.gz
+            npm install --production
+            npm run migration:run
+            pm2 restart love-app-backend-staging || pm2 start dist/main.js --name love-app-backend-staging
+          ENDSSH
+
+          rm -f staging_key
+
+      - name: Notify deployment
+        run: echo "✅ Staging deployment completed"

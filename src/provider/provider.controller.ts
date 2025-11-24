@@ -9,17 +9,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { ProviderService } from './provider.service';
-import { CreateProviderDto } from './dto/create-provider.dto';
+import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Provider } from './entities/provider.entity';
 
+@ApiTags('Providers')
 @Controller('providers')
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
-
-  @Post()
-  create(@Body() createProviderDto: CreateProviderDto) {
-    return this.providerService.create(createProviderDto);
-  }
 
   @Get()
   findAll(
@@ -47,8 +45,11 @@ export class ProviderController {
     });
   }
 
+  @ApiOperation({ summary: 'Register a new provider' })
+  @ApiResponse({ status: 201, type: Provider })
+  @ApiBody({ type: CreateProvider })
   @Post('register')
-  register(@Body() createProviderDto: CreateProviderDto) {
+  register(@Body() createProviderDto: CreateProvider) {
     return this.providerService.create(createProviderDto);
   }
 

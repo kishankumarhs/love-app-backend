@@ -1,11 +1,24 @@
 # Love App Backend 💝
 
 <p align="center">
-  <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
-  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-  <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white" alt="JWT" />
+  ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
+  ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+  ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+  ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+  ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+</p>
+
+<p align="center">
+  ![CI](https://github.com/kishankumarhs/love-app-backend/workflows/CI/badge.svg)
+  ![CD](https://github.com/kishankumarhs/love-app-backend/workflows/CD%20-%20Deploy%20to%20Production/badge.svg)
+  ![CodeQL](https://github.com/kishankumarhs/love-app-backend/workflows/CodeQL%20Security%20Scan/badge.svg)
+  ![License](https://img.shields.io/badge/license-UNLICENSED-blue.svg)
+</p>
+
+<p align="center">
+  ![CI](https://github.com/kishankumarhs/love-app-backend/workflows/CI/badge.svg)
+  ![CD](https://github.com/kishankumarhs/love-app-backend/workflows/CD%20-%20Deploy%20to%20Production/badge.svg)
+  ![CodeQL](https://github.com/kishankumarhs/love-app-backend/workflows/CodeQL%20Security%20Scan/badge.svg)
 </p>
 
 <p align="center">
@@ -345,6 +358,17 @@ GET /health
 - Update documentation
 - Follow security guidelines
 - Add translations for new features
+
+## 🚀 CI/CD
+
+This project includes comprehensive CI/CD pipelines using GitHub Actions:
+
+- ✅ **Continuous Integration** - Automated testing, linting, and builds
+- 🚀 **Continuous Deployment** - Automated deployments to staging and production
+- 🔒 **Security Scanning** - CodeQL analysis and dependency updates
+- 📦 **Docker Support** - Automated image builds and deployments
+
+For detailed setup instructions, see [CI/CD Setup Guide](./docs/CI_CD_SETUP.md).
 
 ## 📝 License
 

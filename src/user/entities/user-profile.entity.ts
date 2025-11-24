@@ -44,6 +44,10 @@ export class UserProfile {
   @Column('json', { nullable: true })
   preferences: any;
 
+  @ApiProperty()
+  @Column({ nullable: true })
+  religion: string;
+
   @OneToOne(() => User)
   @JoinColumn()
   user: User;

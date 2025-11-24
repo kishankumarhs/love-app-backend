@@ -22,9 +22,7 @@ export class CampaignService {
     providerId?: string;
     status?: string;
   }): Promise<Campaign[]> {
-    const query = this.campaignRepository
-      .createQueryBuilder('campaign')
-      .leftJoinAndSelect('campaign.provider', 'provider');
+    const query = this.campaignRepository.createQueryBuilder('campaign');
 
     if (filters?.category) {
       query.andWhere('campaign.category = :category', {
@@ -48,7 +46,6 @@ export class CampaignService {
   async findOne(id: string): Promise<Campaign> {
     const campaign = await this.campaignRepository.findOne({
       where: { id },
-      relations: ['provider'],
     });
 
     if (!campaign) {
@@ -76,7 +73,6 @@ export class CampaignService {
   async findByProvider(providerId: string): Promise<Campaign[]> {
     return this.campaignRepository.find({
       where: { providerId },
-      relations: ['provider'],
     });
   }
 
@@ -87,37 +83,64 @@ export class CampaignService {
     radius?: number;
     status?: string;
   }): Promise<Campaign[]> {
-    const query = this.campaignRepository
-      .createQueryBuilder('campaign')
-      .leftJoinAndSelect('campaign.provider', 'provider');
+    let campaigns = await this.findAll({
+      category: filters.category,
+      status: filters.status,
+    });
 
-    if (filters.category) {
-      query.andWhere('campaign.category = :category', {
-        category: filters.category,
+    if (filters.latitude && filters.longitude && filters.radius) {
+      campaigns = campaigns.filter((campaign) => {
+        const distance = this.calculateDistance(
+          filters.latitude,
+          filters.longitude,
+          campaign.location.coordinates[1],
+          campaign.location.coordinates[0],
+        );
+        return distance <= filters.radius;
       });
     }
 
-    if (filters.status) {
-      query.andWhere('campaign.status = :status', { status: filters.status });
-    }
+    return campaigns;
+  }
 
-    if (filters.latitude && filters.longitude && filters.radius) {
-      query.andWhere(
-        `(
-          6371 * acos(
-            cos(radians(:latitude)) * cos(radians(campaign.latitude)) *
-            cos(radians(campaign.longitude) - radians(:longitude)) +
-            sin(radians(:latitude)) * sin(radians(campaign.latitude))
-          )
-        ) <= :radius`,
-        {
-          latitude: filters.latitude,
-          longitude: filters.longitude,
-          radius: filters.radius,
-        },
+  async findNearby(
+    lat: number,
+    lng: number,
+    radiusKm: number = 10,
+  ): Promise<Campaign[]> {
+    const campaigns = await this.campaignRepository.find();
+
+    return campaigns.filter((campaign) => {
+      const distance = this.calculateDistance(
+        lat,
+        lng,
+        campaign.location.coordinates[1],
+        campaign.location.coordinates[0],
       );
-    }
+      return distance <= radiusKm;
+    });
+  }
 
-    return query.orderBy('campaign.createdAt', 'DESC').getMany();
+  private calculateDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number,
+  ): number {
+    const R = 6371; // Earth's radius in km
+    const dLat = this.toRad(lat2 - lat1);
+    const dLng = this.toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  private toRad(value: number): number {
+    return (value * Math.PI) / 180;
   }
 }

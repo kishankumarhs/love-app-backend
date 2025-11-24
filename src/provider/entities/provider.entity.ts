@@ -5,56 +5,86 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Campaign } from '../../campaign/entities/campaign.entity';
+import { User } from 'src/user/entities/user.entity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('providers')
 export class Provider {
+  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty()
   @Column()
   name: string;
 
+  @ApiProperty()
   @Column('text')
-  description: string;
+  email: string;
 
+  @ApiProperty()
   @Column('simple-array')
-  categories: string[];
+  service_area: string[];
 
-  @Column('text')
-  eligibility: string;
-
+  @ApiProperty()
   @Column()
-  address: string;
+  organization: string;
 
+  @ApiProperty()
+  @Column('text')
+  capabilities: string;
+
+  @ApiProperty()
+  @Column()
+  website: string;
+
+  @ApiProperty()
   @Column('decimal', { precision: 10, scale: 7 })
   latitude: number;
 
+  @ApiProperty()
   @Column('decimal', { precision: 10, scale: 7 })
   longitude: number;
 
-  @Column()
+  @ApiProperty()
+  @Column('simple-array')
+  documentLinks: string[];
+
+  @ApiProperty()
+  @Column({ type: 'text', nullable: true })
   operatingHours: string;
 
-  @Column('int')
+  @Column('int', { nullable: true })
   capacity: number;
 
-  @Column()
+  @Column({ nullable: true })
   contactEmail: string;
 
-  @Column()
+  @Column({ nullable: true })
   contactPhone: string;
 
   @Column({ default: true })
   isActive: boolean;
 
+  @ApiProperty()
+  @OneToOne(() => User, (user: any) => user.provider)
+  @JoinColumn()
+  userId: string;
+
+  @ApiProperty()
   @OneToMany(() => Campaign, (campaign) => campaign.provider)
+  @JoinColumn()
   campaigns: Campaign[];
 
+  @ApiProperty()
   @CreateDateColumn()
   createdAt: Date;
 
+  @ApiProperty()
   @UpdateDateColumn()
   updatedAt: Date;
 }

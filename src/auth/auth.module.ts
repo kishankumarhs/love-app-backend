@@ -10,6 +10,7 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { GuestGuard } from './guards/guest.guard';
+import { FirebaseStrategy } from './strategies/firebase.strategy';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { GuestGuard } from './guards/guest.guard';
   providers: [
     AuthService,
     JwtStrategy,
+    FirebaseStrategy,
     GoogleStrategy,
     JwtAuthGuard,
     RolesGuard,
