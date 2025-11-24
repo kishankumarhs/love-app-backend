@@ -91,7 +91,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/love-app-backend:${{ github.sha }}
 
       - name: Deploy to production server
-        uses: appleboy/ssh-action@v1.0.0
+        uses: appleboy/ssh-action@v1.2.3
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
