@@ -32,7 +32,7 @@ import { CommonModule } from './common/common.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { Countries } from './user/entities/countires.entity';
 import firebaseConfig from './config/firebase.config';
-import { CampaignModule } from './campaign/campaign.module';
+// import { CampaignModule } from './campaign/campaign.module';
 
 @Module({
   imports: [
