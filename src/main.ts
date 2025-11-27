@@ -7,7 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import helmet from 'helmet';
-import * as compression from 'compression';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,19 +17,22 @@ async function bootstrap() {
   // Security middleware
   app.use(
     helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          scriptSrc: ["'self'"],
-          imgSrc: ["'self'", 'data:', 'https:'],
-          connectSrc: ["'self'"],
-          fontSrc: ["'self'"],
-          objectSrc: ["'none'"],
-          mediaSrc: ["'self'"],
-          frameSrc: ["'none'"],
-        },
-      },
+      contentSecurityPolicy:
+        process.env.NODE_ENV === 'production'
+          ? {
+              directives: {
+                defaultSrc: ["'self'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                imgSrc: ["'self'", 'data:', 'https:'],
+                connectSrc: ["'self'"],
+                fontSrc: ["'self'", 'data:'],
+                objectSrc: ["'none'"],
+                mediaSrc: ["'self'"],
+                frameSrc: ["'none'"],
+              },
+            }
+          : false,
       crossOriginEmbedderPolicy: false,
     }),
   );
@@ -62,7 +65,7 @@ async function bootstrap() {
   app.enableCors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? ['https://loveapp.com', 'https://www.loveapp.com']
+        ? (process.env.ALLOWED_ORIGINS || 'https://loveapp.com').split(',')
         : [
             'http://localhost:3000',
             'http://localhost:3001',
@@ -114,7 +117,13 @@ async function bootstrap() {
     .addTag('Admin', 'Administrative endpoints')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+    customSiteTitle: 'LOVE App API Documentation',
+    customCss: '.swagger-ui .topbar { display: none }',
+  });
 
   // Health check endpoint
   app.getHttpAdapter().get('/health', (req, res) => {
@@ -127,11 +136,12 @@ async function bootstrap() {
     });
   });
 
-  const port = configService.get<number>('app.port');
-  await app.listen(port);
-  logger.log(`🚀 Application is running on: http://localhost:${port}`);
-  logger.log(`📚 Swagger documentation: http://localhost:${port}/api/docs`);
-  logger.log(`🏥 Health check: http://localhost:${port}/health`);
+  const port = configService.get<number>('app.port') || 3000;
+  const host = process.env.HOST || '0.0.0.0';
+  await app.listen(port, host);
+  logger.log(`🚀 Application is running on: http://${host}:${port}`);
+  logger.log(`📚 Swagger documentation: http://${host}:${port}/api/docs`);
+  logger.log(`🏥 Health check: http://${host}:${port}/health`);
   logger.log(
     `🔒 Security features enabled: Helmet, CORS, Rate Limiting, Validation`,
   );

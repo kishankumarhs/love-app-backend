@@ -7,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Request } from './request.entity';
 import { Provider } from '../../provider/entities/provider.entity';
 import { User } from '../../user/entities/user.entity';
 
@@ -46,9 +45,9 @@ export class Referral {
   @Column({ nullable: true })
   completedAt: Date;
 
-  @ManyToOne(() => Request, (request) => request.referrals)
+  @ManyToOne('Request', (request: any) => request.referrals)
   @JoinColumn({ name: 'requestId' })
-  request: Request;
+  request: any;
 
   @ManyToOne(() => Provider)
   @JoinColumn({ name: 'providerId' })
