@@ -7,7 +7,6 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Provider } from '../../provider/entities/provider.entity';
 
 @Entity('campaigns')
 export class Campaign {
@@ -47,9 +46,9 @@ export class Campaign {
   @Column('uuid')
   providerId: string;
 
-  @ManyToOne(() => Provider, (provider) => provider.campaigns)
+  @ManyToOne('Provider', (provider: any) => provider.campaigns)
   @JoinColumn({ name: 'providerId' })
-  provider: Provider;
+  provider: any;
 
   @CreateDateColumn()
   createdAt: Date;

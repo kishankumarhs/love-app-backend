@@ -10,7 +10,6 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Provider } from '../../provider/entities/provider.entity';
-import { Referral } from './referral.entity';
 
 @Entity('requests')
 export class Request {
@@ -67,8 +66,8 @@ export class Request {
   @JoinColumn({ name: 'providerId' })
   provider: Provider;
 
-  @OneToMany(() => Referral, (referral) => referral.request)
-  referrals: Referral[];
+  @OneToMany('Referral', (referral: any) => referral.request)
+  referrals: any[];
 
   @CreateDateColumn()
   createdAt: Date;

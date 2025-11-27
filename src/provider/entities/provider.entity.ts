@@ -8,7 +8,6 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { Campaign } from '../../campaign/entities/campaign.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -76,9 +75,9 @@ export class Provider {
   userId: string;
 
   @ApiProperty()
-  @OneToMany(() => Campaign, (campaign) => campaign.provider)
+  @OneToMany('Campaign', (campaign: any) => campaign.provider)
   @JoinColumn()
-  campaigns: Campaign[];
+  campaigns: any[];
 
   @ApiProperty()
   @CreateDateColumn()
