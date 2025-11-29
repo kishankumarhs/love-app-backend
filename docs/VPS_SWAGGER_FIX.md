@@ -10,30 +10,50 @@ Swagger UI shows blank page with errors:
 
 ## Solution Steps
 
-### 1. Install SSL Certificate (Required)
+### 1. Prepare for SSL Certificate
+
+On your VPS, create the webroot directory:
 
 ```bash
-# Install Certbot
-sudo apt update
-sudo apt install certbot python3-certbot-nginx
-
-# Get SSL certificate
-sudo certbot certonly --nginx -d lovesolutions.cloud -d www.lovesolutions.cloud
-
-# Certificates will be in: /etc/letsencrypt/live/lovesolutions.cloud/
+sudo mkdir -p /var/www/html/.well-known/acme-challenge
+sudo chown -R www-data:www-data /var/www/html
 ```
 
-### 2. Configure Nginx
+### 2. Install Temporary Nginx Config (for SSL verification)
 
 ```bash
-# Copy the VPS nginx config
-sudo cp nginx-vps.conf /etc/nginx/sites-available/loveapp-backend
+# Remove any existing config
+sudo rm -f /etc/nginx/sites-enabled/loveapp-backend
 
-# Create symlink
+# Install temporary config for certbot
+sudo cp nginx-certbot.conf /etc/nginx/sites-available/loveapp-backend
 sudo ln -s /etc/nginx/sites-available/loveapp-backend /etc/nginx/sites-enabled/
 
-# Remove default config if exists
-sudo rm /etc/nginx/sites-enabled/default
+# Test and reload
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+### 3. Get SSL Certificate
+
+```bash
+sudo certbot certonly --webroot \
+    -w /var/www/html \
+    -d lovesolutions.cloud \
+    -d www.lovesolutions.cloud \
+    --email your-email@example.com \
+    --agree-tos
+```
+
+**Important:** Replace `your-email@example.com` with your actual email.
+
+### 4. Install Production Nginx Config
+
+After SSL certificate is obtained:
+
+```bash
+# Install production config
+sudo cp nginx-vps.conf /etc/nginx/sites-available/loveapp-backend
 
 # Test configuration
 sudo nginx -t
@@ -42,7 +62,7 @@ sudo nginx -t
 sudo systemctl reload nginx
 ```
 
-### 3. Update Environment Variables
+### 5. Update Environment Variables
 
 Create/update `.env` file on VPS:
 
@@ -193,23 +213,47 @@ sudo certbot renew --dry-run
 
 ## Quick Fix Command Sequence
 
-```bash
-# 1. Get SSL
-sudo certbot certonly --nginx -d lovesolutions.cloud
+**Run these commands on your VPS:**
 
-# 2. Setup Nginx
-sudo cp nginx-vps.conf /etc/nginx/sites-available/loveapp-backend
+```bash
+# Step 1: Prepare webroot
+sudo mkdir -p /var/www/html/.well-known/acme-challenge
+sudo chown -R www-data:www-data /var/www/html
+
+# Step 2: Install temporary nginx config
+sudo rm -f /etc/nginx/sites-enabled/loveapp-backend
+sudo cp nginx-certbot.conf /etc/nginx/sites-available/loveapp-backend
 sudo ln -s /etc/nginx/sites-available/loveapp-backend /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 
-# 3. Update backend env
+# Step 3: Get SSL certificate (REPLACE your-email@example.com!)
+sudo certbot certonly --webroot \
+    -w /var/www/html \
+    -d lovesolutions.cloud \
+    -d www.lovesolutions.cloud \
+    --email your-email@example.com \
+    --agree-tos
+
+# Step 4: Install production config
+sudo cp nginx-vps.conf /etc/nginx/sites-available/loveapp-backend
+sudo nginx -t && sudo systemctl reload nginx
+
+# Step 5: Update backend env
 echo "ALLOWED_ORIGINS=https://lovesolutions.cloud,https://www.lovesolutions.cloud" >> .env
 
-# 4. Restart backend
+# Step 6: Restart backend
 pm2 restart loveapp-backend
 
-# 5. Test
+# Step 7: Test
 curl https://lovesolutions.cloud/health
+```
+
+**Or use the automated script:**
+
+```bash
+chmod +x setup-ssl.sh
+# Edit setup-ssl.sh and replace your-email@example.com
+./setup-ssl.sh
 ```
 
 Access: <https://lovesolutions.cloud/api/docs>
