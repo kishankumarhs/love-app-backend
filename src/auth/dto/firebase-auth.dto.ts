@@ -1,6 +1,6 @@
 import { IsEnum, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from 'src/user/entities/user.entity';
+import { UserRole } from '../../user/entities/user.entity';
 
 export class FirebaseAuthDto {
   @ApiProperty({
