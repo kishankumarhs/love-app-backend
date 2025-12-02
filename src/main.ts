@@ -14,9 +14,6 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const logger = new Logger('Bootstrap');
 
-  // Trust proxy for VPS deployment
-  app.set('trust proxy', 1);
-
   // Security middleware
   app.use(
     helmet({
