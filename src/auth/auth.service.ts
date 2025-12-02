@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as admin from 'firebase-admin';
 import { UserRole } from '../user/entities/user.entity';
-import { AuthResponse } from 'src/common/types';
+import { AuthResponse } from '../common/types';
 
 @Injectable()
 export class AuthService {

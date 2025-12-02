@@ -9,7 +9,6 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
-import { Provider } from '../../provider/entities/provider.entity';
 
 export enum ReviewStatus {
   PENDING = 'pending',
@@ -55,9 +54,9 @@ export class Review {
   @Column()
   userId: string;
 
-  @ManyToOne(() => Provider)
+  @ManyToOne('Provider')
   @JoinColumn()
-  provider: Provider;
+  provider: any;
 
   @Column()
   providerId: string;
