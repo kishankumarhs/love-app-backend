@@ -68,7 +68,7 @@
     "socket.io": "^4.8.1",
     "stripe": "^19.3.0",
     "swagger-ui-express": "^5.0.1",
-    "twilio": "^5.10.4",
+    "twilio": "^5.10.7",
     "typeorm": "^0.3.27",
     "xlsx": "^0.18.5"
   },
