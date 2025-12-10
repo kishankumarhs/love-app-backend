@@ -29,6 +29,14 @@ export class AuthService {
     }
   }
 
+  async findByEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
+  }
+
   async firebaseAuth(
     idToken: string,
     role: UserRole,

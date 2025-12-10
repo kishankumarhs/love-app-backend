@@ -23,7 +23,7 @@ export class SecurityMiddleware implements NestMiddleware {
       },
     })(req, res, () => {
       // Apply compression
-      compression()(req, res, next);
+      compression()(req as any, res as any, next);
     });
   }
 }
