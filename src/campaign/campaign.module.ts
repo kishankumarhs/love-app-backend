@@ -3,9 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CampaignService } from './campaign.service';
 import { CampaignController } from './campaign.controller';
 import { Campaign } from './entities/campaign.entity';
+import { Employee } from '../provider/entities/emplyee.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Campaign])],
+  imports: [TypeOrmModule.forFeature([Campaign, Employee])],
   controllers: [CampaignController],
   providers: [CampaignService],
   exports: [CampaignService],

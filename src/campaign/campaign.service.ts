@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Employee } from '../provider/entities/emplyee.entity';
 import { Campaign } from './entities/campaign.entity';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
@@ -10,7 +11,52 @@ export class CampaignService {
   constructor(
     @InjectRepository(Campaign)
     private campaignRepository: Repository<Campaign>,
+    @InjectRepository(Employee)
+    private employeeRepository: Repository<Employee>,
   ) {}
+
+  // Assign employees to campaign
+  async assignEmployees(
+    campaignId: string,
+    employeeIds: string[],
+  ): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+      relations: ['employees'],
+    });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    const employees = await this.employeeRepository.findByIds(employeeIds);
+    campaign.employees = Array.isArray(campaign.employees)
+      ? [...new Set([...campaign.employees, ...employees])]
+      : employees;
+    return this.campaignRepository.save(campaign);
+  }
+
+  // Remove employee from campaign
+  async unassignEmployee(
+    campaignId: string,
+    employeeId: string,
+  ): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+      relations: ['employees'],
+    });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    campaign.employees = (campaign.employees || []).filter(
+      (e: any) => e.id !== employeeId,
+    );
+    return this.campaignRepository.save(campaign);
+  }
+
+  // List employees for a campaign
+  async listEmployees(campaignId: string): Promise<Employee[]> {
+    const campaign = await this.campaignRepository.findOne({
+      where: { id: campaignId },
+      relations: ['employees'],
+    });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    return campaign.employees || [];
+  }
 
   async create(createCampaignDto: CreateCampaignDto): Promise<Campaign> {
     const campaign = this.campaignRepository.create(createCampaignDto);
@@ -142,5 +188,13 @@ export class CampaignService {
 
   private toRad(value: number): number {
     return (value * Math.PI) / 180;
+  }
+
+  // Publish campaign
+  async publishCampaign(id: string): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findOne({ where: { id } });
+    if (!campaign) throw new NotFoundException('Campaign not found');
+    campaign.status = 'published';
+    return this.campaignRepository.save(campaign);
   }
 }

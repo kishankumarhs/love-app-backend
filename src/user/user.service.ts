@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -26,7 +30,19 @@ export class UserService {
 
   async create(createUserDto: Partial<CreateUserDto>): Promise<User> {
     const user = this.userRepository.create(createUserDto);
-    return this.userRepository.save(user);
+    try {
+      return await this.userRepository.save(user);
+    } catch (error) {
+      const e = error as any;
+      // Postgres unique violation code is 23505 — map it to a Conflict (409)
+      if (
+        e?.code === '23505' ||
+        (e?.message && e.message.includes('duplicate key'))
+      ) {
+        throw new ConflictException('Email already exists');
+      }
+      throw error;
+    }
   }
 
   async findAll(

@@ -6,10 +6,19 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 
 @Entity('campaigns')
 export class Campaign {
+  @ManyToMany('Employee', () => Object, { cascade: false })
+  @JoinTable({
+    name: 'campaign_employees',
+    joinColumn: { name: 'campaignId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'employeeId', referencedColumnName: 'id' },
+  })
+  employees: any[];
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

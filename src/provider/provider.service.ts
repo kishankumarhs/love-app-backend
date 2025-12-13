@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Provider } from './entities/provider.entity';
+import { Employee } from './entities/emplyee.entity';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
 import { UserService } from '../user/user.service';
@@ -12,8 +15,40 @@ export class ProviderService {
   constructor(
     @InjectRepository(Provider)
     private providerRepository: Repository<Provider>,
+    @InjectRepository(Employee)
+    private employeeRepository: Repository<Employee>,
     private userService: UserService,
   ) {}
+  // Employee CRUD
+  async createEmployee(dto: CreateEmployeeDto): Promise<Employee> {
+    // Optionally: check provider exists
+    const employee = this.employeeRepository.create(dto);
+    return this.employeeRepository.save(employee);
+  }
+
+  async findAllEmployees(providerId?: string): Promise<Employee[]> {
+    if (providerId) {
+      return this.employeeRepository.find({ where: { providerId } });
+    }
+    return this.employeeRepository.find();
+  }
+
+  async findEmployeeById(id: string): Promise<Employee> {
+    const employee = await this.employeeRepository.findOne({ where: { id } });
+    if (!employee) throw new NotFoundException('Employee not found');
+    return employee;
+  }
+
+  async updateEmployee(id: string, dto: UpdateEmployeeDto): Promise<Employee> {
+    await this.employeeRepository.update(id, dto);
+    return this.findEmployeeById(id);
+  }
+
+  async removeEmployee(id: string): Promise<void> {
+    const result = await this.employeeRepository.delete(id);
+    if (result.affected === 0)
+      throw new NotFoundException('Employee not found');
+  }
 
   async create(createProviderDto: CreateProvider): Promise<Provider> {
     await this.userService.update(createProviderDto.userId, {
