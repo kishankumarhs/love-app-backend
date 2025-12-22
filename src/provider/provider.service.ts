@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { Provider } from './entities/provider.entity';
 import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
-import { UserService } from 'src/user/user.service';
-import { UserRole } from 'src/user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { UserRole } from '../user/entities/user.entity';
 
 @Injectable()
 export class ProviderService {

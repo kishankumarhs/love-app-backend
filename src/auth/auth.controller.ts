@@ -48,4 +48,20 @@ export class AuthController {
       firebaseAuthDto.role,
     );
   }
+
+  @Get('check-user-exists')
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
+  @ApiOperation({
+    summary: 'Check if a user exists by email',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User existence checked successfully',
+  })
+  async checkUserExists(@Request() req) {
+    const email = req.query.email;
+    const user = await this.authService.findByEmail(email);
+    return { exists: !!user };
+  }
 }
