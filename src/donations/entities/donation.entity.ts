@@ -9,8 +9,6 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
-import { Campaign } from '../../campaign/entities/campaign.entity';
-import { Provider } from '../../provider/entities/provider.entity';
 
 export enum DonationStatus {
   PENDING = 'pending',
@@ -48,16 +46,16 @@ export class Donation {
   @Column({ nullable: true })
   userId: string;
 
-  @ManyToOne(() => Campaign)
+  @ManyToOne('Campaign')
   @JoinColumn()
-  campaign: Campaign;
+  campaign: any;
 
   @Column()
   campaignId: string;
 
-  @ManyToOne(() => Provider, { nullable: true })
+  @ManyToOne('Provider', { nullable: true })
   @JoinColumn()
-  provider: Provider;
+  provider: any;
 
   @Column({ nullable: true })
   providerId: string;

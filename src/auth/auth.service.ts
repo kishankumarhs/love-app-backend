@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as admin from 'firebase-admin';
 import { UserRole } from '../user/entities/user.entity';
-import { AuthResponse } from 'src/common/types';
+import { AuthResponse } from '../common/types';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +27,14 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  async findByEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
   }
 
   async firebaseAuth(

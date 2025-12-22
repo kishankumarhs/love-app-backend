@@ -65,7 +65,9 @@ async function bootstrap() {
   app.enableCors({
     origin:
       process.env.NODE_ENV === 'production'
-        ? (process.env.ALLOWED_ORIGINS || 'https://loveapp.com').split(',')
+        ? (process.env.ALLOWED_ORIGINS || 'https://lovesolutions.cloud').split(
+            ',',
+          )
         : [
             'http://localhost:3000',
             'http://localhost:3001',
