@@ -9,8 +9,6 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.entity';
-import { Provider } from '../../provider/entities/provider.entity';
-import { Campaign } from '../../campaign/entities/campaign.entity';
 
 export enum VoucherStatus {
   ACTIVE = 'active',
@@ -29,16 +27,16 @@ export class WifiVoucher {
   @Column({ unique: true, length: 20 })
   code: string;
 
-  @ManyToOne(() => Provider)
+  @ManyToOne('Provider')
   @JoinColumn()
-  provider: Provider;
+  provider: any;
 
   @Column()
   providerId: string;
 
-  @ManyToOne(() => Campaign, { nullable: true })
+  @ManyToOne('Campaign', { nullable: true })
   @JoinColumn()
-  campaign: Campaign;
+  campaign: any;
 
   @Column({ nullable: true })
   campaignId: string;
