@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Review } from './entities/review.entity';
 import { ModerationQueue } from './entities/moderation-queue.entity';
-import { AuditLog } from './entities/audit-log.entity';
+import { AuditLog } from '../audit/entities/audit-log.entity';
 import { Report } from './entities/report.entity';
 import { ReviewController } from './review.controller';
 import { ReviewService } from './review.service';

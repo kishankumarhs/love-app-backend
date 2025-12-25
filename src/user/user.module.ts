@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { UserProfile } from './entities/user-profile.entity';
 import { Feedback } from './entities/feedback.entity';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { Countries } from './entities/countires.entity';
+import { Country } from './entities/countries.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, UserProfile, Feedback, Countries])],
+  imports: [TypeOrmModule.forFeature([User, Feedback, Country])],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

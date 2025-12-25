@@ -8,8 +8,10 @@ import {
   OneToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiHideProperty } from '@nestjs/swagger';
+import { User } from '../../user/entities/user.entity';
+import { Campaign } from '../../campaign/entities/campaign.entity';
+import { Employee } from './employee.entity';
 
 @Entity('providers')
 export class Provider {
@@ -57,27 +59,42 @@ export class Provider {
   @Column({ type: 'text', nullable: true })
   operatingHours: string;
 
+  @ApiProperty()
   @Column('int', { nullable: true })
   capacity: number;
 
+  @ApiProperty()
   @Column({ nullable: true })
   contactEmail: string;
 
+  @ApiProperty()
   @Column({ nullable: true })
   contactPhone: string;
 
+  @ApiProperty()
   @Column({ default: true })
   isActive: boolean;
 
-  @ApiProperty()
-  @OneToOne(() => User, (user: any) => user.provider)
-  @JoinColumn()
-  userId: string;
+  // ---------- RELATIONS ----------
 
-  @ApiProperty()
-  @OneToMany('Campaign', (campaign: any) => campaign.provider)
-  @JoinColumn()
-  campaigns: any[];
+  // Owning side of the Provider <-> User one-to-one relation.
+  // Use lazy resolver and explicit JoinColumn to ensure the FK column
+  // name is `userId` and no duplicate columns are created. Mark relation
+  // nullable to avoid breaking existing provider rows with no user.
+  @ApiHideProperty()
+  @OneToOne(() => User, (user) => user.provider, { nullable: true })
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @ApiHideProperty()
+  @OneToMany(() => Campaign, (campaign) => campaign.provider)
+  campaigns: Campaign[];
+
+  @ApiHideProperty()
+  @OneToMany(() => Employee, (employee) => employee.provider)
+  employees: Employee[];
+
+  // ---------- TIMESTAMPS ----------
 
   @ApiProperty()
   @CreateDateColumn()

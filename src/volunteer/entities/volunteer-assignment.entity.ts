@@ -9,8 +9,6 @@ import {
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Volunteer } from './volunteer.entity';
-import { Campaign } from '../../campaign/entities/campaign.entity';
-import { Provider } from '../../provider/entities/provider.entity';
 
 export enum AssignmentType {
   CAMPAIGN_SUPPORT = 'campaign_support',
@@ -47,16 +45,16 @@ export class VolunteerAssignment {
   @Column()
   volunteerId: string;
 
-  @ManyToOne(() => Campaign, { nullable: true })
+  @ManyToOne('Campaign', { nullable: true })
   @JoinColumn()
-  campaign: Campaign;
+  campaign: any;
 
   @Column({ nullable: true })
   campaignId: string;
 
-  @ManyToOne(() => Provider, { nullable: true })
+  @ManyToOne('Provider', { nullable: true })
   @JoinColumn()
-  provider: Provider;
+  provider: any;
 
   @Column({ nullable: true })
   providerId: string;

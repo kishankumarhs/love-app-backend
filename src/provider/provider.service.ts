@@ -2,27 +2,64 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Provider } from './entities/provider.entity';
+import { Employee } from './entities/employee.entity';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
-import { UserService } from 'src/user/user.service';
-import { UserRole } from 'src/user/entities/user.entity';
+import { UserService } from '../user/user.service';
+import { UserRole } from '../user/entities/user.entity';
 
 @Injectable()
 export class ProviderService {
   constructor(
     @InjectRepository(Provider)
     private providerRepository: Repository<Provider>,
+    @InjectRepository(Employee)
+    private employeeRepository: Repository<Employee>,
     private userService: UserService,
   ) {}
+  // Employee CRUD
+  async createEmployee(dto: CreateEmployeeDto): Promise<Employee> {
+    // Optionally: check provider exists
+    const employee = this.employeeRepository.create(dto);
+    return this.employeeRepository.save(employee);
+  }
+
+  async findAllEmployees(providerId?: string): Promise<Employee[]> {
+    if (providerId) {
+      return this.employeeRepository.find({
+        where: {
+          provider: { id: providerId },
+        },
+      });
+    }
+    return this.employeeRepository.find();
+  }
+
+  async findEmployeeById(id: string): Promise<Employee> {
+    const employee = await this.employeeRepository.findOne({ where: { id } });
+    if (!employee) throw new NotFoundException('Employee not found');
+    return employee;
+  }
+
+  async updateEmployee(id: string, dto: UpdateEmployeeDto): Promise<Employee> {
+    await this.employeeRepository.update(id, dto);
+    return this.findEmployeeById(id);
+  }
+
+  async removeEmployee(id: string): Promise<void> {
+    const result = await this.employeeRepository.delete(id);
+    if (result.affected === 0)
+      throw new NotFoundException('Employee not found');
+  }
 
   async create(createProviderDto: CreateProvider): Promise<Provider> {
     await this.userService.update(createProviderDto.userId, {
-      country: createProviderDto.country,
       role: UserRole.PROVIDER,
     });
-
     const provider = this.providerRepository.create(createProviderDto);
-    return this.providerRepository.save(provider);
+    return await this.providerRepository.save(provider);
   }
 
   async findAll(filters?: {
@@ -56,7 +93,7 @@ export class ProviderService {
   async findOne(id: string): Promise<Provider> {
     const provider = await this.providerRepository.findOne({
       where: { id },
-      relations: ['campaigns', 'userId'],
+      relations: ['campaigns', 'user'],
     });
 
     if (!provider) {

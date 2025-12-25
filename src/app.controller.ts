@@ -7,7 +7,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { AppService } from './app.service';
-import { Countries } from './user/entities/countires.entity';
+import { Country } from './user/entities/countries.entity';
 
 @ApiTags('Health Check')
 @Controller()
@@ -75,7 +75,7 @@ export class AppController {
 
   @Get('country-list')
   @ApiOperation({ summary: 'Create user profile' })
-  @ApiResponse({ status: 201, type: Countries })
+  @ApiResponse({ status: 201, type: Country })
   getCountries() {
     return this.appService.getCountries();
   }

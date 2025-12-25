@@ -4,8 +4,13 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToOne,
+  OneToMany,
 } from 'typeorm';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Provider } from '../../provider/entities/provider.entity';
+import { ApiHideProperty } from '@nestjs/swagger';
+import { WifiVoucher } from '../../volunteer/entities/wifi-voucher.entity';
 
 export enum UserRole {
   USER = 'user',
@@ -77,6 +82,26 @@ export class User {
   @ApiProperty()
   @Column({ type: 'varchar', length: 5, default: 'en' })
   language: string;
+
+  // Optional geolocation for users (nullable). Added to simplify nearby
+  // searches without a separate profile table.
+  @ApiPropertyOptional()
+  @Column({ type: 'decimal', precision: 9, scale: 6, nullable: true })
+  latitude?: number;
+
+  @ApiPropertyOptional()
+  @Column({ type: 'decimal', precision: 9, scale: 6, nullable: true })
+  longitude?: number;
+
+  // Inverse side of Provider <-> User. Keep hidden from Swagger to avoid
+  // circular schema expansion. This side must not declare @JoinColumn
+  // (the owning side is Provider) and should reference the relation property.
+  @ApiHideProperty()
+  @OneToOne(() => Provider, (provider) => provider.user)
+  provider: Provider;
+
+  @OneToMany(() => WifiVoucher, (voucher) => voucher.user)
+  vochers: WifiVoucher[];
 
   @ApiProperty()
   @CreateDateColumn()
