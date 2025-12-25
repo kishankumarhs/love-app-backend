@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "login_success": "Connexion réussie",
+    "login_failed": "Identifiants invalides",
+    "register_success": "Inscription réussie",
+    "logout_success": "Déconnexion réussie",
+    "token_expired": "Le token a expiré",
+    "unauthorized": "Accès non autorisé"
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire",
+    "email_invalid": "Veuillez fournir une adresse email valide",
+    "password_weak": "Le mot de passe doit contenir des majuscules, minuscules, chiffres et caractères spéciaux",
+    "phone_invalid": "Veuillez fournir un numéro de téléphone valide",
+    "date_invalid": "Veuillez fournir une date valide"
+  },
+  "errors": {
+    "not_found": "Ressource non trouvée",
+    "server_error": "Erreur interne du serveur",
+    "bad_request": "Mauvaise requête",
+    "forbidden": "Accès interdit",
+    "too_many_requests": "Trop de requêtes. Veuillez réessayer plus tard"
+  },
+  "sos": {
+    "alert_created": "Alerte SOS créée avec succès",
+    "emergency_call_initiated": "Appel d'urgence initié",
+    "help_on_way": "L'aide est en route"
+  },
+  "donations": {
+    "payment_success": "Paiement traité avec succès",
+    "payment_failed": "Échec du traitement du paiement",
+    "refund_processed": "Remboursement traité avec succès"
+  },
+  "campaigns": {
+    "created": "Campagne créée avec succès",
+    "updated": "Campagne mise à jour avec succès",
+    "ended": "La campagne est terminée",
+    "goal_reached": "Objectif de la campagne atteint!"
+  },
+  "volunteers": {
+    "application_submitted": "Candidature de bénévole soumise",
+    "application_approved": "Votre candidature de bénévole a été approuvée",
+    "opportunity_joined": "Rejoint avec succès l'opportunité de bénévolat"
+  },
+  "notifications": {
+    "new_message": "Vous avez un nouveau message",
+    "campaign_update": "Mise à jour de campagne disponible",
+    "donation_received": "Don reçu",
+    "sos_alert": "Alerte d'urgence dans votre région"
+  },
+  "common": {
+    "success": "Succès",
+    "failed": "Échoué",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "active": "Actif",
+    "inactive": "Inactif",
+    "completed": "Terminé"
+  }
+}

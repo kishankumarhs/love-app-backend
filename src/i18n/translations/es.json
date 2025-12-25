@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "login_success": "Inicio de sesión exitoso",
+    "login_failed": "Credenciales inválidas",
+    "register_success": "Registro exitoso",
+    "logout_success": "Cierre de sesión exitoso",
+    "token_expired": "El token ha expirado",
+    "unauthorized": "Acceso no autorizado"
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "email_invalid": "Por favor proporcione una dirección de correo válida",
+    "password_weak": "La contraseña debe contener mayúsculas, minúsculas, números y caracteres especiales",
+    "phone_invalid": "Por favor proporcione un número de teléfono válido",
+    "date_invalid": "Por favor proporcione una fecha válida"
+  },
+  "errors": {
+    "not_found": "Recurso no encontrado",
+    "server_error": "Error interno del servidor",
+    "bad_request": "Solicitud incorrecta",
+    "forbidden": "Acceso prohibido",
+    "too_many_requests": "Demasiadas solicitudes. Inténtelo de nuevo más tarde"
+  },
+  "sos": {
+    "alert_created": "Alerta SOS creada exitosamente",
+    "emergency_call_initiated": "Llamada de emergencia iniciada",
+    "help_on_way": "La ayuda está en camino"
+  },
+  "donations": {
+    "payment_success": "Pago procesado exitosamente",
+    "payment_failed": "Error al procesar el pago",
+    "refund_processed": "Reembolso procesado exitosamente"
+  },
+  "campaigns": {
+    "created": "Campaña creada exitosamente",
+    "updated": "Campaña actualizada exitosamente",
+    "ended": "La campaña ha terminado",
+    "goal_reached": "¡Meta de la campaña alcanzada!"
+  },
+  "volunteers": {
+    "application_submitted": "Solicitud de voluntario enviada",
+    "application_approved": "Su solicitud de voluntario ha sido aprobada",
+    "opportunity_joined": "Se unió exitosamente a la oportunidad de voluntariado"
+  },
+  "notifications": {
+    "new_message": "Tienes un nuevo mensaje",
+    "campaign_update": "Actualización de campaña disponible",
+    "donation_received": "Donación recibida",
+    "sos_alert": "Alerta de emergencia en su área"
+  },
+  "common": {
+    "success": "Éxito",
+    "failed": "Fallido",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "completed": "Completado"
+  }
+}

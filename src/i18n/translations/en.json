@@ -1,0 +1,61 @@
+{
+  "auth": {
+    "login_success": "Login successful",
+    "login_failed": "Invalid credentials",
+    "register_success": "Registration successful",
+    "logout_success": "Logout successful",
+    "token_expired": "Token has expired",
+    "unauthorized": "Unauthorized access"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email_invalid": "Please provide a valid email address",
+    "password_weak": "Password must contain uppercase, lowercase, number and special character",
+    "phone_invalid": "Please provide a valid phone number",
+    "date_invalid": "Please provide a valid date"
+  },
+  "errors": {
+    "not_found": "Resource not found",
+    "server_error": "Internal server error",
+    "bad_request": "Bad request",
+    "forbidden": "Access forbidden",
+    "too_many_requests": "Too many requests. Please try again later"
+  },
+  "sos": {
+    "alert_created": "SOS alert created successfully",
+    "emergency_call_initiated": "Emergency call initiated",
+    "help_on_way": "Help is on the way"
+  },
+  "donations": {
+    "payment_success": "Payment processed successfully",
+    "payment_failed": "Payment processing failed",
+    "refund_processed": "Refund processed successfully"
+  },
+  "campaigns": {
+    "created": "Campaign created successfully",
+    "updated": "Campaign updated successfully",
+    "ended": "Campaign has ended",
+    "goal_reached": "Campaign goal reached!"
+  },
+  "volunteers": {
+    "application_submitted": "Volunteer application submitted",
+    "application_approved": "Your volunteer application has been approved",
+    "opportunity_joined": "Successfully joined volunteer opportunity"
+  },
+  "notifications": {
+    "new_message": "You have a new message",
+    "campaign_update": "Campaign update available",
+    "donation_received": "Donation received",
+    "sos_alert": "Emergency alert in your area"
+  },
+  "common": {
+    "success": "Success",
+    "failed": "Failed",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed"
+  }
+}

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Love App – Coming Soon</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #1b2b3a, #0f2027);
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 55px;
+        border-radius: 28px;
+        backdrop-filter: blur(14px);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        max-width: 700px;
+        width: 90%;
+        animation: fadeIn 1.2s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .logo {
+        font-size: 4rem;
+        margin-bottom: 10px;
+      }
+
+      h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      p {
+        font-size: 1.15rem;
+        margin-bottom: 28px;
+        font-weight: 300;
+        line-height: 1.6;
+      }
+
+      .notify-input {
+        padding: 14px;
+        width: 75%;
+        border-radius: 30px;
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        margin-bottom: 18px;
+      }
+
+      .notify-btn {
+        padding: 13px 30px;
+        border: none;
+        border-radius: 30px;
+        background: #f5c16c;
+        color: #1b2b3a;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .notify-btn:hover {
+        transform: scale(1.05);
+        background: #ffd78a;
+      }
+
+      .links {
+        margin-top: 40px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        justify-content: center;
+      }
+
+      .links a {
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #1b2b3a;
+        font-size: 0.95rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+
+      .links a:hover {
+        background: #f5c16c;
+        transform: translateY(-2px);
+      }
+
+      .footer {
+        margin-top: 30px;
+        font-size: 0.85rem;
+        opacity: 0.8;
+      }
+
+      /* POPUP */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.65);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+
+      .popup {
+        background: white;
+        color: #1b2b3a;
+        padding: 35px 40px;
+        border-radius: 22px;
+        max-width: 420px;
+        text-align: center;
+        animation: popIn 0.4s ease;
+      }
+
+      @keyframes popIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      .popup h2 {
+        margin-top: 10px;
+        font-size: 1.6rem;
+      }
+
+      .popup p {
+        font-size: 1rem;
+        margin: 15px 0 25px;
+      }
+
+      .popup button {
+        border: none;
+        padding: 10px 22px;
+        border-radius: 20px;
+        background: #1b2b3a;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="logo">🤍</div>
+
+      <h1>Love App</h1>
+
+      <p>
+        A social initiative built on compassion and connectivity.
+        <br />
+        Empowering communities and supporting homeless lives with dignity.
+      </p>
+
+      <input
+        id="emailInput"
+        class="notify-input"
+        type="email"
+        placeholder="Enter your email to stay connected"
+      />
+      <br />
+      <button class="notify-btn" onclick="notifyMe()">Notify Me</button>
+
+      <div class="links">
+        <a
+          href="https://api.leadconnectorhq.com/widget/form/oQDfkcZDmU6C7kCWp2qD"
+          target="_blank"
+          >Volunteers</a
+        >
+        <a href="https://lailasloveinitiative.org/poc/" target="_blank"
+          >Power of Connectivity</a
+        >
+        <a
+          href="https://api.leadconnectorhq.com/widget/form/p4EoVsT0tu9S3eCE68pC"
+          target="_blank"
+          >Donate</a
+        >
+        <a
+          href="https://api.leadconnectorhq.com/widget/form/0olubm6St29PCSiDdScj"
+          target="_blank"
+          >App Release Notification</a
+        >
+      </div>
+
+      <div class="footer">© 2025 Laila’s Love — Humanity first 🤍</div>
+    </div>
+
+    <!-- POPUP -->
+    <div id="overlay" class="overlay">
+      <div class="popup">
+        <div style="font-size: 2.5rem">🤍</div>
+        <h2>Thank You</h2>
+        <p>
+          Your email has been added.
+          <br />
+          Together, we can bring hope and dignity to those in need.
+        </p>
+        <button onclick="closePopup()">Close</button>
+      </div>
+    </div>
+
+    <script>
+      function notifyMe() {
+        const email = document.getElementById('emailInput').value.trim();
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!regex.test(email)) {
+          alert('Please enter a valid email address');
+          return;
+        }
+
+        document.getElementById('overlay').style.display = 'flex';
+        document.getElementById('emailInput').value = '';
+      }
+
+      function closePopup() {
+        document.getElementById('overlay').style.display = 'none';
+      }
+    </script>
+  </body>
+</html>
