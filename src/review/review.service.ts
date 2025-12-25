@@ -9,7 +9,7 @@ import { Review, ReviewStatus } from './entities/review.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { AuditService } from './services/audit.service';
 import { ModerationService } from './services/moderation.service';
-import { AuditAction } from './entities/audit-log.entity';
+import { AuditAction } from '../audit/entities/audit-log.entity';
 
 @Injectable()
 export class ReviewService {

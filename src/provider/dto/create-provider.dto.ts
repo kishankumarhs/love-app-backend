@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, IsNumber, IsEmail } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsString,
+  IsArray,
+  IsNumber,
+  IsEmail,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateProvider {
   @ApiProperty({ example: 'John' })
@@ -31,15 +38,15 @@ export class CreateProvider {
   @IsString()
   website: string;
 
-  @ApiProperty({ example: 'USA' })
-  @IsString()
-  country: string;
-
   @ApiProperty({ example: 40.712776 })
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   latitude: number;
 
   @ApiProperty({ example: -74.005974 })
+  @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   longitude: number;
 

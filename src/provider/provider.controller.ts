@@ -13,11 +13,53 @@ import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Provider } from './entities/provider.entity';
+import { Employee } from './entities/employee.entity';
+import { CreateEmployeeDto } from './dto/create-employee.dto';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @ApiTags('Providers')
 @Controller('providers')
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
+
+  // Employee CRUD
+  @ApiOperation({ summary: 'Create employee' })
+  @ApiResponse({ status: 201, type: Employee })
+  @Post(':providerId/employees')
+  createEmployee(
+    @Param('providerId') providerId: string,
+    @Body() dto: CreateEmployeeDto,
+  ) {
+    return this.providerService.createEmployee({ ...dto, providerId });
+  }
+
+  @ApiOperation({ summary: 'Get all employees (optionally by provider)' })
+  @ApiResponse({ status: 200, type: [Employee] })
+  @Get('employees')
+  findAllEmployees(@Query('providerId') providerId?: string) {
+    return this.providerService.findAllEmployees(providerId);
+  }
+
+  @ApiOperation({ summary: 'Get employee by id' })
+  @ApiResponse({ status: 200, type: Employee })
+  @Get('employees/:id')
+  findEmployeeById(@Param('id') id: string) {
+    return this.providerService.findEmployeeById(id);
+  }
+
+  @ApiOperation({ summary: 'Update employee' })
+  @ApiResponse({ status: 200, type: Employee })
+  @Patch('employees/:id')
+  updateEmployee(@Param('id') id: string, @Body() dto: UpdateEmployeeDto) {
+    return this.providerService.updateEmployee(id, dto);
+  }
+
+  @ApiOperation({ summary: 'Delete employee' })
+  @ApiResponse({ status: 200, description: 'Employee deleted' })
+  @Delete('employees/:id')
+  removeEmployee(@Param('id') id: string) {
+    return this.providerService.removeEmployee(id);
+  }
 
   @Get()
   findAll(

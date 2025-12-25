@@ -9,7 +9,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { Provider } from '../../provider/entities/provider.entity';
 
 @Entity('requests')
 export class Request {
@@ -62,9 +61,9 @@ export class Request {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Provider, { nullable: true })
+  @ManyToOne('Provider', { nullable: true })
   @JoinColumn({ name: 'providerId' })
-  provider: Provider;
+  provider: any;
 
   @OneToMany('Referral', (referral: any) => referral.request)
   referrals: any[];

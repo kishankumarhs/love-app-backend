@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Countries } from './user/entities/countires.entity';
+import { Country } from './user/entities/countries.entity';
 
 @Injectable()
 export class AppService {
   constructor(
-    @InjectRepository(Countries)
-    private countries: Repository<Countries>,
+    @InjectRepository(Country)
+    private countries: Repository<Country>,
   ) {}
   getHello(): string {
     return 'LOVE App Backend API is running!';

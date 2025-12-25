@@ -8,7 +8,6 @@ import {
   Put,
   Delete,
   Query,
-  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,13 +19,8 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {
-  CreateUserProfileDto,
-  UpdateUserProfileDto,
-} from './dto/user-profile.dto';
 import { CreateFeedbackDto, UpdateFeedbackDto } from './dto/feedback.dto';
 import { User, UserRole } from './entities/user.entity';
-import { UserProfile } from './entities/user-profile.entity';
 import { Feedback } from './entities/feedback.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -86,38 +80,6 @@ export class UserController {
   }
 
   // Profile Management
-  @Post('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Create user profile' })
-  @ApiResponse({ status: 201, type: UserProfile })
-  createProfile(@Body() createProfileDto: CreateUserProfileDto) {
-    return this.userService.createProfile(createProfileDto);
-  }
-
-  // Profile Management
-
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get current user profile' })
-  @ApiResponse({ status: 200, type: UserProfile })
-  getCurrentProfile(@Request() req) {
-    return this.userService.getProfile(req.user.id);
-  }
-
-  @Put('profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update current user profile' })
-  @ApiResponse({ status: 200, type: UserProfile })
-  updateCurrentProfile(
-    @Request() req,
-    @Body() updateProfileDto: UpdateUserProfileDto,
-  ) {
-    return this.userService.updateProfile(req.user.id, updateProfileDto);
-  }
-
   @Get('nearby')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -129,27 +91,6 @@ export class UserController {
     @Query('radius') radius: number = 10,
   ) {
     return this.userService.findNearby(latitude, longitude, radius);
-  }
-
-  @Get(':userId/profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Get user profile' })
-  @ApiResponse({ status: 200, type: UserProfile })
-  getProfile(@Param('userId') userId: string) {
-    return this.userService.getProfile(userId);
-  }
-
-  @Put(':userId/profile')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update user profile' })
-  @ApiResponse({ status: 200, type: UserProfile })
-  updateProfile(
-    @Param('userId') userId: string,
-    @Body() updateProfileDto: UpdateUserProfileDto,
-  ) {
-    return this.userService.updateProfile(userId, updateProfileDto);
   }
 
   // Feedback Management

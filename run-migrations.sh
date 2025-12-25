@@ -26,19 +26,19 @@ run_migration() {
     fi
 }
 
-# Run migrations in order
-# run_migration "src/migrations/001-create-providers.sql"
-# run_migration "src/migrations/002-create-campaigns.sql"
-# run_migration "src/migrations/003-create-sos-tables.sql"
-# run_migration "src/migrations/004-create-requests-referrals.sql"
-# run_migration "src/migrations/005-create-notification-tables.sql"
-# run_migration "src/migrations/006-create-user-profile-feedback.sql"
-# run_migration "src/migrations/007-create-donations-payments.sql"
-# run_migration "src/migrations/008-create-volunteer-voucher-system.sql"
-# run_migration "src/migrations/009-create-reviews-moderation-audit.sql"
-# run_migration "src/migrations/010-create-notification-templates-realtime.sql"
-# run_migration "src/migrations/011-create-admin-analytics-management.sql"
-run_migration "src/migrations/013-create-countries-table.sql"
+# Run all SQL migrations in src/migrations in lexicographic order.
+# Files are executed with psql; migrations should be idempotent (use IF NOT EXISTS)
+MIG_DIR="src/migrations"
+shopt -s nullglob
+sql_files=($MIG_DIR/*.sql)
+if [ ${#sql_files[@]} -eq 0 ]; then
+    echo "No SQL migration files found in $MIG_DIR"
+else
+    IFS=$'\n' sorted_files=($(printf "%s\n" "${sql_files[@]}" | sort))
+    for f in "${sorted_files[@]}"; do
+        run_migration "$f"
+    done
+fi
 
 echo "All migrations completed successfully!"
 echo "Database schema is now up to date."

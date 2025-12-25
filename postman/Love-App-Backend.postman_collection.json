@@ -148,6 +148,60 @@
               "path": ["auth", "login"]
             }
           }
+        },
+        {
+          "name": "Assign Employees to Campaign",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"employeeIds\": [\"{{employeeId1}}\", \"{{employeeId2}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/campaigns/{{campaignId}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["campaigns", "{{campaignId}}", "employees"]
+            }
+          }
+        },
+        {
+          "name": "Unassign Employee from Campaign",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/campaigns/{{campaignId}}/employees/{{employeeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "campaigns",
+                "{{campaignId}}",
+                "employees",
+                "{{employeeId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Employees for Campaign",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/campaigns/{{campaignId}}/employees",
+              "host": ["{{baseUrl}}"],
+              "path": ["campaigns", "{{campaignId}}", "employees"]
+            }
+          }
+        },
+        {
+          "name": "Publish Campaign",
+          "request": {
+            "method": "PATCH",
+            "url": {
+              "raw": "{{baseUrl}}/campaigns/{{campaignId}}/publish",
+              "host": ["{{baseUrl}}"],
+              "path": ["campaigns", "{{campaignId}}", "publish"]
+            }
+          }
         }
       ]
     },

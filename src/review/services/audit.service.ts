@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AuditLog, AuditAction } from '../entities/audit-log.entity';
+import { AuditLog, AuditAction } from '../../audit/entities/audit-log.entity';
 
 @Injectable()
 export class AuditService {
@@ -24,19 +24,16 @@ export class AuditService {
   ): Promise<AuditLog> {
     const changes = this.calculateChanges(oldValues, newValues);
 
-    const auditLog = this.auditLogRepository.create({
+    const payload: Partial<AuditLog> = {
       entityType,
       entityId,
       action,
       userId,
-      userEmail,
       ipAddress,
-      userAgent,
-      oldValues,
-      newValues,
       changes,
-      metadata: metadata || {},
-    });
+    };
+
+    const auditLog = this.auditLogRepository.create(payload);
 
     return await this.auditLogRepository.save(auditLog);
   }

@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { UserService } from './user.service';
 import { User } from './entities/user.entity';
-import { UserProfile } from './entities/user-profile.entity';
 import { Feedback } from './entities/feedback.entity';
 import { mockRepository } from '../test/setup';
 import { NotFoundException } from '@nestjs/common';
@@ -16,10 +15,6 @@ describe('UserService', () => {
         UserService,
         {
           provide: getRepositoryToken(User),
-          useValue: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(UserProfile),
           useValue: mockRepository,
         },
         {
