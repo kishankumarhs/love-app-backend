@@ -1,8 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Provider } from './entities/provider.entity';
 import { Employee } from './entities/employee.entity';
+import { Review, ReviewStatus } from '../review/entities/review.entity';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { UpdateEmployeeDto } from './dto/update-employee.dto';
 import { CreateProvider } from './dto/create-provider.dto';
@@ -17,8 +19,10 @@ export class ProviderService {
     private providerRepository: Repository<Provider>,
     @InjectRepository(Employee)
     private employeeRepository: Repository<Employee>,
+    @InjectRepository(Review)
+    private reviewRepository: Repository<Review>,
     private userService: UserService,
-  ) {}
+  ) { }
   // Employee CRUD
   async createEmployee(dto: CreateEmployeeDto): Promise<Employee> {
     // Optionally: check provider exists
@@ -158,5 +162,94 @@ export class ProviderService {
     }
 
     return query.getMany();
+  }
+
+  /**
+   * Mobile-friendly service discovery
+   * - Supports map/list views via lat/long/radius
+   * - Filters: category (capabilities), open_now (isActive), capacity
+   * - Pagination included
+   */
+  async discovery(filters: {
+    latitude?: number;
+    longitude?: number;
+    radius?: number; // in km
+    category?: string;
+    open_now?: boolean;
+    capacity_available?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<{ providers: Provider[]; total: number }> {
+    const query = this.providerRepository.createQueryBuilder('provider');
+    const {
+      latitude,
+      longitude,
+      radius,
+      category,
+      open_now,
+      capacity_available,
+      page = 1,
+      limit = 20,
+    } = filters;
+
+    // 1. Location Filter (Haversine)
+    if (latitude && longitude && radius) {
+      query.andWhere(
+        `(
+          6371 * acos(
+            cos(radians(:latitude)) * cos(radians(provider.latitude)) *
+            cos(radians(provider.longitude) - radians(:longitude)) +
+            sin(radians(:latitude)) * sin(radians(provider.latitude))
+          )
+        ) <= :radius`,
+        { latitude, longitude, radius },
+      );
+    }
+
+    // 2. Category Filter (Mapped to capabilities since categories column is missing/unreliable)
+    if (category) {
+      query.andWhere('provider.capabilities ILIKE :category', {
+        category: `%${category}%`,
+      });
+    }
+
+    // 3. Open Now (Mapped to isActive)
+    if (open_now) {
+      query.andWhere('provider.isActive = :isActive', { isActive: true });
+    }
+
+    // 4. Capacity Filter
+    if (capacity_available) {
+      query.andWhere('provider.capacity > 0');
+    }
+
+    // Pagination
+    query.skip((page - 1) * limit).take(limit);
+
+    const [providers, total] = await query.getManyAndCount();
+    return { providers, total };
+  }
+
+  /**
+   * Mobile-optimized detail view
+   * Fetches provider + approved reviews
+   */
+  async getMobileDetail(id: string): Promise<any> {
+    const provider = await this.findOne(id);
+
+    // Fetch approved reviews separately
+    const reviews = await this.reviewRepository.find({
+      where: {
+        providerId: id,
+        status: ReviewStatus.APPROVED
+      },
+      order: { createdAt: 'DESC' },
+      take: 20 // Limit reviews for mobile performance
+    });
+
+    return {
+      ...provider,
+      reviews
+    };
   }
 }

@@ -7,7 +7,9 @@ import { WifiVoucher } from './entities/wifi-voucher.entity';
 import { VoucherUsageLog } from './entities/voucher-usage-log.entity';
 import { VolunteerService } from './volunteer.service';
 import { VoucherService } from './services/voucher.service';
+
 import { VolunteerController } from './volunteer.controller';
+import { VouchersController } from './vouchers.controller';
 
 @Module({
   imports: [
@@ -19,8 +21,8 @@ import { VolunteerController } from './volunteer.controller';
       VoucherUsageLog,
     ]),
   ],
-  controllers: [VolunteerController],
+  controllers: [VolunteerController, VouchersController],
   providers: [VolunteerService, VoucherService],
   exports: [VolunteerService, VoucherService],
 })
-export class VolunteerModule {}
+export class VolunteerModule { }

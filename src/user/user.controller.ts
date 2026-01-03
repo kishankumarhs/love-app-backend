@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Query,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,13 +31,26 @@ import { PaginationDto } from '../common/dto/pagination.dto';
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({ status: 201, type: User })
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Get('profile/me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get current user profile (Mobile)' })
+  @ApiResponse({ status: 200, type: User })
+  async getProfile(@Request() req) {
+    const user = await this.userService.findOne(req.user.id);
+    if (user) {
+      delete user.password;
+    }
+    return user;
   }
 
   @Get()

@@ -38,11 +38,25 @@ export enum NotificationCategory {
   SYSTEM = 'system',
 }
 
+/**
+ * Notification Entity
+ * - MVP Rule: Generates both System (Email/SMS) and In-App (Mobile Feed) notifications.
+ * - Mobile App: Uses `GET /notifications/me` to list these.
+ * - Mobile users marking as read -> updates `readAt`.
+ */
 @Entity('notifications')
 export class Notification {
   @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  /**
+   * For Mobile Feed: Timestamp when user viewed this notification.
+   * Null = Unread.
+   */
+  @ApiProperty()
+  @Column({ nullable: true })
+  readAt: Date;
 
   @ApiProperty()
   @Column()

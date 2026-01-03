@@ -6,6 +6,8 @@ import {
   Param,
   UseGuards,
   Put,
+  Query,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -39,7 +41,7 @@ export class NotificationController {
     private readonly notificationService: NotificationService,
     private readonly templateService: TemplateService,
     private readonly notificationGateway: NotificationGateway,
-  ) {}
+  ) { }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -121,6 +123,22 @@ export class NotificationController {
   @ApiResponse({ status: 200, type: [Notification] })
   findUserNotifications(@Param('userId') userId: string) {
     return this.notificationService.findUserNotifications(userId);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({ summary: 'Get my notifications (Mobile)' })
+  @ApiResponse({ status: 200, description: 'Paginated notifications' })
+  getMyNotifications(
+    @Request() req,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.notificationService.findMyNotifications(req.user.id, {
+      page,
+      limit,
+    });
   }
 
   // Notification Preferences

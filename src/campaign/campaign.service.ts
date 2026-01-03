@@ -5,6 +5,7 @@ import { Employee } from '../provider/entities/employee.entity';
 import { Campaign } from './entities/campaign.entity';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
+import { Provider } from '../provider/entities/provider.entity';
 
 @Injectable()
 export class CampaignService {
@@ -13,6 +14,8 @@ export class CampaignService {
     private campaignRepository: Repository<Campaign>,
     @InjectRepository(Employee)
     private employeeRepository: Repository<Employee>,
+    @InjectRepository(Provider)
+    private providerRepo: Repository<Provider>,
   ) {}
 
   // Assign employees to campaign
@@ -59,8 +62,33 @@ export class CampaignService {
   }
 
   async create(createCampaignDto: CreateCampaignDto): Promise<Campaign> {
-    const campaign = this.campaignRepository.create(createCampaignDto);
+    // 1️⃣ Validate provider exists
+    const provider = await this.providerRepo.findOne({
+      where: { id: createCampaignDto.providerId },
+    });
+
+    if (!provider) {
+      throw new NotFoundException('Provider not found');
+    }
+
+    // 2️⃣ Create campaign entity
+    const campaign = this.campaignRepository.create({
+      title: createCampaignDto.title,
+      description: createCampaignDto.description,
+      category: createCampaignDto.category,
+      startDate: new Date(createCampaignDto.startDate),
+      endDate: new Date(createCampaignDto.endDate),
+      targetAmount: createCampaignDto.targetAmount,
+      volunteersNeeded: createCampaignDto.volunteersNeeded,
+      status: createCampaignDto.status ?? 'active',
+      location: createCampaignDto.location,
+      provider, // ✅ THIS IS THE RELATION
+    });
+
+    // 3️⃣ Save campaign
     return this.campaignRepository.save(campaign);
+    // const campaign = this.campaignRepository.create(createCampaignDto);
+    // return this.campaignRepository.save(campaign);
   }
 
   async findAll(filters?: {

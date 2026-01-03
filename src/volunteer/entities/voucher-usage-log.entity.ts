@@ -18,6 +18,12 @@ export enum VoucherEventType {
   BANDWIDTH_EXCEEDED = 'bandwidth_exceeded',
 }
 
+/**
+ * Voucher Usage Log
+ * - Tracks lifecycle events: Created, Activated, Used, Expired.
+ * - Mobile App: 'activated' event = User redeemed code via `POST /vouchers/redeem`.
+ * - Stores `userId` to link redemption to a specific app user.
+ */
 @Entity('voucher_usage_logs')
 export class VoucherUsageLog {
   @ApiProperty()
@@ -58,6 +64,13 @@ export class VoucherUsageLog {
   @ApiProperty()
   @Column({ nullable: true })
   sessionDurationMinutes: number;
+
+  @ManyToOne('User', { nullable: true })
+  @JoinColumn({ name: 'userId' })
+  user: any;
+
+  @Column({ nullable: true })
+  userId: string;
 
   @ApiProperty()
   @CreateDateColumn()

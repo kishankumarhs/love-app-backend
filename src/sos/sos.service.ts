@@ -6,6 +6,7 @@ import { EmergencyContact } from './entities/emergency-contact.entity';
 import { CreateSOSTicketDto } from './dto/create-sos-ticket.dto';
 import { UpdateSOSTicketDto } from './dto/update-sos-ticket.dto';
 import { EmergencyCallService } from './services/emergency-call.service';
+import { RequestsService } from '../requests/requests.service';
 
 @Injectable()
 export class SOSService {
@@ -17,7 +18,8 @@ export class SOSService {
     @InjectRepository(EmergencyContact)
     private emergencyContactRepository: Repository<EmergencyContact>,
     private emergencyCallService: EmergencyCallService,
-  ) {}
+    private requestsService: RequestsService,
+  ) { }
 
   async createSOSTicket(
     createSOSTicketDto: CreateSOSTicketDto,
@@ -28,6 +30,25 @@ export class SOSService {
     });
 
     const savedTicket = await this.sosTicketRepository.save(ticket);
+
+    // Create a corresponding Request entity to track this service interaction
+    if (savedTicket.userId) {
+      try {
+        await this.requestsService.createRequest({
+          userId: savedTicket.userId,
+          title: `SOS: ${createSOSTicketDto.emergencyType.toUpperCase()}`,
+          description: createSOSTicketDto.description || 'Emergency SOS Alert',
+          category: 'sos',
+          urgency: savedTicket.priority || 'high',
+          latitude: createSOSTicketDto.latitude,
+          longitude: createSOSTicketDto.longitude,
+          address: createSOSTicketDto.address,
+        });
+      } catch (error) {
+        this.logger.error(`Failed to create Request for SOS ticket ${savedTicket.id}`, error.stack);
+        // Do not fail the SOS creation if Request creation fails, catching error to proceed
+      }
+    }
 
     // Handle emergency call if required
     if (createSOSTicketDto.requiresEmergencyCall) {

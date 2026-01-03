@@ -30,7 +30,7 @@ export class NotificationService {
     private emailService: EmailService,
     private smsService: SMSService,
     private notificationGateway: NotificationGateway,
-  ) {}
+  ) { }
 
   async create(
     createNotificationDto: CreateNotificationDto,
@@ -179,6 +179,20 @@ export class NotificationService {
       where: { userId },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async findMyNotifications(
+    userId: string,
+    options: { page: number; limit: number },
+  ): Promise<{ data: Notification[]; total: number }> {
+    const { page = 1, limit = 10 } = options;
+    const [data, total] = await this.notificationRepository.findAndCount({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+    return { data, total };
   }
 
   // Notification Preferences

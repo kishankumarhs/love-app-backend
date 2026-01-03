@@ -20,7 +20,7 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 @ApiTags('Providers')
 @Controller('providers')
 export class ProviderController {
-  constructor(private readonly providerService: ProviderService) {}
+  constructor(private readonly providerService: ProviderService) { }
 
   // Employee CRUD
   @ApiOperation({ summary: 'Create employee' })
@@ -68,6 +68,48 @@ export class ProviderController {
     @Query('capacity') capacity?: number,
   ) {
     return this.providerService.findAll({ category, location, capacity });
+  }
+
+  /**
+   * Mobile-friendly service discovery API
+   * Used for Map and List views in the mobile app.
+   */
+  @Get('discovery')
+  @ApiOperation({ summary: 'Discover services (Mobile Map/List)' })
+  @ApiResponse({ status: 200, description: 'List of providers with pagination' })
+  discovery(
+    @Query('latitude') latitude?: number,
+    @Query('longitude') longitude?: number,
+    @Query('radius') radius?: number,
+    @Query('category') category?: string,
+    @Query('open_now') open_now?: boolean,
+    @Query('capacity_available') capacity_available?: boolean,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.providerService.discovery({
+      latitude,
+      longitude,
+      radius,
+      category,
+      open_now,
+      capacity_available,
+      page,
+      limit,
+    });
+  }
+
+
+
+  /**
+   * Mobile-friendly service detail
+   * Includes approved reviews.
+   */
+  @Get('details/:id')
+  @ApiOperation({ summary: 'Get provider details with approved reviews' })
+  @ApiResponse({ status: 200, description: 'Provider details + approved reviews' })
+  getMobileDetail(@Param('id') id: string) {
+    return this.providerService.getMobileDetail(id);
   }
 
   @Get('search')

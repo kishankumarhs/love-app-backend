@@ -17,6 +17,12 @@ export enum ReviewStatus {
   FLAGGED = 'flagged',
 }
 
+/**
+ * Review Entity (Service Feedback)
+ * - MVP Rule: All mobile feedback is strictly MODERATED (defaults to PENDING).
+ * - Mobile App: Users can submit feedback via `POST /reviews/feedback`.
+ * - Anonymity: Logic is handled at the Service layer (ReviewService), masking User ID if `isAnonymous` is true.
+ */
 @Entity('reviews')
 export class Review {
   @ApiProperty()

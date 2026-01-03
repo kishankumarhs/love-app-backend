@@ -11,6 +11,12 @@ import {
 import { Provider } from '../../provider/entities/provider.entity';
 import { Employee } from '../../provider/entities/employee.entity';
 
+/**
+ * Campaign Entity (Donation Drives)
+ * - MVP Rule: Campaigns are created/managed by ADMINs only.
+ * - Mobile App: Users can VIEW campaigns and DONATE to them.
+ * - Mobile users cannot create campaigns.
+ */
 @Entity('campaigns')
 export class Campaign {
   @PrimaryGeneratedColumn('uuid')

@@ -7,13 +7,15 @@ import { Employee } from './entities/employee.entity';
 import { UserModule } from '../user/user.module';
 import { User } from '../user/entities/user.entity';
 
+import { Review } from '../review/entities/review.entity';
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Provider, Employee, User]),
+    TypeOrmModule.forFeature([Provider, Employee, User, Review]),
     forwardRef(() => UserModule),
   ],
   controllers: [ProviderController],
   providers: [ProviderService],
   exports: [ProviderService],
 })
-export class ProviderModule {}
+export class ProviderModule { }

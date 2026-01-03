@@ -26,6 +26,7 @@ import { ModerationService } from './services/moderation.service';
 import { ReportService } from './services/report.service';
 import { AuditService } from './services/audit.service';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { CreateMobileReviewDto } from './dto/create-mobile-review.dto';
 import { ReviewStatus } from './entities/review.entity';
 import { ReportType, ReportFormat } from './entities/report.entity';
 import {
@@ -42,7 +43,7 @@ export class ReviewController {
     private readonly moderationService: ModerationService,
     private readonly reportService: ReportService,
     private readonly auditService: AuditService,
-  ) {}
+  ) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -58,6 +59,38 @@ export class ReviewController {
     };
     return this.reviewService.create(
       { ...createReviewDto, userId: req.user.id },
+      userInfo,
+    );
+    return this.reviewService.create(
+      { ...createReviewDto, userId: req.user.id },
+      userInfo,
+    );
+  }
+
+  @Post('feedback')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Submit mobile feedback (Anonymous optional)',
+    description:
+      'Submit feedback for a provider. If isAnonymous is true, the user identity will be hidden from the provider. Review status defaults to PENDING moderation.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Feedback submitted and pending moderation',
+  })
+  submitFeedback(@Body() createMobileReviewDto: CreateMobileReviewDto, @Request() req) {
+    const userInfo = {
+      userId: req.user.id,
+      email: req.user.email,
+      ipAddress: req.ip,
+      userAgent: req.get('User-Agent'),
+    };
+    return this.reviewService.create(
+      {
+        ...createMobileReviewDto,
+        userId: req.user.id,
+      },
       userInfo,
     );
   }

@@ -15,7 +15,7 @@ export class RequestsService {
     private requestRepository: Repository<Request>,
     @InjectRepository(Referral)
     private referralRepository: Repository<Referral>,
-  ) {}
+  ) { }
 
   async createRequest(createRequestDto: CreateRequestDto): Promise<Request> {
     const request = this.requestRepository.create(createRequestDto);
@@ -48,6 +48,33 @@ export class RequestsService {
     }
 
     return query.orderBy('request.createdAt', 'DESC').getMany();
+  }
+
+  async findMyRequests(
+    userId: string,
+    options: {
+      page: number;
+      limit: number;
+      status?: string;
+    },
+  ): Promise<{ data: Request[]; total: number }> {
+    const { page = 1, limit = 10, status } = options;
+    const query = this.requestRepository
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.provider', 'provider')
+      .where('request.userId = :userId', { userId });
+
+    if (status) {
+      query.andWhere('request.status = :status', { status });
+    }
+
+    query
+      .orderBy('request.createdAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    const [data, total] = await query.getManyAndCount();
+    return { data, total };
   }
 
   async findOneRequest(id: string): Promise<Request> {

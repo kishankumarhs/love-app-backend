@@ -10,6 +10,12 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
+/**
+ * Request Entity (Generic Service Interaction)
+ * - Used for: Walk-ins, Slot Booking, SOS, and QR Code Attendance.
+ * - NOTE: Slots are computed dynamically; booking a slot creates a Request record.
+ * - There is NO separate Booking entity in the MVP.
+ */
 @Entity('requests')
 export class Request {
   @PrimaryGeneratedColumn('uuid')
@@ -24,8 +30,7 @@ export class Request {
   @Column('text')
   description: string;
 
-  @Column()
-  category: string;
+
 
   @Column()
   urgency: string;
@@ -56,6 +61,23 @@ export class Request {
 
   @Column({ nullable: true })
   completedAt: Date;
+
+  /**
+   * For Slot Booking: The start time of the booked slot.
+   * If null, it is considered a "Walk-in" or "ASAP" request.
+   */
+  @Column({ nullable: true })
+  scheduledAt: Date;
+
+  /**
+   * Request Type / Category
+   * - 'sos': Emergency Signal (High Urgency)
+   * - 'booking': Scheduled appointment (requires scheduledAt)
+   * - 'walk_in': Immediate service request
+   * - 'attendance': QR Code scan for presence
+   */
+  @Column()
+  category: string;
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'userId' })

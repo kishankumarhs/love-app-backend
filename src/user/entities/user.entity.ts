@@ -15,6 +15,10 @@ import { WifiVoucher } from '../../volunteer/entities/wifi-voucher.entity';
 export enum UserRole {
   USER = 'user',
   PROVIDER = 'provider',
+  /**
+   * Volunteer is a role/flag on the User entity.
+   * It is NOT a standalone system. Volunteers are managed by Admins.
+   */
   VOLUNTEER = 'volunteer',
   ADMIN = 'admin',
   SUPER_ADMIN = 'super_admin',
@@ -26,6 +30,12 @@ export enum UserStatus {
   SUSPENDED = 'suspended',
 }
 
+/**
+ * User Entity
+ * Core identity for all system users including Providers, Volunteers, and Admins.
+ * - Role-based access control rules applies via `role` field.
+ * - Volunteers are Users with `role: VOLUNTEER`.
+ */
 @Entity('users')
 export class User {
   @ApiProperty()

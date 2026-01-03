@@ -6,10 +6,15 @@ import { SOSService } from './sos.service';
 import { SOSController } from './sos.controller';
 import { EmergencyCallService } from './services/emergency-call.service';
 
+import { RequestsModule } from '../requests/requests.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([SOSTicket, EmergencyContact])],
+  imports: [
+    TypeOrmModule.forFeature([SOSTicket, EmergencyContact]),
+    RequestsModule,
+  ],
   controllers: [SOSController],
   providers: [SOSService, EmergencyCallService],
   exports: [SOSService, EmergencyCallService],
 })
-export class SOSModule {}
+export class SOSModule { }

@@ -11,18 +11,32 @@ import {
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
+import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '../user/entities/user.entity';
 
-@Controller('campaigns')
+@ApiTags('Campaigns')
+@Controller('Campaign')
 export class CampaignController {
-  constructor(private readonly campaignService: CampaignService) {}
+  constructor(private readonly campaignService: CampaignService) { }
 
   @Patch(':id/publish')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Publish campaign (Admin only)' })
   publish(@Param('id') id: string) {
     return this.campaignService.publishCampaign(id);
   }
 
   // Assign employees to campaign
   @Post(':id/employees')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
   assignEmployees(
     @Param('id') id: string,
     @Body('employeeIds') employeeIds: string[],
@@ -32,6 +46,9 @@ export class CampaignController {
 
   // Unassign employee from campaign
   @Delete(':id/employees/:employeeId')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
   unassignEmployee(
     @Param('id') id: string,
     @Param('employeeId') employeeId: string,
@@ -46,11 +63,20 @@ export class CampaignController {
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create campaign (Admin only)' })
   create(@Body() createCampaignDto: CreateCampaignDto) {
     return this.campaignService.create(createCampaignDto);
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'List all campaigns (Mobile: Use status=active)',
+    description:
+      'To list active campaigns for the mobile app, use GET /Campaign?status=active. This returns only campaigns that are published and not expired.',
+  })
   findAll(
     @Query('category') category?: string,
     @Query('providerId') providerId?: string,
@@ -87,6 +113,10 @@ export class CampaignController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update campaign (Admin only)' })
   update(
     @Param('id') id: string,
     @Body() updateCampaignDto: UpdateCampaignDto,
@@ -95,6 +125,10 @@ export class CampaignController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete campaign (Admin only)' })
   remove(@Param('id') id: string) {
     return this.campaignService.remove(id);
   }

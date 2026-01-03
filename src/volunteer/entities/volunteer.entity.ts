@@ -22,6 +22,12 @@ export enum VerificationStatus {
   REJECTED = 'rejected',
 }
 
+/**
+ * Volunteer Profile Entity
+ * Represents the extended profile for a User with `role: VOLUNTEER`.
+ * This is NOT a standalone identity; it must be linked to a User.
+ * Managed and assigned by Admin only.
+ */
 @Entity('volunteers')
 export class Volunteer {
   @ApiProperty()
