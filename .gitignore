@@ -12,6 +12,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+src/auth/strategies/firebase-creds.json
+
 # OS
 .DS_Store
 

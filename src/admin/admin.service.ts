@@ -38,7 +38,7 @@ export class AdminService {
     private donationRepository: Repository<Donation>,
     @InjectRepository(Volunteer)
     private volunteerRepository: Repository<Volunteer>,
-  ) {}
+  ) { }
 
   // Analytics
   async getDashboardMetrics(): Promise<any> {
@@ -150,7 +150,7 @@ export class AdminService {
 
     const total = await query.getCount();
     const users = await query
-      .orderBy(`user.${filters.sortBy || 'createdAt'}`, filters.sortOrder)
+      .orderBy(`user.${this.getValidSortBy(User, filters.sortBy, 'createdAt')}`, filters.sortOrder)
       .skip((filters.page - 1) * filters.limit)
       .take(filters.limit)
       .getMany();
@@ -225,7 +225,7 @@ export class AdminService {
 
     const total = await query.getCount();
     const providers = await query
-      .orderBy(`provider.${filters.sortBy || 'createdAt'}`, filters.sortOrder)
+      .orderBy(`provider.${this.getValidSortBy(Provider, filters.sortBy, 'createdAt')}`, filters.sortOrder)
       .skip((filters.page - 1) * filters.limit)
       .take(filters.limit)
       .getMany();
@@ -279,28 +279,33 @@ export class AdminService {
   async getCampaigns(
     filters: AdminFiltersDto,
   ): Promise<{ campaigns: Campaign[]; total: number }> {
-    const query = this.campaignRepository
-      .createQueryBuilder('campaign')
-      .leftJoinAndSelect('campaign.provider', 'provider');
+    try {
+      const query = this.campaignRepository
+        .createQueryBuilder('campaign')
+        .leftJoinAndSelect('campaign.provider', 'provider');
 
-    if (filters.search) {
-      query.andWhere('campaign.title ILIKE :search', {
-        search: `%${filters.search}%`,
-      });
+      if (filters.search) {
+        query.andWhere('campaign.title ILIKE :search', {
+          search: `%${filters.search}%`,
+        });
+      }
+
+      if (filters.status) {
+        query.andWhere('campaign.status = :status', { status: filters.status });
+      }
+
+      const total = await query.getCount();
+      const campaigns = await query
+        .orderBy(`campaign.${this.getValidSortBy(Campaign, filters.sortBy, 'createdAt')}`, filters.sortOrder)
+        .skip((filters.page - 1) * filters.limit)
+        .take(filters.limit)
+        .getMany();
+
+      return { campaigns, total };
+    } catch (error) {
+      console.error('Error in AdminService.getCampaigns:', error);
+      throw error;
     }
-
-    if (filters.status) {
-      query.andWhere('campaign.status = :status', { status: filters.status });
-    }
-
-    const total = await query.getCount();
-    const campaigns = await query
-      .orderBy(`campaign.${filters.sortBy || 'createdAt'}`, filters.sortOrder)
-      .skip((filters.page - 1) * filters.limit)
-      .take(filters.limit)
-      .getMany();
-
-    return { campaigns, total };
   }
 
   // Donation Management
@@ -330,7 +335,7 @@ export class AdminService {
 
     const total = await query.getCount();
     const donations = await query
-      .orderBy(`donation.${filters.sortBy || 'createdAt'}`, filters.sortOrder)
+      .orderBy(`donation.${this.getValidSortBy(Donation, filters.sortBy, 'createdAt')}`, filters.sortOrder)
       .skip((filters.page - 1) * filters.limit)
       .take(filters.limit)
       .getMany();
@@ -359,7 +364,7 @@ export class AdminService {
 
     const total = await query.getCount();
     const volunteers = await query
-      .orderBy(`volunteer.${filters.sortBy || 'createdAt'}`, filters.sortOrder)
+      .orderBy(`volunteer.${this.getValidSortBy(Volunteer, filters.sortBy, 'createdAt')}`, filters.sortOrder)
       .skip((filters.page - 1) * filters.limit)
       .take(filters.limit)
       .getMany();
@@ -429,5 +434,15 @@ export class AdminService {
       adminId,
     });
     return await this.actionRepository.save(action);
+  }
+
+  private getValidSortBy(entity: any, sortBy: string, defaultColumn: string): string {
+    if (!sortBy) return defaultColumn;
+
+    // Check if the property exists in the entity metadata
+    const metadata = this.userRepository.manager.connection.getMetadata(entity);
+    const hasColumn = metadata.columns.some(col => col.propertyName === sortBy);
+
+    return hasColumn ? sortBy : defaultColumn;
   }
 }

@@ -38,4 +38,4 @@ import { FirebaseStrategy } from './strategies/firebase.strategy';
   ],
   exports: [AuthService, JwtAuthGuard, RolesGuard, GuestGuard],
 })
-export class AuthModule {}
+export class AuthModule { }

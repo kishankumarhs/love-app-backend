@@ -27,12 +27,12 @@ import { CampaignModule } from './campaign/campaign.module';
 import { RequestsModule } from './requests/requests.module';
 import { DonationsModule } from './donations/donations.module';
 import { SOSModule } from './sos/sos.module';
-// import { VolunteerModule } from './volunteer/volunteer.module';
-// import { ConnectivityModule } from './connectivity/connectivity.module';
+import { VolunteerModule } from './volunteer/volunteer.module';
+import { ConnectivityModule } from './connectivity/connectivity.module';
 import { ReviewModule } from './review/review.module';
 import { NotificationModule } from './notification/notification.module';
-// import { AdminModule } from './admin/admin.module';
-// import { AuditModule } from './audit/audit.module';
+import { AdminModule } from './admin/admin.module';
+import { AuditModule } from './audit/audit.module';
 // import { I18nCustomModule } from './i18n/i18n.module';
 import { CommonModule } from './common/common.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
@@ -66,12 +66,12 @@ import firebaseConfig from './config/firebase.config';
     RequestsModule,
     DonationsModule,
     SOSModule,
-    // VolunteerModule,
-    // ConnectivityModule,
+    VolunteerModule,
+    ConnectivityModule,
     ReviewModule,
     NotificationModule,
-    // AdminModule,
-    // AuditModule,
+    AdminModule,
+    AuditModule,
     SecurityModule,
     // I18nCustomModule,
     CommonModule,

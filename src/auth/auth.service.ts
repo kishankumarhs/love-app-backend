@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async verifyEmail(token: string): Promise<boolean> {
     try {
@@ -42,13 +42,9 @@ export class AuthService {
     role: UserRole,
   ): Promise<Partial<AuthResponse>> {
     try {
+      console.log(idToken)
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       const { email, name, uid } = decodedToken;
-      await admin.auth().setCustomUserClaims(uid, {
-        role,
-        permissions: ['read', 'write'],
-      });
-
       let user = await this.userService.findByEmail(email);
       if (!user) {
         const [firstName, ...lastNameParts] = (name || '').split(' ');
@@ -60,11 +56,16 @@ export class AuthService {
           isEmailVerified: true,
           role,
         });
+        await admin.auth().setCustomUserClaims(uid, {
+          role,
+          permissions: ['read', 'write'],
+        });
       }
       return {
         user,
       };
     } catch (error) {
+      console.log(error)
       throw new UnauthorizedException('Invalid Firebase token');
     }
   }
