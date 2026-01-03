@@ -1,12 +1,8 @@
 name: CD - Deploy to Production
 
 on:
-  push:
-    branches: [main]
-    tags:
-      - 'v*.*.*'
-  workflow_dispatch:
-
+  workflow_dispatch
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
