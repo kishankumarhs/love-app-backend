@@ -8,6 +8,7 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import helmet from 'helmet';
 import compression from 'compression';
+import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,6 +16,19 @@ async function bootstrap() {
   const logger = new Logger('Bootstrap');
 
   // Security middleware
+  // Strip '/api' prefix from incoming requests (useful when reverse proxy adds it)
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (req.url && req.url.startsWith('/api')) {
+        req.url = req.url.replace(/^\/api/, '') || '/';
+        if (req.originalUrl)
+          req.originalUrl = req.originalUrl.replace(/^\/api/, '') || '/';
+      }
+    } catch (e) {
+      // noop - don't break requests if something unexpected happens
+    }
+    next();
+  });
   app.use(
     helmet({
       contentSecurityPolicy:
@@ -95,7 +109,11 @@ async function bootstrap() {
     .setContact('LOVE App Team', 'https://loveapp.com', 'support@loveapp.com')
     .setLicense('MIT', 'https://opensource.org/licenses/MIT')
     .addServer('http://localhost:3000', 'Development server')
-    .addServer('https://api.loveapp.com', 'Production server')
+    .addServer('https://lovesolutions.cloud/api', 'Production server')
+    .addServer(
+      `http://${process.env.HOST || 'localhost'}:${configService.get<number>('app.port') || 3000}`,
+      'Current server',
+    )
     .addBearerAuth(
       {
         type: 'http',
@@ -138,8 +156,14 @@ async function bootstrap() {
     });
   });
 
+  // Handle favicon.ico to prevent 404s
+  app.getHttpAdapter().get('/favicon.ico', (req, res) => {
+    res.status(204).end();
+  });
+
   const port = configService.get<number>('app.port') || 3000;
   const host = process.env.HOST || '0.0.0.0';
+
   await app.listen(port, host);
   logger.log(`🚀 Application is running on: http://${host}:${port}`);
   logger.log(`📚 Swagger documentation: http://${host}:${port}/api/docs`);

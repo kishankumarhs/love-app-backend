@@ -74,13 +74,18 @@ export class UserController {
     return this.userService.findOne(id);
   }
 
-  @Put(':id')
+  @Put('profile') // Changed from ':id' to 'profile' to avoid conflict or just usage preference.
+  // Actually, if I change to 'profile', I need to update frontend?
+  // User said "remove unessary id passing". 
+  // Maybe just @Put() since it is 'users' controller?
+  // Let's go with @Put() which maps to /users
+  @Put()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
-  @ApiOperation({ summary: 'Update user' })
+  @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: 200, type: User })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  update(@Request() req, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(req.user.id, updateUserDto);
   }
 
   @Delete(':id')

@@ -9,6 +9,7 @@ import {
   Delete,
   Query,
   Request,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -40,7 +41,7 @@ export class VolunteerController {
   constructor(
     private readonly volunteerService: VolunteerService,
     private readonly voucherService: VoucherService,
-  ) {}
+  ) { }
 
   @Post('applications')
   @UseGuards(JwtAuthGuard)
@@ -155,12 +156,19 @@ export class VolunteerController {
     return this.voucherService.getVoucherByCode(code);
   }
 
-  @Get('vouchers/provider/:providerId')
+  @Get('vouchers/provider') // Removed :providerId
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Get vouchers by provider' })
   @ApiResponse({ status: 200, description: 'Vouchers retrieved successfully' })
-  getVouchersByProvider(@Param('providerId') providerId: string) {
+  getVouchersByProvider(@Request() req, @Query('providerId') providerId?: string) {
+    const user = req.user;
+    if (user?.role === 'provider' && user.provider) {
+      return this.voucherService.getVouchersByProvider(user.provider.id);
+    }
+    if (!providerId) {
+      throw new BadRequestException('Provider ID required');
+    }
     return this.voucherService.getVouchersByProvider(providerId);
   }
 
@@ -230,13 +238,13 @@ export class VolunteerController {
     return this.volunteerService.update(id, updateVolunteerDto);
   }
 
-  @Put('user/:userId/preferences')
+  @Put('preferences') // Removed :userId
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update volunteer preferences' })
   @ApiResponse({ status: 200, type: Volunteer })
-  updatePreferences(@Param('userId') userId: string, @Body() preferences: any) {
-    return this.volunteerService.updatePreferences(userId, preferences);
+  updatePreferences(@Request() req, @Body() preferences: any) {
+    return this.volunteerService.updatePreferences(req.user.id, preferences);
   }
 
   @Delete(':id')

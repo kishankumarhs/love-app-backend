@@ -113,8 +113,9 @@ export class CampaignService {
     if (filters?.status) {
       query.andWhere('campaign.status = :status', { status: filters.status });
     }
-
-    return query.getMany();
+    const result = await query.getMany();
+    console.log('findAll result:', result);
+    return result;
   }
 
   async findOne(id: string): Promise<Campaign> {

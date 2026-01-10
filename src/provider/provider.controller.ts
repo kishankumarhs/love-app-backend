@@ -7,7 +7,11 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Request,
+  BadRequestException,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProviderService } from './provider.service';
 import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
@@ -25,18 +29,33 @@ export class ProviderController {
   // Employee CRUD
   @ApiOperation({ summary: 'Create employee' })
   @ApiResponse({ status: 201, type: Employee })
-  @Post(':providerId/employees')
+  @Post('employees') // Removed :providerId
+  @UseGuards(JwtAuthGuard) // Added guard to ensure user/provider logic works
   createEmployee(
-    @Param('providerId') providerId: string,
+    @Request() req,
     @Body() dto: CreateEmployeeDto,
   ) {
+    // Assuming req.user is populated by FirebaseAuthMiddleware and has provider
+    const providerId = req.user.provider?.id;
+    if (!providerId) {
+      // Handle case where user is not a provider or provider not loaded
+      throw new BadRequestException('User is not a provider');
+      // Need to import BadRequestException
+    }
     return this.providerService.createEmployee({ ...dto, providerId });
   }
 
   @ApiOperation({ summary: 'Get all employees (optionally by provider)' })
   @ApiResponse({ status: 200, type: [Employee] })
   @Get('employees')
-  findAllEmployees(@Query('providerId') providerId?: string) {
+  @UseGuards(JwtAuthGuard)
+  findAllEmployees(@Request() req, @Query('providerId') providerId?: string) {
+    const user = req.user;
+    // If user is a provider, force their own employees
+    if (user?.role === 'provider' && user.provider) {
+      return this.providerService.findAllEmployees(user.provider.id);
+    }
+    // Otherwise allow filtering by query param (e.g. for admins)
     return this.providerService.findAllEmployees(providerId);
   }
 

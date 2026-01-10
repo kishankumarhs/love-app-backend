@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { GuestGuard } from './guards/guest.guard';
 import { FirebaseStrategy } from './strategies/firebase.strategy';
+import { FirebaseAuthMiddleware } from './middleware/firebase-auth.middleware';
 
 @Module({
   imports: [
@@ -38,4 +39,8 @@ import { FirebaseStrategy } from './strategies/firebase.strategy';
   ],
   exports: [AuthService, JwtAuthGuard, RolesGuard, GuestGuard],
 })
-export class AuthModule { }
+export class AuthModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(FirebaseAuthMiddleware).forRoutes('*');
+  }
+}

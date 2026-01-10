@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async verifyEmail(token: string): Promise<boolean> {
     try {
@@ -42,10 +42,9 @@ export class AuthService {
     role: UserRole,
   ): Promise<Partial<AuthResponse>> {
     try {
-      console.log(idToken)
       const decodedToken = await admin.auth().verifyIdToken(idToken);
       const { email, name, uid } = decodedToken;
-      let user = await this.userService.findByEmail(email);
+      let user = await this.userService.findByEmail(email, ['provider']);
       if (!user) {
         const [firstName, ...lastNameParts] = (name || '').split(' ');
         user = await this.userService.create({
@@ -65,7 +64,11 @@ export class AuthService {
         user,
       };
     } catch (error) {
-      console.log(error)
+      const err = error as any;
+      console.error('Firebase token verification failed:', {
+        message: err?.message,
+        code: err?.code,
+      });
       throw new UnauthorizedException('Invalid Firebase token');
     }
   }

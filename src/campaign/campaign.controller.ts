@@ -11,7 +11,12 @@ import {
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -21,7 +26,7 @@ import { UserRole } from '../user/entities/user.entity';
 @ApiTags('Campaigns')
 @Controller('Campaign')
 export class CampaignController {
-  constructor(private readonly campaignService: CampaignService) { }
+  constructor(private readonly campaignService: CampaignService) {}
 
   @Patch(':id/publish')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -77,12 +82,30 @@ export class CampaignController {
     description:
       'To list active campaigns for the mobile app, use GET /Campaign?status=active. This returns only campaigns that are published and not expired.',
   })
+  @ApiQuery({
+    name: 'category',
+    required: false,
+    description: 'Filter by category',
+  })
+  @ApiQuery({
+    name: 'providerId',
+    required: false,
+    description: 'Filter by provider ID',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    description:
+      'Filter by status (e.g., active, expired, draft). Use "active" to get published and non-expired campaigns.',
+  })
   findAll(
     @Query('category') category?: string,
     @Query('providerId') providerId?: string,
     @Query('status') status?: string,
   ) {
-    return this.campaignService.findAll({ category, providerId, status });
+    const res = this.campaignService.findAll({ category, providerId, status });
+    console.log('findAll called with:', res);
+    return res;
   }
 
   @Get('search')

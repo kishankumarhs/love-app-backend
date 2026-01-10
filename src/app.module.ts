@@ -37,7 +37,9 @@ import { AuditModule } from './audit/audit.module';
 import { CommonModule } from './common/common.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { Country } from './user/entities/countries.entity';
+
 import firebaseConfig from './config/firebase.config';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -62,6 +64,7 @@ import firebaseConfig from './config/firebase.config';
     AuthModule,
     UserModule,
     ProviderModule,
+    CategoryModule,
     CampaignModule,
     RequestsModule,
     DonationsModule,

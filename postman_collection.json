@@ -1,1 +1,3833 @@
-{"openapi":"3.0.0","paths":{"/":{"get":{"description":"Returns a simple message to verify the service is running","operationId":"getHello","parameters":[],"responses":{"200":{"description":"Service is running successfully","content":{"application/json":{"schema":{"type":"string","example":"LOVE App Backend API is running!"}}}},"500":{"description":"Internal server error"}},"summary":"Basic health check","tags":["Health Check"]}},"/health":{"get":{"description":"Returns detailed health information including timestamp and service name","operationId":"getHealthStatus","parameters":[],"responses":{"200":{"description":"Detailed health status","content":{"application/json":{"schema":{"type":"object","properties":{"status":{"type":"string","example":"ok","description":"Service status"},"timestamp":{"type":"string","format":"date-time","example":"2024-01-01T00:00:00.000Z","description":"Current timestamp"},"service":{"type":"string","example":"LOVE App Backend","description":"Service name"}}}}}}},"summary":"Detailed health status","tags":["Health Check"]}},"/country-list":{"get":{"operationId":"AppController_getCountries","parameters":[],"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Country"}}}}},"summary":"Create user profile","tags":["Health Check"]}},"/auth/profile":{"get":{"operationId":"AuthController_getProfile","parameters":[],"responses":{"200":{"description":"Profile retrieved successfully"},"401":{"description":"Unauthorized"}},"security":[{"JWT-auth":[]}],"summary":"Get current user profile","tags":["Authentication"]}},"/auth/firebase":{"post":{"operationId":"AuthController_firebaseAuth","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/FirebaseAuthDto"}}}},"responses":{"200":{"description":"Authentication successful"},"401":{"description":"Invalid Firebase token"}},"summary":"Authenticate with Firebase (Google/Apple Sign-In)","tags":["Authentication"]}},"/auth/check-user-exists":{"get":{"operationId":"AuthController_checkUserExists","parameters":[{"name":"email","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"User existence checked successfully"}},"summary":"Check if a user exists by email","tags":["Authentication"]}},"/users":{"post":{"operationId":"UserController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateUserDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}}},"summary":"Create user","tags":["Users"]},"get":{"operationId":"UserController_findAll","parameters":[{"name":"page","required":false,"in":"query","description":"Page number for pagination","schema":{"minimum":1,"default":1,"example":1,"type":"number"}},{"name":"limit","required":false,"in":"query","description":"Number of items per page","schema":{"minimum":1,"maximum":100,"default":10,"example":10,"type":"number"}}],"responses":{"200":{"description":"List of users with pagination"}},"security":[{"JWT-auth":[]}],"summary":"Get all users with pagination","tags":["Users"]}},"/users/profile/me":{"get":{"operationId":"UserController_getProfile","parameters":[],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}}},"security":[{"JWT-auth":[]}],"summary":"Get current user profile (Mobile)","tags":["Users"]}},"/users/{id}":{"get":{"operationId":"UserController_findOne","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}}},"security":[{"JWT-auth":[]}],"summary":"Get user by ID","tags":["Users"]},"put":{"operationId":"UserController_update","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateUserDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/User"}}}}},"security":[{"JWT-auth":[]}],"summary":"Update user","tags":["Users"]},"delete":{"operationId":"UserController_remove","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"User deleted successfully"}},"security":[{"JWT-auth":[]}],"summary":"Delete user","tags":["Users"]}},"/users/nearby":{"get":{"operationId":"UserController_getNearbyUsers","parameters":[{"name":"latitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"longitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"radius","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"List of nearby users"}},"security":[{"JWT-auth":[]}],"summary":"Get nearby users","tags":["Users"]}},"/users/feedback":{"post":{"operationId":"UserController_createFeedback","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateFeedbackDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Feedback"}}}}},"security":[{"JWT-auth":[]}],"summary":"Submit feedback","tags":["Users"]}},"/users/feedback/all":{"get":{"operationId":"UserController_getFeedback","parameters":[{"name":"page","required":false,"in":"query","description":"Page number for pagination","schema":{"minimum":1,"default":1,"example":1,"type":"number"}},{"name":"limit","required":false,"in":"query","description":"Number of items per page","schema":{"minimum":1,"maximum":100,"default":10,"example":10,"type":"number"}}],"responses":{"200":{"description":"List of feedback with pagination"}},"security":[{"JWT-auth":[]}],"summary":"Get all feedback (Admin only)","tags":["Users"]}},"/users/feedback/{id}":{"put":{"operationId":"UserController_updateFeedback","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateFeedbackDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Feedback"}}}}},"security":[{"JWT-auth":[]}],"summary":"Update feedback status (Admin only)","tags":["Users"]}},"/providers/{providerId}/employees":{"post":{"operationId":"ProviderController_createEmployee","parameters":[{"name":"providerId","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateEmployeeDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Employee"}}}}},"summary":"Create employee","tags":["Providers"]}},"/providers/employees":{"get":{"operationId":"ProviderController_findAllEmployees","parameters":[{"name":"providerId","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Employee"}}}}}},"summary":"Get all employees (optionally by provider)","tags":["Providers"]}},"/providers/employees/{id}":{"get":{"operationId":"ProviderController_findEmployeeById","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Employee"}}}}},"summary":"Get employee by id","tags":["Providers"]},"patch":{"operationId":"ProviderController_updateEmployee","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateEmployeeDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Employee"}}}}},"summary":"Update employee","tags":["Providers"]},"delete":{"operationId":"ProviderController_removeEmployee","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Employee deleted"}},"summary":"Delete employee","tags":["Providers"]}},"/providers":{"get":{"operationId":"ProviderController_findAll","parameters":[{"name":"category","required":true,"in":"query","schema":{"type":"string"}},{"name":"location","required":true,"in":"query","schema":{"type":"string"}},{"name":"capacity","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":""}},"tags":["Providers"]}},"/providers/discovery":{"get":{"operationId":"ProviderController_discovery","parameters":[{"name":"latitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"longitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"radius","required":true,"in":"query","schema":{"type":"number"}},{"name":"category","required":true,"in":"query","schema":{"type":"string"}},{"name":"open_now","required":true,"in":"query","schema":{"type":"boolean"}},{"name":"capacity_available","required":true,"in":"query","schema":{"type":"boolean"}},{"name":"page","required":true,"in":"query","schema":{"type":"number"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"List of providers with pagination"}},"summary":"Discover services (Mobile Map/List)","tags":["Providers"]}},"/providers/details/{id}":{"get":{"operationId":"ProviderController_getMobileDetail","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Provider details + approved reviews"}},"summary":"Get provider details with approved reviews","tags":["Providers"]}},"/providers/search":{"get":{"operationId":"ProviderController_search","parameters":[{"name":"q","required":true,"in":"query","schema":{"type":"string"}},{"name":"type","required":true,"in":"query","schema":{"type":"string"}},{"name":"latitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"longitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"radius","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":""}},"tags":["Providers"]}},"/providers/register":{"post":{"operationId":"ProviderController_register","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateProvider"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Provider"}}}}},"summary":"Register a new provider","tags":["Providers"]}},"/providers/{id}":{"get":{"operationId":"ProviderController_findOne","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Providers"]},"patch":{"operationId":"ProviderController_update","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateProviderDto"}}}},"responses":{"200":{"description":""}},"tags":["Providers"]},"delete":{"operationId":"ProviderController_remove","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Providers"]}},"/Campaign/{id}/publish":{"patch":{"operationId":"CampaignController_publish","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"security":[{"bearer":[]}],"summary":"Publish campaign (Admin only)","tags":["Campaigns"]}},"/Campaign/{id}/employees":{"post":{"operationId":"CampaignController_assignEmployees","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"security":[{"bearer":[]}],"tags":["Campaigns"]},"get":{"operationId":"CampaignController_listEmployees","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Campaigns"]}},"/Campaign/{id}/employees/{employeeId}":{"delete":{"operationId":"CampaignController_unassignEmployee","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}},{"name":"employeeId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"security":[{"bearer":[]}],"tags":["Campaigns"]}},"/Campaign":{"post":{"operationId":"CampaignController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateCampaignDto"}}}},"responses":{"201":{"description":""}},"security":[{"bearer":[]}],"summary":"Create campaign (Admin only)","tags":["Campaigns"]},"get":{"description":"To list active campaigns for the mobile app, use GET /Campaign?status=active. This returns only campaigns that are published and not expired.","operationId":"CampaignController_findAll","parameters":[{"name":"category","required":true,"in":"query","schema":{"type":"string"}},{"name":"providerId","required":true,"in":"query","schema":{"type":"string"}},{"name":"status","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"summary":"List all campaigns (Mobile: Use status=active)","tags":["Campaigns"]}},"/Campaign/search":{"get":{"operationId":"CampaignController_search","parameters":[{"name":"category","required":true,"in":"query","schema":{"type":"string"}},{"name":"latitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"longitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"radius","required":true,"in":"query","schema":{"type":"number"}},{"name":"status","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Campaigns"]}},"/Campaign/provider/{providerId}":{"get":{"operationId":"CampaignController_findByProvider","parameters":[{"name":"providerId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Campaigns"]}},"/Campaign/{id}":{"get":{"operationId":"CampaignController_findOne","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Campaigns"]},"patch":{"operationId":"CampaignController_update","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateCampaignDto"}}}},"responses":{"200":{"description":""}},"security":[{"bearer":[]}],"summary":"Update campaign (Admin only)","tags":["Campaigns"]},"delete":{"operationId":"CampaignController_remove","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"security":[{"bearer":[]}],"summary":"Delete campaign (Admin only)","tags":["Campaigns"]}},"/requests":{"post":{"operationId":"RequestsController_createRequest","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateRequestDto"}}}},"responses":{"201":{"description":""}},"tags":["Requests"]},"get":{"operationId":"RequestsController_findAllRequests","parameters":[{"name":"status","required":true,"in":"query","schema":{"type":"string"}},{"name":"category","required":true,"in":"query","schema":{"type":"string"}},{"name":"userId","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Requests"]}},"/requests/me":{"get":{"operationId":"RequestsController_getMyRequests","parameters":[{"name":"page","required":true,"in":"query","schema":{"type":"number"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}},{"name":"status","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"Paginated list of user requests"}},"security":[{"JWT-auth":[]}],"summary":"Get my requests (Mobile)","tags":["Requests"]}},"/requests/{id}":{"get":{"operationId":"RequestsController_findOneRequest","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Requests"]},"patch":{"operationId":"RequestsController_updateRequest","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateRequestDto"}}}},"responses":{"200":{"description":""}},"tags":["Requests"]},"delete":{"operationId":"RequestsController_deleteRequest","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Requests"]}},"/requests/referrals":{"post":{"operationId":"RequestsController_createReferral","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateReferralDto"}}}},"responses":{"201":{"description":""}},"tags":["Requests"]}},"/requests/{requestId}/referrals":{"get":{"operationId":"RequestsController_findReferralsByRequest","parameters":[{"name":"requestId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Requests"]}},"/requests/referrals/{id}":{"patch":{"operationId":"RequestsController_updateReferral","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateReferralDto"}}}},"responses":{"200":{"description":""}},"tags":["Requests"]}},"/requests/user/{userId}/referrals":{"get":{"operationId":"RequestsController_getReferralHistory","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["Requests"]}},"/requests/{id}/help":{"post":{"operationId":"RequestsController_requestHelp","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"tags":["Requests"]}},"/requests/{id}/refer":{"post":{"operationId":"RequestsController_referSomeone","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"tags":["Requests"]}},"/requests/{id}/donate":{"post":{"operationId":"RequestsController_donate","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"tags":["Requests"]}},"/donations/payment-intent":{"post":{"operationId":"DonationsController_createPaymentIntent","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreatePaymentIntentDto"}}}},"responses":{"201":{"description":"Payment intent created successfully"}},"security":[{"bearer":[]}],"summary":"Create payment intent for donation","tags":["donations"]}},"/donations/confirm/{id}":{"post":{"operationId":"DonationsController_confirmDonation","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Donation confirmed successfully"}},"security":[{"bearer":[]}],"summary":"Confirm donation payment","tags":["donations"]}},"/donations/refund":{"post":{"operationId":"DonationsController_createRefund","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateRefundDto"}}}},"responses":{"201":{"description":"Refund created successfully"}},"security":[{"bearer":[]}],"summary":"Create refund for donation","tags":["donations"]}},"/donations/payment-methods":{"post":{"operationId":"DonationsController_savePaymentMethod","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SavePaymentMethodDto"}}}},"responses":{"201":{"description":"Payment method saved successfully"}},"security":[{"bearer":[]}],"summary":"Save payment method","tags":["donations"]},"get":{"operationId":"DonationsController_getUserPaymentMethods","parameters":[],"responses":{"200":{"description":"Payment methods retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get user payment methods","tags":["donations"]}},"/donations/history":{"get":{"operationId":"DonationsController_getDonationHistory","parameters":[{"name":"campaignId","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"Donation history retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get donation history","tags":["donations"]}},"/donations/{id}":{"get":{"operationId":"DonationsController_getDonationById","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Donation retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get donation by ID","tags":["donations"]}},"/donations/webhook":{"post":{"operationId":"DonationsController_handleWebhook","parameters":[{"name":"stripe-signature","required":true,"in":"header","schema":{"type":"string"}}],"responses":{"200":{"description":"Webhook processed successfully"}},"summary":"Handle Stripe webhooks","tags":["donations"]}},"/sos":{"post":{"operationId":"SOSController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateSOSTicketDto"}}}},"responses":{"201":{"description":""}},"tags":["SOS"]}},"/sos/my-alerts":{"get":{"operationId":"SOSController_getMyAlerts","parameters":[],"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/nearby":{"get":{"operationId":"SOSController_getNearbyAlerts","parameters":[{"name":"latitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"longitude","required":true,"in":"query","schema":{"type":"number"}},{"name":"radius","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/ticket":{"post":{"operationId":"SOSController_createTicket","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateSOSTicketDto"}}}},"responses":{"201":{"description":""}},"tags":["SOS"]}},"/sos/tickets":{"get":{"operationId":"SOSController_findAllTickets","parameters":[{"name":"status","required":true,"in":"query","schema":{"type":"string"}},{"name":"userId","required":true,"in":"query","schema":{"type":"string"}},{"name":"emergencyType","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/tickets/guest/{phone}":{"get":{"operationId":"SOSController_getGuestTickets","parameters":[{"name":"phone","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/tickets/{id}":{"get":{"operationId":"SOSController_findOneTicket","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":""}},"tags":["SOS"]},"patch":{"operationId":"SOSController_updateTicket","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateSOSTicketDto"}}}},"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/emergency-contacts":{"get":{"operationId":"SOSController_getEmergencyContacts","parameters":[],"responses":{"200":{"description":""}},"tags":["SOS"]}},"/sos/emergency-call/{ticketId}":{"post":{"operationId":"SOSController_triggerEmergencyCall","parameters":[{"name":"ticketId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":""}},"tags":["SOS"]}},"/sos/guest/ticket":{"post":{"operationId":"SOSController_createGuestTicket","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/GuestSOSDto"}}}},"responses":{"201":{"description":""}},"tags":["SOS"]}},"/volunteers/applications":{"post":{"operationId":"VolunteerController_submitApplication","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateVolunteerApplicationDto"}}}},"responses":{"201":{"description":"Application submitted successfully"}},"security":[{"JWT-auth":[]}],"summary":"Submit volunteer application","tags":["Volunteers"]},"get":{"operationId":"VolunteerController_getApplications","parameters":[{"name":"status","required":true,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"Applications retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get volunteer applications","tags":["Volunteers"]}},"/volunteers/applications/{id}/approve":{"post":{"operationId":"VolunteerController_approveApplication","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Application approved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Approve volunteer application","tags":["Volunteers"]}},"/volunteers/apply":{"post":{"operationId":"VolunteerController_apply","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateVolunteerApplicationDto"}}}},"responses":{"201":{"description":"Application submitted successfully"}},"security":[{"JWT-auth":[]}],"summary":"Apply as volunteer","tags":["Volunteers"]}},"/volunteers/opportunities":{"get":{"operationId":"VolunteerController_getOpportunities","parameters":[],"responses":{"200":{"description":"Opportunities retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get volunteer opportunities","tags":["Volunteers"]}},"/volunteers/opportunities/{id}/join":{"post":{"operationId":"VolunteerController_joinOpportunity","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Joined opportunity successfully"}},"security":[{"JWT-auth":[]}],"summary":"Join volunteer opportunity","tags":["Volunteers"]}},"/volunteers/applications/my":{"get":{"operationId":"VolunteerController_getMyApplication","parameters":[],"responses":{"200":{"description":"Application retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get current user application","tags":["Volunteers"]}},"/volunteers/vouchers":{"post":{"operationId":"VolunteerController_createVoucher","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateWifiVoucherDto"}}}},"responses":{"201":{"description":"Voucher created successfully"}},"security":[{"JWT-auth":[]}],"summary":"Create Wi-Fi voucher","tags":["Volunteers"]}},"/volunteers/vouchers/activate":{"post":{"operationId":"VolunteerController_activateVoucher","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ActivateVoucherDto"}}}},"responses":{"200":{"description":"Voucher activated successfully"}},"summary":"Activate Wi-Fi voucher","tags":["Volunteers"]}},"/volunteers/vouchers/code/{code}":{"get":{"operationId":"VolunteerController_getVoucherByCode","parameters":[{"name":"code","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Voucher retrieved successfully"}},"summary":"Get voucher by code","tags":["Volunteers"]}},"/volunteers/vouchers/provider/{providerId}":{"get":{"operationId":"VolunteerController_getVouchersByProvider","parameters":[{"name":"providerId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Vouchers retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get vouchers by provider","tags":["Volunteers"]}},"/volunteers":{"post":{"operationId":"VolunteerController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateVolunteerDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Volunteer"}}}}},"security":[{"JWT-auth":[]}],"summary":"Create volunteer profile","tags":["Volunteers"]},"get":{"operationId":"VolunteerController_findAll","parameters":[{"name":"page","required":false,"in":"query","description":"Page number for pagination","schema":{"minimum":1,"default":1,"example":1,"type":"number"}},{"name":"limit","required":false,"in":"query","description":"Number of items per page","schema":{"minimum":1,"maximum":100,"default":10,"example":10,"type":"number"}}],"responses":{"200":{"description":"List of volunteers with pagination"}},"security":[{"JWT-auth":[]}],"summary":"Get all volunteers","tags":["Volunteers"]}},"/volunteers/{id}":{"get":{"operationId":"VolunteerController_findOne","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Volunteer"}}}}},"security":[{"JWT-auth":[]}],"summary":"Get volunteer by ID","tags":["Volunteers"]},"put":{"operationId":"VolunteerController_update","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateVolunteerDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Volunteer"}}}}},"security":[{"JWT-auth":[]}],"summary":"Update volunteer profile","tags":["Volunteers"]},"delete":{"operationId":"VolunteerController_remove","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Volunteer deleted successfully"}},"security":[{"JWT-auth":[]}],"summary":"Delete volunteer profile","tags":["Volunteers"]}},"/volunteers/{id}/assignments":{"get":{"operationId":"VolunteerController_getAssignments","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Assignments retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get volunteer assignments","tags":["Volunteers"]}},"/volunteers/user/{userId}":{"get":{"operationId":"VolunteerController_findByUserId","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Volunteer"}}}}},"security":[{"JWT-auth":[]}],"summary":"Get volunteer by user ID","tags":["Volunteers"]}},"/volunteers/user/{userId}/preferences":{"put":{"operationId":"VolunteerController_updatePreferences","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Volunteer"}}}}},"security":[{"JWT-auth":[]}],"summary":"Update volunteer preferences","tags":["Volunteers"]}},"/vouchers/redeem":{"post":{"operationId":"VouchersController_redeem","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ActivateVoucherDto"}}}},"responses":{"200":{"description":"Voucher successfully activated","content":{"application/json":{"schema":{"$ref":"#/components/schemas/WifiVoucher"}}}},"400":{"description":"Voucher expired, already used, or invalid"},"404":{"description":"Voucher code not found"}},"summary":"Redeem/Activate a voucher code","tags":["Vouchers"]}},"/reviews":{"post":{"operationId":"ReviewController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateReviewDto"}}}},"responses":{"201":{"description":"Review created successfully"}},"security":[{"bearer":[]}],"summary":"Create review","tags":["reviews"]},"get":{"operationId":"ReviewController_findAll","parameters":[{"name":"status","required":true,"in":"query","schema":{"type":"string"}},{"name":"providerId","required":true,"in":"query","schema":{"type":"string"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}},{"name":"offset","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"Reviews retrieved successfully"}},"summary":"Get all reviews","tags":["reviews"]}},"/reviews/feedback":{"post":{"description":"Submit feedback for a provider. If isAnonymous is true, the user identity will be hidden from the provider. Review status defaults to PENDING moderation.","operationId":"ReviewController_submitFeedback","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateMobileReviewDto"}}}},"responses":{"201":{"description":"Feedback submitted and pending moderation"}},"security":[{"bearer":[]}],"summary":"Submit mobile feedback (Anonymous optional)","tags":["reviews"]}},"/reviews/provider/{providerId}":{"get":{"operationId":"ReviewController_getProviderReviews","parameters":[{"name":"providerId","required":true,"in":"path","schema":{"type":"string"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}},{"name":"offset","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"Provider reviews retrieved successfully"}},"summary":"Get provider reviews","tags":["reviews"]}},"/reviews/{id}/report":{"post":{"operationId":"ReviewController_reportReview","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"201":{"description":"Review reported successfully"}},"security":[{"bearer":[]}],"summary":"Report review","tags":["reviews"]}},"/reviews/{id}/moderate":{"post":{"operationId":"ReviewController_moderateReview","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Review moderated successfully"}},"security":[{"bearer":[]}],"summary":"Moderate review","tags":["reviews"]}},"/reviews/moderation/queue":{"get":{"operationId":"ReviewController_getModerationQueue","parameters":[{"name":"status","required":true,"in":"query","schema":{"type":"string"}},{"name":"contentType","required":true,"in":"query","schema":{"type":"string"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}},{"name":"offset","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"Moderation queue retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get moderation queue","tags":["reviews"]}},"/reviews/moderation/{id}/resolve":{"post":{"operationId":"ReviewController_resolveModeration","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Moderation resolved successfully"}},"security":[{"bearer":[]}],"summary":"Resolve moderation item","tags":["reviews"]}},"/reviews/reports":{"post":{"operationId":"ReviewController_createReport","parameters":[],"responses":{"201":{"description":"Report created successfully"}},"security":[{"bearer":[]}],"summary":"Create admin report","tags":["reviews"]},"get":{"operationId":"ReviewController_getReports","parameters":[],"responses":{"200":{"description":"Reports retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get admin reports","tags":["reviews"]}},"/reviews/reports/{id}/download":{"get":{"operationId":"ReviewController_downloadReport","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Report downloaded successfully"}},"security":[{"bearer":[]}],"summary":"Download report","tags":["reviews"]}},"/reviews/audit":{"get":{"operationId":"ReviewController_getAuditLogs","parameters":[{"name":"entityType","required":true,"in":"query","schema":{"type":"string"}},{"name":"entityId","required":true,"in":"query","schema":{"type":"string"}},{"name":"userId","required":true,"in":"query","schema":{"type":"string"}},{"name":"action","required":true,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":true,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":true,"in":"query","schema":{"type":"string"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}},{"name":"offset","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"Audit logs retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get audit logs","tags":["reviews"]}},"/reviews/{id}":{"get":{"operationId":"ReviewController_findOne","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Review retrieved successfully"}},"summary":"Get review by ID","tags":["reviews"]},"delete":{"operationId":"ReviewController_remove","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Review deleted successfully"}},"security":[{"bearer":[]}],"summary":"Delete review","tags":["reviews"]}},"/notifications":{"post":{"operationId":"NotificationController_create","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateNotificationDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/Notification"}}}}},"security":[{"JWT-auth":[]}],"summary":"Create notification","tags":["Notifications"]}},"/notifications/sos-alert":{"post":{"operationId":"NotificationController_sendSOSAlert","parameters":[],"responses":{"201":{"description":"SOS alert sent successfully"}},"security":[{"JWT-auth":[]}],"summary":"Send SOS alert","tags":["Notifications"]}},"/notifications/templates":{"post":{"operationId":"NotificationController_createTemplate","parameters":[],"responses":{"201":{"description":"Template created successfully"}},"security":[{"JWT-auth":[]}],"summary":"Create notification template","tags":["Notifications"]}},"/notifications/websocket/status":{"get":{"operationId":"NotificationController_getWebSocketStatus","parameters":[],"responses":{"200":{"description":"WebSocket status retrieved successfully"}},"security":[{"JWT-auth":[]}],"summary":"Get WebSocket status","tags":["Notifications"]}},"/notifications/user/{userId}":{"get":{"operationId":"NotificationController_findUserNotifications","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/Notification"}}}}}},"security":[{"JWT-auth":[]}],"summary":"Get user notifications","tags":["Notifications"]}},"/notifications/me":{"get":{"operationId":"NotificationController_getMyNotifications","parameters":[{"name":"page","required":true,"in":"query","schema":{"type":"number"}},{"name":"limit","required":true,"in":"query","schema":{"type":"number"}}],"responses":{"200":{"description":"Paginated notifications"}},"security":[{"JWT-auth":[]}],"summary":"Get my notifications (Mobile)","tags":["Notifications"]}},"/notifications/preferences":{"post":{"operationId":"NotificationController_createPreferences","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreateNotificationPreferenceDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotificationPreference"}}}}},"security":[{"JWT-auth":[]}],"summary":"Create notification preferences","tags":["Notifications"]}},"/notifications/preferences/{userId}":{"get":{"operationId":"NotificationController_getPreferences","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotificationPreference"}}}}},"security":[{"JWT-auth":[]}],"summary":"Get user notification preferences","tags":["Notifications"]},"put":{"operationId":"NotificationController_updatePreferences","parameters":[{"name":"userId","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UpdateNotificationPreferenceDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotificationPreference"}}}}},"security":[{"JWT-auth":[]}],"summary":"Update notification preferences","tags":["Notifications"]}},"/admin/dashboard":{"get":{"operationId":"AdminController_getDashboardMetrics","parameters":[],"responses":{"200":{"description":"Dashboard metrics retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get admin dashboard metrics","tags":["admin"]}},"/admin/analytics":{"get":{"operationId":"AdminController_getAnalytics","parameters":[{"name":"metricType","required":false,"in":"query","schema":{"type":"string"}},{"name":"periodType","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}}],"responses":{"200":{"description":"Analytics data retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get analytics data with filters","tags":["admin"]}},"/admin/users":{"get":{"operationId":"AdminController_getUsers","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Users retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get users with advanced filters","tags":["admin"]}},"/admin/users/manage":{"post":{"operationId":"AdminController_manageUser","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserManagementDto"}}}},"responses":{"200":{"description":"User managed successfully"}},"security":[{"bearer":[]}],"summary":"Manage user (suspend/activate/delete)","tags":["admin"]}},"/admin/providers":{"get":{"operationId":"AdminController_getProviders","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Providers retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get providers with advanced filters","tags":["admin"]}},"/admin/providers/manage":{"post":{"operationId":"AdminController_manageProvider","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProviderManagementDto"}}}},"responses":{"200":{"description":"Provider managed successfully"}},"security":[{"bearer":[]}],"summary":"Manage provider (approve/reject/suspend)","tags":["admin"]}},"/admin/campaigns":{"get":{"operationId":"AdminController_getCampaigns","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Campaigns retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get campaigns with advanced filters","tags":["admin"]}},"/admin/donations":{"get":{"operationId":"AdminController_getDonations","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Donations retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get donations with advanced filters","tags":["admin"]}},"/admin/volunteers":{"get":{"operationId":"AdminController_getVolunteers","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Volunteers retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get volunteers with advanced filters","tags":["admin"]}},"/admin/settings":{"get":{"operationId":"AdminController_getSettings","parameters":[],"responses":{"200":{"description":"Settings retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get system settings","tags":["admin"]}},"/admin/settings/{key}":{"put":{"operationId":"AdminController_updateSetting","parameters":[{"name":"key","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"Setting updated successfully"}},"security":[{"bearer":[]}],"summary":"Update system setting","tags":["admin"]}},"/admin/actions":{"get":{"operationId":"AdminController_getAdminActions","parameters":[{"name":"search","required":false,"in":"query","schema":{"type":"string"}},{"name":"startDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"endDate","required":false,"in":"query","schema":{"type":"string"}},{"name":"status","required":false,"in":"query","schema":{"type":"string"}},{"name":"role","required":false,"in":"query","schema":{"type":"string"}},{"name":"page","required":false,"in":"query","schema":{"default":1,"type":"number"}},{"name":"limit","required":false,"in":"query","schema":{"default":20,"type":"number"}},{"name":"sortBy","required":false,"in":"query","schema":{"type":"string"}},{"name":"sortOrder","required":false,"in":"query","schema":{"type":"string","enum":["ASC","DESC"]}}],"responses":{"200":{"description":"Admin actions retrieved successfully"}},"security":[{"bearer":[]}],"summary":"Get admin actions log","tags":["admin"]}},"/i18n/timezones":{"get":{"operationId":"I18nController_getSupportedTimezones","parameters":[],"responses":{"200":{"description":"List of supported timezones"}},"summary":"Get supported timezones","tags":["Internationalization"]}},"/i18n/languages":{"get":{"operationId":"I18nController_getSupportedLanguages","parameters":[],"responses":{"200":{"description":"List of supported languages"}},"summary":"Get supported languages","tags":["Internationalization"]}},"/i18n/time":{"get":{"operationId":"I18nController_getCurrentTime","parameters":[{"name":"timezone","required":false,"in":"query","schema":{"example":"America/New_York","type":"string"}}],"responses":{"200":{"description":"Current time in specified timezone"}},"summary":"Get current time in specified timezone","tags":["Internationalization"]}}},"info":{"title":"LOVE App API","description":"Backend API for LOVE App - Service-oriented application for providers, campaigns, SOS calls, donations, volunteers, and user management","version":"1.0.0","contact":{"name":"LOVE App Team","url":"https://loveapp.com","email":"support@loveapp.com"},"license":{"name":"MIT","url":"https://opensource.org/licenses/MIT"}},"tags":[{"name":"Authentication","description":"User authentication endpoints"},{"name":"Users","description":"User management endpoints"},{"name":"Providers","description":"Service provider endpoints"},{"name":"Campaigns","description":"Campaign management endpoints"},{"name":"SOS","description":"Emergency SOS endpoints"},{"name":"Donations","description":"Payment and donation endpoints"},{"name":"Volunteers","description":"Volunteer management endpoints"},{"name":"Reviews","description":"Review and feedback endpoints"},{"name":"Notifications","description":"Notification endpoints"},{"name":"Admin","description":"Administrative endpoints"}],"servers":[{"url":"http://localhost:3000","description":"Development server"},{"url":"https://api.loveapp.com","description":"Production server"}],"components":{"securitySchemes":{"JWT-auth":{"scheme":"bearer","bearerFormat":"JWT","type":"http","name":"JWT","description":"Enter JWT token","in":"header"}},"schemas":{"Country":{"type":"object","properties":{}},"UserRole":{"type":"string","enum":["user","provider","volunteer","admin","super_admin"],"description":"User role for authentication"},"FirebaseAuthDto":{"type":"object","properties":{"idToken":{"type":"string","description":"Firebase ID token from client","example":"eyJhbGciOiJSUzI1NiIsImtpZCI6..."},"role":{"description":"User role for authentication","example":"seeker","allOf":[{"$ref":"#/components/schemas/UserRole"}]}},"required":["idToken","role"]},"CreateUserDto":{"type":"object","properties":{"firstName":{"type":"string","example":"John"},"lastName":{"type":"string","example":"Doe"},"age":{"type":"number","example":"+1234567890"},"country":{"type":"string","example":"USA"},"religion":{"type":"string","example":"Christianity"},"email":{"type":"string","example":"user@example.com"},"password":{"type":"string","example":"securePassword123"},"role":{"type":"string","example":"user","enum":["user","provider","volunteer","admin","super_admin"]},"isEmailVerified":{"type":"boolean","example":true}},"required":["firstName","lastName","age","country","religion","email","password","role","isEmailVerified"]},"User":{"type":"object","properties":{"id":{"type":"string"},"email":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"phone":{"type":"string"},"country":{"type":"string"},"age":{"type":"number"},"religion":{"type":"string"},"role":{"type":"string","enum":["user","provider","volunteer","admin","super_admin"]},"status":{"type":"string","enum":["active","inactive","suspended"]},"isEmailVerified":{"type":"boolean"},"timezone":{"type":"string"},"language":{"type":"string"},"latitude":{"type":"number"},"longitude":{"type":"number"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","email","firstName","lastName","phone","country","age","religion","role","status","isEmailVerified","timezone","language","createdAt","updatedAt"]},"UpdateUserDto":{"type":"object","properties":{"id":{"type":"string"},"email":{"type":"string"},"firstName":{"type":"string"},"lastName":{"type":"string"},"phone":{"type":"string"},"country":{"type":"string"},"age":{"type":"number"},"religion":{"type":"string"},"role":{"type":"string","enum":["user","provider","volunteer","admin","super_admin"]},"status":{"type":"string","enum":["active","inactive","suspended"]},"isEmailVerified":{"type":"boolean"},"timezone":{"type":"string"},"language":{"type":"string"},"latitude":{"type":"number"},"longitude":{"type":"number"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}}},"CreateFeedbackDto":{"type":"object","properties":{"type":{"type":"string","enum":["bug","feature","general","complaint"]},"subject":{"type":"string"},"message":{"type":"string"},"userId":{"type":"string"}},"required":["type","subject","message","userId"]},"Feedback":{"type":"object","properties":{"id":{"type":"string"},"type":{"type":"string","enum":["bug","feature","general","complaint"]},"subject":{"type":"string"},"message":{"type":"string"},"status":{"type":"string","enum":["pending","reviewed","resolved"]},"createdAt":{"format":"date-time","type":"string"}},"required":["id","type","subject","message","status","createdAt"]},"UpdateFeedbackDto":{"type":"object","properties":{"status":{"type":"string","enum":["pending","reviewed","resolved"]}}},"CreateEmployeeDto":{"type":"object","properties":{"name":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"position":{"type":"string"},"providerId":{"type":"string"},"isActive":{"type":"boolean","default":true}},"required":["name","providerId"]},"Employee":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"position":{"type":"string"},"isActive":{"type":"boolean"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","name","email","phone","position","isActive","createdAt","updatedAt"]},"UpdateEmployeeDto":{"type":"object","properties":{"name":{"type":"string"},"email":{"type":"string"},"phone":{"type":"string"},"position":{"type":"string"},"providerId":{"type":"string"},"isActive":{"type":"boolean","default":true}}},"CreateProvider":{"type":"object","properties":{"name":{"type":"string","example":"John"},"email":{"type":"string","example":"providers@loveapp.com"},"userId":{"type":"string","example":"1787df61-8383-4dd8-8743-b4ea9ba5219c"},"service_area":{"example":["New York","Los Angeles"],"type":"array","items":{"type":"string"}},"organization":{"type":"string","example":"Helping Hands Organization"},"capabilities":{"type":"string","example":"We provide food and shelter services."},"website":{"type":"string","example":"https://www.helpinghands.org"},"latitude":{"type":"number","example":40.712776},"longitude":{"type":"number","example":-74.005974},"documentLinks":{"example":["https://linktodocument1.com","https://linktodocument2.com"],"type":"array","items":{"type":"string"}}},"required":["name","email","userId","service_area","organization","capabilities","website","latitude","longitude","documentLinks"]},"Provider":{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"},"email":{"type":"string"},"service_area":{"type":"array","items":{"type":"string"}},"organization":{"type":"string"},"capabilities":{"type":"string"},"website":{"type":"string"},"latitude":{"type":"number"},"longitude":{"type":"number"},"documentLinks":{"type":"array","items":{"type":"string"}},"operatingHours":{"type":"string"},"capacity":{"type":"number"},"contactEmail":{"type":"string"},"contactPhone":{"type":"string"},"isActive":{"type":"boolean"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","name","email","service_area","organization","capabilities","website","latitude","longitude","documentLinks","operatingHours","capacity","contactEmail","contactPhone","isActive","createdAt","updatedAt"]},"UpdateProviderDto":{"type":"object","properties":{}},"CreateCampaignDto":{"type":"object","properties":{"title":{"type":"string","description":"Campaign title","example":"Help Local Families"},"description":{"type":"string","description":"Campaign description","example":"Supporting families in need during difficult times"},"category":{"type":"string","description":"Campaign category","example":"Community Support"},"startDate":{"type":"string","description":"Campaign start date","example":"2024-01-01T00:00:00Z"},"endDate":{"type":"string","description":"Campaign end date","example":"2024-12-31T23:59:59Z"},"targetAmount":{"type":"number","description":"Target amount in cents","example":100000},"volunteersNeeded":{"type":"number","description":"Number of volunteers needed","example":10},"providerId":{"type":"string","description":"Provider UUID","example":"123e4567-e89b-12d3-a456-426614174000"},"status":{"type":"string","description":"Campaign status","example":"active","default":"active"},"location":{"type":"object","description":"Campaign location coordinates","example":{"type":"Point","coordinates":[-74.006,40.7128]}}},"required":["title","description","category","startDate","endDate","targetAmount","volunteersNeeded","providerId","location"]},"UpdateCampaignDto":{"type":"object","properties":{}},"CreateRequestDto":{"type":"object","properties":{}},"UpdateRequestDto":{"type":"object","properties":{}},"CreateReferralDto":{"type":"object","properties":{}},"UpdateReferralDto":{"type":"object","properties":{}},"CreatePaymentIntentDto":{"type":"object","properties":{"amount":{"type":"number"},"campaignId":{"type":"string"},"userId":{"type":"string"},"paymentMethodId":{"type":"string"},"providerId":{"type":"string"}},"required":["amount","campaignId"]},"CreateRefundDto":{"type":"object","properties":{"donationId":{"type":"string"},"amount":{"type":"number"},"reason":{"type":"string"}},"required":["donationId"]},"SavePaymentMethodDto":{"type":"object","properties":{"stripePaymentMethodId":{"type":"string"},"setAsDefault":{"type":"boolean"}},"required":["stripePaymentMethodId"]},"CreateSOSTicketDto":{"type":"object","properties":{}},"UpdateSOSTicketDto":{"type":"object","properties":{}},"GuestSOSDto":{"type":"object","properties":{}},"LocationPreferencesDto":{"type":"object","properties":{"preferredAreas":{"type":"array","items":{"type":"string"}},"maxDistance":{"type":"number"},"transportationMode":{"type":"string"},"availableRegions":{"type":"array","items":{"type":"string"}}}},"CreateVolunteerApplicationDto":{"type":"object","properties":{"interests":{"type":"array","items":{"type":"string"}},"skills":{"type":"array","items":{"type":"string"}},"availability":{"type":"string"},"locationPreferences":{"$ref":"#/components/schemas/LocationPreferencesDto"},"motivation":{"type":"string"},"experience":{"type":"string"},"references":{"type":"array","items":{"type":"string"}}},"required":["interests","skills"]},"CreateWifiVoucherDto":{"type":"object","properties":{"providerId":{"type":"string"},"campaignId":{"type":"string"},"userId":{"type":"string"},"durationHours":{"type":"number"},"bandwidthLimitMb":{"type":"number"},"maxDevices":{"type":"number"},"expiresAt":{"type":"string"}},"required":["providerId"]},"ActivateVoucherDto":{"type":"object","properties":{"code":{"type":"string"},"deviceInfo":{"type":"object"}},"required":["code"]},"CreateVolunteerDto":{"type":"object","properties":{"userId":{"type":"string"},"interests":{"type":"array","items":{"type":"string"}},"skills":{"type":"array","items":{"type":"string"}},"availability":{"type":"string"},"preferences":{"type":"object"}},"required":["userId"]},"Volunteer":{"type":"object","properties":{"id":{"type":"string"},"interests":{"type":"array","items":{"type":"string"}},"skills":{"type":"array","items":{"type":"string"}},"availability":{"type":"string"},"locationPreferences":{"type":"object"},"preferences":{"type":"object"},"status":{"type":"string","enum":["active","inactive","suspended"]},"verificationStatus":{"type":"string","enum":["pending","verified","rejected"]},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","interests","skills","availability","locationPreferences","preferences","status","verificationStatus","createdAt","updatedAt"]},"UpdateVolunteerDto":{"type":"object","properties":{"interests":{"type":"array","items":{"type":"string"}},"skills":{"type":"array","items":{"type":"string"}},"availability":{"type":"string"},"preferences":{"type":"object"}}},"WifiVoucher":{"type":"object","properties":{"id":{"type":"string"},"code":{"type":"string"},"status":{"type":"string","enum":["active","used","expired","revoked"]},"durationHours":{"type":"number"},"bandwidthLimitMb":{"type":"number"},"maxDevices":{"type":"number"},"expiresAt":{"format":"date-time","type":"string"},"activatedAt":{"format":"date-time","type":"string"},"usedAt":{"format":"date-time","type":"string"},"deviceInfo":{"type":"object"},"usageStats":{"type":"object"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","code","status","durationHours","bandwidthLimitMb","maxDevices","expiresAt","activatedAt","usedAt","deviceInfo","usageStats","createdAt","updatedAt"]},"CreateReviewDto":{"type":"object","properties":{"rating":{"type":"number","minimum":1,"maximum":5},"comment":{"type":"string"},"userId":{"type":"string"},"providerId":{"type":"string"},"isAnonymous":{"type":"boolean"}},"required":["rating","userId","providerId"]},"CreateMobileReviewDto":{"type":"object","properties":{"rating":{"type":"number","minimum":1,"maximum":5},"comment":{"type":"string"},"providerId":{"type":"string"},"isAnonymous":{"type":"boolean"}},"required":["rating","providerId"]},"CreateNotificationDto":{"type":"object","properties":{"title":{"type":"string"},"message":{"type":"string"},"type":{"type":"string","enum":["email","sms","push"]},"userId":{"type":"string"}},"required":["title","message","type","userId"]},"Notification":{"type":"object","properties":{"id":{"type":"string"},"readAt":{"format":"date-time","type":"string"},"title":{"type":"string"},"message":{"type":"string"},"type":{"type":"string","enum":["email","sms","push"]},"status":{"type":"string","enum":["pending","sent","failed"]},"priority":{"type":"string","enum":["low","medium","high","urgent"]},"category":{"type":"string","enum":["general","sos","campaign","donation","volunteer","system"]},"templateData":{"type":"object"},"sentAt":{"format":"date-time","type":"string"},"failedReason":{"type":"string"},"retryCount":{"type":"number"},"createdAt":{"format":"date-time","type":"string"}},"required":["id","readAt","title","message","type","status","priority","category","templateData","sentAt","failedReason","retryCount","createdAt"]},"CreateNotificationPreferenceDto":{"type":"object","properties":{"userId":{"type":"string"},"emailNotifications":{"type":"boolean"},"smsNotifications":{"type":"boolean"},"pushNotifications":{"type":"boolean"},"campaignUpdates":{"type":"boolean"},"volunteerOpportunities":{"type":"boolean"},"emergencyAlerts":{"type":"boolean"},"donationReceipts":{"type":"boolean"}},"required":["userId"]},"NotificationPreference":{"type":"object","properties":{"id":{"type":"string"},"emailNotifications":{"type":"boolean"},"smsNotifications":{"type":"boolean"},"pushNotifications":{"type":"boolean"},"campaignUpdates":{"type":"boolean"},"volunteerOpportunities":{"type":"boolean"},"emergencyAlerts":{"type":"boolean"},"donationReceipts":{"type":"boolean"},"createdAt":{"format":"date-time","type":"string"},"updatedAt":{"format":"date-time","type":"string"}},"required":["id","emailNotifications","smsNotifications","pushNotifications","campaignUpdates","volunteerOpportunities","emergencyAlerts","donationReceipts","createdAt","updatedAt"]},"UpdateNotificationPreferenceDto":{"type":"object","properties":{"emailNotifications":{"type":"boolean"},"smsNotifications":{"type":"boolean"},"pushNotifications":{"type":"boolean"},"campaignUpdates":{"type":"boolean"},"volunteerOpportunities":{"type":"boolean"},"emergencyAlerts":{"type":"boolean"},"donationReceipts":{"type":"boolean"}}},"UserManagementDto":{"type":"object","properties":{"userId":{"type":"string"},"action":{"type":"string","enum":["suspend","activate","delete"]},"reason":{"type":"string"}},"required":["userId","action"]},"ProviderManagementDto":{"type":"object","properties":{"providerId":{"type":"string"},"action":{"type":"string","enum":["approve","reject","suspend"]},"reason":{"type":"string"}},"required":["providerId","action"]}}}}
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Returns a simple message to verify the service is running",
+        "operationId": "getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Service is running successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "example": "LOVE App Backend API is running!"
+                }
+              }
+            }
+          },
+          "500": { "description": "Internal server error" }
+        },
+        "summary": "Basic health check",
+        "tags": ["Health Check"]
+      }
+    },
+    "/health": {
+      "get": {
+        "description": "Returns detailed health information including timestamp and service name",
+        "operationId": "getHealthStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Detailed health status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok",
+                      "description": "Service status"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2024-01-01T00:00:00.000Z",
+                      "description": "Current timestamp"
+                    },
+                    "service": {
+                      "type": "string",
+                      "example": "LOVE App Backend",
+                      "description": "Service name"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Detailed health status",
+        "tags": ["Health Check"]
+      }
+    },
+    "/country-list": {
+      "get": {
+        "operationId": "AppController_getCountries",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Country" }
+              }
+            }
+          }
+        },
+        "summary": "Create user profile",
+        "tags": ["Health Check"]
+      }
+    },
+    "/auth/profile": {
+      "get": {
+        "operationId": "AuthController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Profile retrieved successfully" },
+          "401": { "description": "Unauthorized" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get current user profile",
+        "tags": ["Authentication"]
+      }
+    },
+    "/auth/firebase": {
+      "post": {
+        "operationId": "AuthController_firebaseAuth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/FirebaseAuthDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authentication successful" },
+          "401": { "description": "Invalid Firebase token" }
+        },
+        "summary": "Authenticate with Firebase (Google/Apple Sign-In)",
+        "tags": ["Authentication"]
+      }
+    },
+    "/auth/check-user-exists": {
+      "get": {
+        "operationId": "AuthController_checkUserExists",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User existence checked successfully" }
+        },
+        "summary": "Check if a user exists by email",
+        "tags": ["Authentication"]
+      }
+    },
+    "/users": {
+      "post": {
+        "operationId": "UserController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        },
+        "summary": "Create user",
+        "tags": ["Users"]
+      },
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of users with pagination" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get all users with pagination",
+        "tags": ["Users"]
+      }
+    },
+    "/users/profile/me": {
+      "get": {
+        "operationId": "UserController_getProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get current user profile (Mobile)",
+        "tags": ["Users"]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "operationId": "UserController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get user by ID",
+        "tags": ["Users"]
+      },
+      "put": {
+        "operationId": "UserController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Update user",
+        "tags": ["Users"]
+      },
+      "delete": {
+        "operationId": "UserController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "User deleted successfully" } },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Delete user",
+        "tags": ["Users"]
+      }
+    },
+    "/users/nearby": {
+      "get": {
+        "operationId": "UserController_getNearbyUsers",
+        "parameters": [
+          {
+            "name": "latitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "longitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "200": { "description": "List of nearby users" } },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get nearby users",
+        "tags": ["Users"]
+      }
+    },
+    "/users/feedback": {
+      "post": {
+        "operationId": "UserController_createFeedback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateFeedbackDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Feedback" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Submit feedback",
+        "tags": ["Users"]
+      }
+    },
+    "/users/feedback/all": {
+      "get": {
+        "operationId": "UserController_getFeedback",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of feedback with pagination" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get all feedback (Admin only)",
+        "tags": ["Users"]
+      }
+    },
+    "/users/feedback/{id}": {
+      "put": {
+        "operationId": "UserController_updateFeedback",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateFeedbackDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Feedback" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Update feedback status (Admin only)",
+        "tags": ["Users"]
+      }
+    },
+    "/providers/{providerId}/employees": {
+      "post": {
+        "operationId": "ProviderController_createEmployee",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateEmployeeDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Employee" }
+              }
+            }
+          }
+        },
+        "summary": "Create employee",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/employees": {
+      "get": {
+        "operationId": "ProviderController_findAllEmployees",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Employee" }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get all employees (optionally by provider)",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/employees/{id}": {
+      "get": {
+        "operationId": "ProviderController_findEmployeeById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Employee" }
+              }
+            }
+          }
+        },
+        "summary": "Get employee by id",
+        "tags": ["Providers"]
+      },
+      "patch": {
+        "operationId": "ProviderController_updateEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateEmployeeDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Employee" }
+              }
+            }
+          }
+        },
+        "summary": "Update employee",
+        "tags": ["Providers"]
+      },
+      "delete": {
+        "operationId": "ProviderController_removeEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "Employee deleted" } },
+        "summary": "Delete employee",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers": {
+      "get": {
+        "operationId": "ProviderController_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "location",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "capacity",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/discovery": {
+      "get": {
+        "operationId": "ProviderController_discovery",
+        "parameters": [
+          {
+            "name": "latitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "longitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "open_now",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "capacity_available",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of providers with pagination" }
+        },
+        "summary": "Discover services (Mobile Map/List)",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/details/{id}": {
+      "get": {
+        "operationId": "ProviderController_getMobileDetail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Provider details + approved reviews" }
+        },
+        "summary": "Get provider details with approved reviews",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/search": {
+      "get": {
+        "operationId": "ProviderController_search",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "type",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "latitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "longitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/register": {
+      "post": {
+        "operationId": "ProviderController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProvider" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Provider" }
+              }
+            }
+          }
+        },
+        "summary": "Register a new provider",
+        "tags": ["Providers"]
+      }
+    },
+    "/providers/{id}": {
+      "get": {
+        "operationId": "ProviderController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Providers"]
+      },
+      "patch": {
+        "operationId": "ProviderController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateProviderDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["Providers"]
+      },
+      "delete": {
+        "operationId": "ProviderController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Providers"]
+      }
+    },
+    "/Campaign/{id}/publish": {
+      "patch": {
+        "operationId": "CampaignController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "summary": "Publish campaign (Admin only)",
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign/{id}/employees": {
+      "post": {
+        "operationId": "CampaignController_assignEmployees",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "tags": ["Campaigns"]
+      },
+      "get": {
+        "operationId": "CampaignController_listEmployees",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign/{id}/employees/{employeeId}": {
+      "delete": {
+        "operationId": "CampaignController_unassignEmployee",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "employeeId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign": {
+      "post": {
+        "operationId": "CampaignController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateCampaignDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "summary": "Create campaign (Admin only)",
+        "tags": ["Campaigns"]
+      },
+      "get": {
+        "description": "To list active campaigns for the mobile app, use GET /Campaign?status=active. This returns only campaigns that are published and not expired.",
+        "operationId": "CampaignController_findAll",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "summary": "List all campaigns (Mobile: Use status=active)",
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign/search": {
+      "get": {
+        "operationId": "CampaignController_search",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "latitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "longitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign/provider/{providerId}": {
+      "get": {
+        "operationId": "CampaignController_findByProvider",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Campaigns"]
+      }
+    },
+    "/Campaign/{id}": {
+      "get": {
+        "operationId": "CampaignController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Campaigns"]
+      },
+      "patch": {
+        "operationId": "CampaignController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateCampaignDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "summary": "Update campaign (Admin only)",
+        "tags": ["Campaigns"]
+      },
+      "delete": {
+        "operationId": "CampaignController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "security": [{ "bearer": [] }],
+        "summary": "Delete campaign (Admin only)",
+        "tags": ["Campaigns"]
+      }
+    },
+    "/requests": {
+      "post": {
+        "operationId": "RequestsController_createRequest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRequestDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["Requests"]
+      },
+      "get": {
+        "operationId": "RequestsController_findAllRequests",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/me": {
+      "get": {
+        "operationId": "RequestsController_getMyRequests",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Paginated list of user requests" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get my requests (Mobile)",
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/{id}": {
+      "get": {
+        "operationId": "RequestsController_findOneRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      },
+      "patch": {
+        "operationId": "RequestsController_updateRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateRequestDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      },
+      "delete": {
+        "operationId": "RequestsController_deleteRequest",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/referrals": {
+      "post": {
+        "operationId": "RequestsController_createReferral",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateReferralDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/{requestId}/referrals": {
+      "get": {
+        "operationId": "RequestsController_findReferralsByRequest",
+        "parameters": [
+          {
+            "name": "requestId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/referrals/{id}": {
+      "patch": {
+        "operationId": "RequestsController_updateReferral",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateReferralDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/user/{userId}/referrals": {
+      "get": {
+        "operationId": "RequestsController_getReferralHistory",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/{id}/help": {
+      "post": {
+        "operationId": "RequestsController_requestHelp",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/{id}/refer": {
+      "post": {
+        "operationId": "RequestsController_referSomeone",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/requests/{id}/donate": {
+      "post": {
+        "operationId": "RequestsController_donate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["Requests"]
+      }
+    },
+    "/donations/payment-intent": {
+      "post": {
+        "operationId": "DonationsController_createPaymentIntent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Payment intent created successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create payment intent for donation",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/confirm/{id}": {
+      "post": {
+        "operationId": "DonationsController_confirmDonation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Donation confirmed successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Confirm donation payment",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/refund": {
+      "post": {
+        "operationId": "DonationsController_createRefund",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateRefundDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Refund created successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create refund for donation",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/payment-methods": {
+      "post": {
+        "operationId": "DonationsController_savePaymentMethod",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SavePaymentMethodDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Payment method saved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Save payment method",
+        "tags": ["donations"]
+      },
+      "get": {
+        "operationId": "DonationsController_getUserPaymentMethods",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Payment methods retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get user payment methods",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/history": {
+      "get": {
+        "operationId": "DonationsController_getDonationHistory",
+        "parameters": [
+          {
+            "name": "campaignId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Donation history retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get donation history",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/{id}": {
+      "get": {
+        "operationId": "DonationsController_getDonationById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Donation retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get donation by ID",
+        "tags": ["donations"]
+      }
+    },
+    "/donations/webhook": {
+      "post": {
+        "operationId": "DonationsController_handleWebhook",
+        "parameters": [
+          {
+            "name": "stripe-signature",
+            "required": true,
+            "in": "header",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Webhook processed successfully" }
+        },
+        "summary": "Handle Stripe webhooks",
+        "tags": ["donations"]
+      }
+    },
+    "/sos": {
+      "post": {
+        "operationId": "SOSController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSOSTicketDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/my-alerts": {
+      "get": {
+        "operationId": "SOSController_getMyAlerts",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/nearby": {
+      "get": {
+        "operationId": "SOSController_getNearbyAlerts",
+        "parameters": [
+          {
+            "name": "latitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "longitude",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/ticket": {
+      "post": {
+        "operationId": "SOSController_createTicket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateSOSTicketDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/tickets": {
+      "get": {
+        "operationId": "SOSController_findAllTickets",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "emergencyType",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/tickets/guest/{phone}": {
+      "get": {
+        "operationId": "SOSController_getGuestTickets",
+        "parameters": [
+          {
+            "name": "phone",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/tickets/{id}": {
+      "get": {
+        "operationId": "SOSController_findOneTicket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      },
+      "patch": {
+        "operationId": "SOSController_updateTicket",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateSOSTicketDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/emergency-contacts": {
+      "get": {
+        "operationId": "SOSController_getEmergencyContacts",
+        "parameters": [],
+        "responses": { "200": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/emergency-call/{ticketId}": {
+      "post": {
+        "operationId": "SOSController_triggerEmergencyCall",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": { "201": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/sos/guest/ticket": {
+      "post": {
+        "operationId": "SOSController_createGuestTicket",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GuestSOSDto" }
+            }
+          }
+        },
+        "responses": { "201": { "description": "" } },
+        "tags": ["SOS"]
+      }
+    },
+    "/volunteers/applications": {
+      "post": {
+        "operationId": "VolunteerController_submitApplication",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolunteerApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Application submitted successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Submit volunteer application",
+        "tags": ["Volunteers"]
+      },
+      "get": {
+        "operationId": "VolunteerController_getApplications",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Applications retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get volunteer applications",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/applications/{id}/approve": {
+      "post": {
+        "operationId": "VolunteerController_approveApplication",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Application approved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Approve volunteer application",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/apply": {
+      "post": {
+        "operationId": "VolunteerController_apply",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVolunteerApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Application submitted successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Apply as volunteer",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/opportunities": {
+      "get": {
+        "operationId": "VolunteerController_getOpportunities",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Opportunities retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get volunteer opportunities",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/opportunities/{id}/join": {
+      "post": {
+        "operationId": "VolunteerController_joinOpportunity",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Joined opportunity successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Join volunteer opportunity",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/applications/my": {
+      "get": {
+        "operationId": "VolunteerController_getMyApplication",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Application retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get current user application",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/vouchers": {
+      "post": {
+        "operationId": "VolunteerController_createVoucher",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateWifiVoucherDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Voucher created successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Create Wi-Fi voucher",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/vouchers/activate": {
+      "post": {
+        "operationId": "VolunteerController_activateVoucher",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ActivateVoucherDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Voucher activated successfully" }
+        },
+        "summary": "Activate Wi-Fi voucher",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/vouchers/code/{code}": {
+      "get": {
+        "operationId": "VolunteerController_getVoucherByCode",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Voucher retrieved successfully" }
+        },
+        "summary": "Get voucher by code",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/vouchers/provider/{providerId}": {
+      "get": {
+        "operationId": "VolunteerController_getVouchersByProvider",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Vouchers retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get vouchers by provider",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers": {
+      "post": {
+        "operationId": "VolunteerController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateVolunteerDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Volunteer" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Create volunteer profile",
+        "tags": ["Volunteers"]
+      },
+      "get": {
+        "operationId": "VolunteerController_findAll",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number for pagination",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items per page",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "List of volunteers with pagination" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get all volunteers",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/{id}": {
+      "get": {
+        "operationId": "VolunteerController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Volunteer" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get volunteer by ID",
+        "tags": ["Volunteers"]
+      },
+      "put": {
+        "operationId": "VolunteerController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateVolunteerDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Volunteer" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Update volunteer profile",
+        "tags": ["Volunteers"]
+      },
+      "delete": {
+        "operationId": "VolunteerController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Volunteer deleted successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Delete volunteer profile",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/{id}/assignments": {
+      "get": {
+        "operationId": "VolunteerController_getAssignments",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Assignments retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get volunteer assignments",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/user/{userId}": {
+      "get": {
+        "operationId": "VolunteerController_findByUserId",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Volunteer" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get volunteer by user ID",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/volunteers/user/{userId}/preferences": {
+      "put": {
+        "operationId": "VolunteerController_updatePreferences",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Volunteer" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Update volunteer preferences",
+        "tags": ["Volunteers"]
+      }
+    },
+    "/vouchers/redeem": {
+      "post": {
+        "operationId": "VouchersController_redeem",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ActivateVoucherDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Voucher successfully activated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WifiVoucher" }
+              }
+            }
+          },
+          "400": { "description": "Voucher expired, already used, or invalid" },
+          "404": { "description": "Voucher code not found" }
+        },
+        "summary": "Redeem/Activate a voucher code",
+        "tags": ["Vouchers"]
+      }
+    },
+    "/reviews": {
+      "post": {
+        "operationId": "ReviewController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateReviewDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Review created successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create review",
+        "tags": ["reviews"]
+      },
+      "get": {
+        "operationId": "ReviewController_findAll",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Reviews retrieved successfully" }
+        },
+        "summary": "Get all reviews",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/feedback": {
+      "post": {
+        "description": "Submit feedback for a provider. If isAnonymous is true, the user identity will be hidden from the provider. Review status defaults to PENDING moderation.",
+        "operationId": "ReviewController_submitFeedback",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateMobileReviewDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Feedback submitted and pending moderation" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Submit mobile feedback (Anonymous optional)",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/provider/{providerId}": {
+      "get": {
+        "operationId": "ReviewController_getProviderReviews",
+        "parameters": [
+          {
+            "name": "providerId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Provider reviews retrieved successfully" }
+        },
+        "summary": "Get provider reviews",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/{id}/report": {
+      "post": {
+        "operationId": "ReviewController_reportReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Review reported successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Report review",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/{id}/moderate": {
+      "post": {
+        "operationId": "ReviewController_moderateReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Review moderated successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Moderate review",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/moderation/queue": {
+      "get": {
+        "operationId": "ReviewController_getModerationQueue",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "contentType",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Moderation queue retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get moderation queue",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/moderation/{id}/resolve": {
+      "post": {
+        "operationId": "ReviewController_resolveModeration",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Moderation resolved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Resolve moderation item",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/reports": {
+      "post": {
+        "operationId": "ReviewController_createReport",
+        "parameters": [],
+        "responses": {
+          "201": { "description": "Report created successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Create admin report",
+        "tags": ["reviews"]
+      },
+      "get": {
+        "operationId": "ReviewController_getReports",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Reports retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get admin reports",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/reports/{id}/download": {
+      "get": {
+        "operationId": "ReviewController_downloadReport",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Report downloaded successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Download report",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/audit": {
+      "get": {
+        "operationId": "ReviewController_getAuditLogs",
+        "parameters": [
+          {
+            "name": "entityType",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "entityId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "action",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Audit logs retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get audit logs",
+        "tags": ["reviews"]
+      }
+    },
+    "/reviews/{id}": {
+      "get": {
+        "operationId": "ReviewController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Review retrieved successfully" }
+        },
+        "summary": "Get review by ID",
+        "tags": ["reviews"]
+      },
+      "delete": {
+        "operationId": "ReviewController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Review deleted successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Delete review",
+        "tags": ["reviews"]
+      }
+    },
+    "/notifications": {
+      "post": {
+        "operationId": "NotificationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateNotificationDto" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Notification" }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Create notification",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/sos-alert": {
+      "post": {
+        "operationId": "NotificationController_sendSOSAlert",
+        "parameters": [],
+        "responses": {
+          "201": { "description": "SOS alert sent successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Send SOS alert",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/templates": {
+      "post": {
+        "operationId": "NotificationController_createTemplate",
+        "parameters": [],
+        "responses": {
+          "201": { "description": "Template created successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Create notification template",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/websocket/status": {
+      "get": {
+        "operationId": "NotificationController_getWebSocketStatus",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "WebSocket status retrieved successfully" }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get WebSocket status",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/user/{userId}": {
+      "get": {
+        "operationId": "NotificationController_findUserNotifications",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Notification" }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get user notifications",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/me": {
+      "get": {
+        "operationId": "NotificationController_getMyNotifications",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": { "type": "number" }
+          }
+        ],
+        "responses": { "200": { "description": "Paginated notifications" } },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get my notifications (Mobile)",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/preferences": {
+      "post": {
+        "operationId": "NotificationController_createPreferences",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNotificationPreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreference"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Create notification preferences",
+        "tags": ["Notifications"]
+      }
+    },
+    "/notifications/preferences/{userId}": {
+      "get": {
+        "operationId": "NotificationController_getPreferences",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreference"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Get user notification preferences",
+        "tags": ["Notifications"]
+      },
+      "put": {
+        "operationId": "NotificationController_updatePreferences",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNotificationPreferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreference"
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "JWT-auth": [] }],
+        "summary": "Update notification preferences",
+        "tags": ["Notifications"]
+      }
+    },
+    "/admin/dashboard": {
+      "get": {
+        "operationId": "AdminController_getDashboardMetrics",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Dashboard metrics retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get admin dashboard metrics",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/analytics": {
+      "get": {
+        "operationId": "AdminController_getAnalytics",
+        "parameters": [
+          {
+            "name": "metricType",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "periodType",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Analytics data retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get analytics data with filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "operationId": "AdminController_getUsers",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Users retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get users with advanced filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/users/manage": {
+      "post": {
+        "operationId": "AdminController_manageUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UserManagementDto" }
+            }
+          }
+        },
+        "responses": { "200": { "description": "User managed successfully" } },
+        "security": [{ "bearer": [] }],
+        "summary": "Manage user (suspend/activate/delete)",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/providers": {
+      "get": {
+        "operationId": "AdminController_getProviders",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Providers retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get providers with advanced filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/providers/manage": {
+      "post": {
+        "operationId": "AdminController_manageProvider",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProviderManagementDto" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Provider managed successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Manage provider (approve/reject/suspend)",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/campaigns": {
+      "get": {
+        "operationId": "AdminController_getCampaigns",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Campaigns retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get campaigns with advanced filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/donations": {
+      "get": {
+        "operationId": "AdminController_getDonations",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Donations retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get donations with advanced filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/volunteers": {
+      "get": {
+        "operationId": "AdminController_getVolunteers",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Volunteers retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get volunteers with advanced filters",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/settings": {
+      "get": {
+        "operationId": "AdminController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "Settings retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get system settings",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/settings/{key}": {
+      "put": {
+        "operationId": "AdminController_updateSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Setting updated successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Update system setting",
+        "tags": ["admin"]
+      }
+    },
+    "/admin/actions": {
+      "get": {
+        "operationId": "AdminController_getAdminActions",
+        "parameters": [
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 1, "type": "number" }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "default": 20, "type": "number" }
+          },
+          {
+            "name": "sortBy",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sortOrder",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"] }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Admin actions retrieved successfully" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Get admin actions log",
+        "tags": ["admin"]
+      }
+    },
+    "/i18n/timezones": {
+      "get": {
+        "operationId": "I18nController_getSupportedTimezones",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "List of supported timezones" }
+        },
+        "summary": "Get supported timezones",
+        "tags": ["Internationalization"]
+      }
+    },
+    "/i18n/languages": {
+      "get": {
+        "operationId": "I18nController_getSupportedLanguages",
+        "parameters": [],
+        "responses": {
+          "200": { "description": "List of supported languages" }
+        },
+        "summary": "Get supported languages",
+        "tags": ["Internationalization"]
+      }
+    },
+    "/i18n/time": {
+      "get": {
+        "operationId": "I18nController_getCurrentTime",
+        "parameters": [
+          {
+            "name": "timezone",
+            "required": false,
+            "in": "query",
+            "schema": { "example": "America/New_York", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Current time in specified timezone" }
+        },
+        "summary": "Get current time in specified timezone",
+        "tags": ["Internationalization"]
+      }
+    }
+  },
+  "info": {
+    "title": "LOVE App API",
+    "description": "Backend API for LOVE App - Service-oriented application for providers, campaigns, SOS calls, donations, volunteers, and user management",
+    "version": "1.0.0",
+    "contact": {
+      "name": "LOVE App Team",
+      "url": "https://loveapp.com",
+      "email": "support@loveapp.com"
+    },
+    "license": { "name": "MIT", "url": "https://opensource.org/licenses/MIT" }
+  },
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication endpoints"
+    },
+    { "name": "Users", "description": "User management endpoints" },
+    { "name": "Providers", "description": "Service provider endpoints" },
+    { "name": "Campaigns", "description": "Campaign management endpoints" },
+    { "name": "SOS", "description": "Emergency SOS endpoints" },
+    { "name": "Donations", "description": "Payment and donation endpoints" },
+    { "name": "Volunteers", "description": "Volunteer management endpoints" },
+    { "name": "Reviews", "description": "Review and feedback endpoints" },
+    { "name": "Notifications", "description": "Notification endpoints" },
+    { "name": "Admin", "description": "Administrative endpoints" }
+  ],
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Development server" },
+    { "url": "https://api.loveapp.com", "description": "Production server" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "JWT-auth": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "name": "JWT",
+        "description": "Enter JWT token",
+        "in": "header"
+      }
+    },
+    "schemas": {
+      "Country": { "type": "object", "properties": {} },
+      "UserRole": {
+        "type": "string",
+        "enum": ["user", "provider", "volunteer", "admin", "super_admin"],
+        "description": "User role for authentication"
+      },
+      "FirebaseAuthDto": {
+        "type": "object",
+        "properties": {
+          "idToken": {
+            "type": "string",
+            "description": "Firebase ID token from client",
+            "example": "eyJhbGciOiJSUzI1NiIsImtpZCI6..."
+          },
+          "role": {
+            "description": "User role for authentication",
+            "example": "seeker",
+            "allOf": [{ "$ref": "#/components/schemas/UserRole" }]
+          }
+        },
+        "required": ["idToken", "role"]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "firstName": { "type": "string", "example": "John" },
+          "lastName": { "type": "string", "example": "Doe" },
+          "age": { "type": "number", "example": "+1234567890" },
+          "country": { "type": "string", "example": "USA" },
+          "religion": { "type": "string", "example": "Christianity" },
+          "email": { "type": "string", "example": "user@example.com" },
+          "password": { "type": "string", "example": "securePassword123" },
+          "role": {
+            "type": "string",
+            "example": "user",
+            "enum": ["user", "provider", "volunteer", "admin", "super_admin"]
+          },
+          "isEmailVerified": { "type": "boolean", "example": true }
+        },
+        "required": [
+          "firstName",
+          "lastName",
+          "age",
+          "country",
+          "religion",
+          "email",
+          "password",
+          "role",
+          "isEmailVerified"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "phone": { "type": "string" },
+          "country": { "type": "string" },
+          "age": { "type": "number" },
+          "religion": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["user", "provider", "volunteer", "admin", "super_admin"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          },
+          "isEmailVerified": { "type": "boolean" },
+          "timezone": { "type": "string" },
+          "language": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "email",
+          "firstName",
+          "lastName",
+          "phone",
+          "country",
+          "age",
+          "religion",
+          "role",
+          "status",
+          "isEmailVerified",
+          "timezone",
+          "language",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "phone": { "type": "string" },
+          "country": { "type": "string" },
+          "age": { "type": "number" },
+          "religion": { "type": "string" },
+          "role": {
+            "type": "string",
+            "enum": ["user", "provider", "volunteer", "admin", "super_admin"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          },
+          "isEmailVerified": { "type": "boolean" },
+          "timezone": { "type": "string" },
+          "language": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        }
+      },
+      "CreateFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["bug", "feature", "general", "complaint"]
+          },
+          "subject": { "type": "string" },
+          "message": { "type": "string" },
+          "userId": { "type": "string" }
+        },
+        "required": ["type", "subject", "message", "userId"]
+      },
+      "Feedback": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["bug", "feature", "general", "complaint"]
+          },
+          "subject": { "type": "string" },
+          "message": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["pending", "reviewed", "resolved"]
+          },
+          "createdAt": { "format": "date-time", "type": "string" }
+        },
+        "required": ["id", "type", "subject", "message", "status", "createdAt"]
+      },
+      "UpdateFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pending", "reviewed", "resolved"]
+          }
+        }
+      },
+      "CreateEmployeeDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "position": { "type": "string" },
+          "providerId": { "type": "string" },
+          "isActive": { "type": "boolean", "default": true }
+        },
+        "required": ["name", "providerId"]
+      },
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "position": { "type": "string" },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "position",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateEmployeeDto": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "phone": { "type": "string" },
+          "position": { "type": "string" },
+          "providerId": { "type": "string" },
+          "isActive": { "type": "boolean", "default": true }
+        }
+      },
+      "CreateProvider": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "John" },
+          "email": { "type": "string", "example": "providers@loveapp.com" },
+          "userId": {
+            "type": "string",
+            "example": "1787df61-8383-4dd8-8743-b4ea9ba5219c"
+          },
+          "service_area": {
+            "example": ["New York", "Los Angeles"],
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "organization": {
+            "type": "string",
+            "example": "Helping Hands Organization"
+          },
+          "capabilities": {
+            "type": "string",
+            "example": "We provide food and shelter services."
+          },
+          "website": {
+            "type": "string",
+            "example": "https://www.helpinghands.org"
+          },
+          "latitude": { "type": "number", "example": 40.712776 },
+          "longitude": { "type": "number", "example": -74.005974 },
+          "documentLinks": {
+            "example": [
+              "https://linktodocument1.com",
+              "https://linktodocument2.com"
+            ],
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "userId",
+          "service_area",
+          "organization",
+          "capabilities",
+          "website",
+          "latitude",
+          "longitude",
+          "documentLinks"
+        ]
+      },
+      "Provider": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "email": { "type": "string" },
+          "service_area": { "type": "array", "items": { "type": "string" } },
+          "organization": { "type": "string" },
+          "capabilities": { "type": "string" },
+          "website": { "type": "string" },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" },
+          "documentLinks": { "type": "array", "items": { "type": "string" } },
+          "operatingHours": { "type": "string" },
+          "capacity": { "type": "number" },
+          "contactEmail": { "type": "string" },
+          "contactPhone": { "type": "string" },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "service_area",
+          "organization",
+          "capabilities",
+          "website",
+          "latitude",
+          "longitude",
+          "documentLinks",
+          "operatingHours",
+          "capacity",
+          "contactEmail",
+          "contactPhone",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateProviderDto": { "type": "object", "properties": {} },
+      "CreateCampaignDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Campaign title",
+            "example": "Help Local Families"
+          },
+          "description": {
+            "type": "string",
+            "description": "Campaign description",
+            "example": "Supporting families in need during difficult times"
+          },
+          "category": {
+            "type": "string",
+            "description": "Campaign category",
+            "example": "Community Support"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Campaign start date",
+            "example": "2024-01-01T00:00:00Z"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "Campaign end date",
+            "example": "2024-12-31T23:59:59Z"
+          },
+          "targetAmount": {
+            "type": "number",
+            "description": "Target amount in cents",
+            "example": 100000
+          },
+          "volunteersNeeded": {
+            "type": "number",
+            "description": "Number of volunteers needed",
+            "example": 10
+          },
+          "providerId": {
+            "type": "string",
+            "description": "Provider UUID",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "status": {
+            "type": "string",
+            "description": "Campaign status",
+            "example": "active",
+            "default": "active"
+          },
+          "location": {
+            "type": "object",
+            "description": "Campaign location coordinates",
+            "example": { "type": "Point", "coordinates": [-74.006, 40.7128] }
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "category",
+          "startDate",
+          "endDate",
+          "targetAmount",
+          "volunteersNeeded",
+          "providerId",
+          "location"
+        ]
+      },
+      "UpdateCampaignDto": { "type": "object", "properties": {} },
+      "CreateRequestDto": { "type": "object", "properties": {} },
+      "UpdateRequestDto": { "type": "object", "properties": {} },
+      "CreateReferralDto": { "type": "object", "properties": {} },
+      "UpdateReferralDto": { "type": "object", "properties": {} },
+      "CreatePaymentIntentDto": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number" },
+          "campaignId": { "type": "string" },
+          "userId": { "type": "string" },
+          "paymentMethodId": { "type": "string" },
+          "providerId": { "type": "string" }
+        },
+        "required": ["amount", "campaignId"]
+      },
+      "CreateRefundDto": {
+        "type": "object",
+        "properties": {
+          "donationId": { "type": "string" },
+          "amount": { "type": "number" },
+          "reason": { "type": "string" }
+        },
+        "required": ["donationId"]
+      },
+      "SavePaymentMethodDto": {
+        "type": "object",
+        "properties": {
+          "stripePaymentMethodId": { "type": "string" },
+          "setAsDefault": { "type": "boolean" }
+        },
+        "required": ["stripePaymentMethodId"]
+      },
+      "CreateSOSTicketDto": { "type": "object", "properties": {} },
+      "UpdateSOSTicketDto": { "type": "object", "properties": {} },
+      "GuestSOSDto": { "type": "object", "properties": {} },
+      "LocationPreferencesDto": {
+        "type": "object",
+        "properties": {
+          "preferredAreas": { "type": "array", "items": { "type": "string" } },
+          "maxDistance": { "type": "number" },
+          "transportationMode": { "type": "string" },
+          "availableRegions": { "type": "array", "items": { "type": "string" } }
+        }
+      },
+      "CreateVolunteerApplicationDto": {
+        "type": "object",
+        "properties": {
+          "interests": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "availability": { "type": "string" },
+          "locationPreferences": {
+            "$ref": "#/components/schemas/LocationPreferencesDto"
+          },
+          "motivation": { "type": "string" },
+          "experience": { "type": "string" },
+          "references": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["interests", "skills"]
+      },
+      "CreateWifiVoucherDto": {
+        "type": "object",
+        "properties": {
+          "providerId": { "type": "string" },
+          "campaignId": { "type": "string" },
+          "userId": { "type": "string" },
+          "durationHours": { "type": "number" },
+          "bandwidthLimitMb": { "type": "number" },
+          "maxDevices": { "type": "number" },
+          "expiresAt": { "type": "string" }
+        },
+        "required": ["providerId"]
+      },
+      "ActivateVoucherDto": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "deviceInfo": { "type": "object" }
+        },
+        "required": ["code"]
+      },
+      "CreateVolunteerDto": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "interests": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "availability": { "type": "string" },
+          "preferences": { "type": "object" }
+        },
+        "required": ["userId"]
+      },
+      "Volunteer": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "interests": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "availability": { "type": "string" },
+          "locationPreferences": { "type": "object" },
+          "preferences": { "type": "object" },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive", "suspended"]
+          },
+          "verificationStatus": {
+            "type": "string",
+            "enum": ["pending", "verified", "rejected"]
+          },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "interests",
+          "skills",
+          "availability",
+          "locationPreferences",
+          "preferences",
+          "status",
+          "verificationStatus",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateVolunteerDto": {
+        "type": "object",
+        "properties": {
+          "interests": { "type": "array", "items": { "type": "string" } },
+          "skills": { "type": "array", "items": { "type": "string" } },
+          "availability": { "type": "string" },
+          "preferences": { "type": "object" }
+        }
+      },
+      "WifiVoucher": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "code": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["active", "used", "expired", "revoked"]
+          },
+          "durationHours": { "type": "number" },
+          "bandwidthLimitMb": { "type": "number" },
+          "maxDevices": { "type": "number" },
+          "expiresAt": { "format": "date-time", "type": "string" },
+          "activatedAt": { "format": "date-time", "type": "string" },
+          "usedAt": { "format": "date-time", "type": "string" },
+          "deviceInfo": { "type": "object" },
+          "usageStats": { "type": "object" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "code",
+          "status",
+          "durationHours",
+          "bandwidthLimitMb",
+          "maxDevices",
+          "expiresAt",
+          "activatedAt",
+          "usedAt",
+          "deviceInfo",
+          "usageStats",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateReviewDto": {
+        "type": "object",
+        "properties": {
+          "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+          "comment": { "type": "string" },
+          "userId": { "type": "string" },
+          "providerId": { "type": "string" },
+          "isAnonymous": { "type": "boolean" }
+        },
+        "required": ["rating", "userId", "providerId"]
+      },
+      "CreateMobileReviewDto": {
+        "type": "object",
+        "properties": {
+          "rating": { "type": "number", "minimum": 1, "maximum": 5 },
+          "comment": { "type": "string" },
+          "providerId": { "type": "string" },
+          "isAnonymous": { "type": "boolean" }
+        },
+        "required": ["rating", "providerId"]
+      },
+      "CreateNotificationDto": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "type": { "type": "string", "enum": ["email", "sms", "push"] },
+          "userId": { "type": "string" }
+        },
+        "required": ["title", "message", "type", "userId"]
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "readAt": { "format": "date-time", "type": "string" },
+          "title": { "type": "string" },
+          "message": { "type": "string" },
+          "type": { "type": "string", "enum": ["email", "sms", "push"] },
+          "status": { "type": "string", "enum": ["pending", "sent", "failed"] },
+          "priority": {
+            "type": "string",
+            "enum": ["low", "medium", "high", "urgent"]
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "general",
+              "sos",
+              "campaign",
+              "donation",
+              "volunteer",
+              "system"
+            ]
+          },
+          "templateData": { "type": "object" },
+          "sentAt": { "format": "date-time", "type": "string" },
+          "failedReason": { "type": "string" },
+          "retryCount": { "type": "number" },
+          "createdAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "readAt",
+          "title",
+          "message",
+          "type",
+          "status",
+          "priority",
+          "category",
+          "templateData",
+          "sentAt",
+          "failedReason",
+          "retryCount",
+          "createdAt"
+        ]
+      },
+      "CreateNotificationPreferenceDto": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "emailNotifications": { "type": "boolean" },
+          "smsNotifications": { "type": "boolean" },
+          "pushNotifications": { "type": "boolean" },
+          "campaignUpdates": { "type": "boolean" },
+          "volunteerOpportunities": { "type": "boolean" },
+          "emergencyAlerts": { "type": "boolean" },
+          "donationReceipts": { "type": "boolean" }
+        },
+        "required": ["userId"]
+      },
+      "NotificationPreference": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "emailNotifications": { "type": "boolean" },
+          "smsNotifications": { "type": "boolean" },
+          "pushNotifications": { "type": "boolean" },
+          "campaignUpdates": { "type": "boolean" },
+          "volunteerOpportunities": { "type": "boolean" },
+          "emergencyAlerts": { "type": "boolean" },
+          "donationReceipts": { "type": "boolean" },
+          "createdAt": { "format": "date-time", "type": "string" },
+          "updatedAt": { "format": "date-time", "type": "string" }
+        },
+        "required": [
+          "id",
+          "emailNotifications",
+          "smsNotifications",
+          "pushNotifications",
+          "campaignUpdates",
+          "volunteerOpportunities",
+          "emergencyAlerts",
+          "donationReceipts",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UpdateNotificationPreferenceDto": {
+        "type": "object",
+        "properties": {
+          "emailNotifications": { "type": "boolean" },
+          "smsNotifications": { "type": "boolean" },
+          "pushNotifications": { "type": "boolean" },
+          "campaignUpdates": { "type": "boolean" },
+          "volunteerOpportunities": { "type": "boolean" },
+          "emergencyAlerts": { "type": "boolean" },
+          "donationReceipts": { "type": "boolean" }
+        }
+      },
+      "UserManagementDto": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": ["suspend", "activate", "delete"]
+          },
+          "reason": { "type": "string" }
+        },
+        "required": ["userId", "action"]
+      },
+      "ProviderManagementDto": {
+        "type": "object",
+        "properties": {
+          "providerId": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": ["approve", "reject", "suspend"]
+          },
+          "reason": { "type": "string" }
+        },
+        "required": ["providerId", "action"]
+      }
+    }
+  }
+}
