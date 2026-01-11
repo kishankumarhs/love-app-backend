@@ -26,7 +26,7 @@ import { UserRole } from '../user/entities/user.entity';
 @ApiTags('Campaigns')
 @Controller('Campaign')
 export class CampaignController {
-  constructor(private readonly campaignService: CampaignService) {}
+  constructor(private readonly campaignService: CampaignService) { }
 
   @Patch(':id/publish')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -69,9 +69,9 @@ export class CampaignController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  @Roles(UserRole.ADMIN, UserRole.PROVIDER, UserRole.SUPER_ADMIN)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Create campaign (Admin only)' })
+  @ApiOperation({ summary: 'Create campaign (Admin & Provider)' })
   create(@Body() createCampaignDto: CreateCampaignDto) {
     return this.campaignService.create(createCampaignDto);
   }
