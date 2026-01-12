@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsString,
   IsArray,
@@ -23,6 +23,7 @@ export class CreateProvider {
   userId: string;
 
   @ApiProperty({ example: ['New York', 'Los Angeles'] })
+  @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
   @IsArray()
   service_area: string[];
 
@@ -53,6 +54,7 @@ export class CreateProvider {
   @ApiProperty({
     example: ['https://linktodocument1.com', 'https://linktodocument2.com'],
   })
+  @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
   @IsArray()
   documentLinks: string[];
 }

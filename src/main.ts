@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
@@ -34,18 +35,18 @@ async function bootstrap() {
       contentSecurityPolicy:
         process.env.NODE_ENV === 'production'
           ? {
-              directives: {
-                defaultSrc: ["'self'"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-                imgSrc: ["'self'", 'data:', 'https:'],
-                connectSrc: ["'self'"],
-                fontSrc: ["'self'", 'data:'],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                frameSrc: ["'none'"],
-              },
-            }
+            directives: {
+              defaultSrc: ["'self'"],
+              styleSrc: ["'self'", "'unsafe-inline'"],
+              scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+              imgSrc: ["'self'", 'data:', 'https:'],
+              connectSrc: ["'self'"],
+              fontSrc: ["'self'", 'data:'],
+              objectSrc: ["'none'"],
+              mediaSrc: ["'self'"],
+              frameSrc: ["'none'"],
+            },
+          }
           : false,
       crossOriginEmbedderPolicy: false,
     }),
@@ -73,6 +74,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new LoggingInterceptor(),
     new TransformInterceptor(),
+    new (AnyFilesInterceptor())(),
   );
 
   // CORS with security
@@ -80,13 +82,13 @@ async function bootstrap() {
     origin:
       process.env.NODE_ENV === 'production'
         ? (process.env.ALLOWED_ORIGINS || 'https://lovesolutions.cloud').split(
-            ',',
-          )
+          ',',
+        )
         : [
-            'http://localhost:3000',
-            'http://localhost:3001',
-            'http://localhost:8080',
-          ],
+          'http://localhost:3000',
+          'http://localhost:3001',
+          'http://localhost:8080',
+        ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
