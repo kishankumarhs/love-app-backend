@@ -1,25 +1,35 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
-import { AnyFilesInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { WinstonModule } from 'nest-winston';
+import { winstonConfig } from './common/logger/winston.config';
 import helmet from 'helmet';
 import compression from 'compression';
 import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
   const configService = app.get(ConfigService);
-  const logger = new Logger('Bootstrap');
+  const logger = new Logger('Bootstrap'); // This will now use Winston under the hood
+
 
   // Security middleware
   // Strip '/api' prefix from incoming requests (useful when reverse proxy adds it)
   app.use((req: Request, res: Response, next: NextFunction) => {
     try {
+      logger.log(req.url);
+      logger.log(req.originalUrl);
+      logger.log(req.method);
+      logger.log(req.headers);
+      logger.log(req.query);
+      logger.log(req.body);
       if (req.url && req.url.startsWith('/api')) {
         req.url = req.url.replace(/^\/api/, '') || '/';
         if (req.originalUrl)
@@ -54,6 +64,11 @@ async function bootstrap() {
 
   app.use(compression());
 
+  app.useGlobalInterceptors(
+    new LoggingInterceptor(),
+    new TransformInterceptor(),
+  );
+
   // Global pipes with security
   app.useGlobalPipes(
     new ValidationPipe({
@@ -71,11 +86,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Global interceptors
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new TransformInterceptor(),
-    new (AnyFilesInterceptor())(),
-  );
+
 
   // CORS with security
   app.enableCors({

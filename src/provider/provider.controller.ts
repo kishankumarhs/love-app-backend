@@ -15,6 +15,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProviderService } from './provider.service';
 import { CreateProvider } from './dto/create-provider.dto';
 import { UpdateProviderDto } from './dto/update-provider.dto';
+import { FormDataRequest } from 'nestjs-form-data';
 import { ApiBody, ApiConsumes, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Provider } from './entities/provider.entity';
 import { Employee } from './entities/employee.entity';
@@ -150,9 +151,10 @@ export class ProviderController {
 
   @ApiOperation({ summary: 'Register a new provider' })
   @ApiResponse({ status: 201, type: Provider })
-  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateProvider })
   @Post('register')
+  @FormDataRequest()
   register(@Body() createProviderDto: CreateProvider) {
     return this.providerService.create(createProviderDto);
   }

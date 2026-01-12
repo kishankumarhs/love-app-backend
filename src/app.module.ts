@@ -19,6 +19,7 @@ import { CustomThrottlerGuard } from './common/guards/rate-limit.guard';
 import { SecurityMiddleware } from './common/middleware/security.middleware';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
+
 // Core modules
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
@@ -40,9 +41,14 @@ import { Country } from './user/entities/countries.entity';
 
 import firebaseConfig from './config/firebase.config';
 import { CategoryModule } from './category/category.module';
+import { MemoryStoredFile, NestjsFormDataModule } from 'nestjs-form-data';
 
 @Module({
   imports: [
+    NestjsFormDataModule.config({
+      isGlobal: true, // Applies to all routes automatically
+      storage: MemoryStoredFile // Keeps files in memory for easy access
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [

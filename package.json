@@ -55,6 +55,8 @@
     "handlebars": "^4.7.8",
     "helmet": "^8.1.0",
     "moment-timezone": "^0.6.0",
+    "nest-winston": "^1.10.2",
+    "nestjs-form-data": "^1.9.93",
     "nestjs-i18n": "^10.5.1",
     "nodemailer": "^7.0.10",
     "passport": "^0.7.0",
@@ -71,6 +73,7 @@
     "swagger-ui-express": "^5.0.1",
     "twilio": "^5.10.4",
     "typeorm": "^0.3.27",
+    "winston": "^3.19.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
