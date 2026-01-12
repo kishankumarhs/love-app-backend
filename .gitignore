@@ -12,6 +12,10 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 src/auth/strategies/firebase-creds.json
 
 # OS
