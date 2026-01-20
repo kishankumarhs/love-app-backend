@@ -62,7 +62,11 @@ export class ProviderService {
     await this.userService.update(createProviderDto.userId, {
       role: UserRole.PROVIDER,
     });
-    const provider = this.providerRepository.create(createProviderDto);
+    // Explicitly map userId DTO field to the user relation
+    const provider = this.providerRepository.create({
+      ...createProviderDto,
+      user: { id: createProviderDto.userId },
+    });
     return await this.providerRepository.save(provider);
   }
 
